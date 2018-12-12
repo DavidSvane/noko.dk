@@ -1,0 +1,130 @@
+:root { --page-width: 985px; }
+@font-face { font-family: darleston; src: url(../res/darleston.otf); }
+@font-face { font-family: respective; src: url(../res/respective.ttf); }
+
+
+/********** STANDARDS **********/
+html, body p, div, input, table, tr, td, img, b, span, form, a, select, option, h1, h2, h3, h4 { border: 0; margin: 0; padding: 0; font-weight: normal; font-family: Georgia, Times, "Times New Roman", serif;; }
+a, textarea:focus, input:focus { outline: none; border: none; text-decoration: none; }
+table { border-collapse: collapse; }
+body { margin-top: 0px !important; padding-top: 0px !important; font-size: 12px; }
+
+
+/********** GENERAL PURPOSE **********/
+.centered { display: block; margin-left: auto; margin-right: auto; }
+.blocky { box-sizing: border-box; width: var(--page-width); }
+.fixcenter { position: fixed; display: block; box-sizing: border-box; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+
+/********** PAGE SPECIFIC **********/
+/* GENERAL */
+hr { box-sizing: border-box; border: none; border-top: 1px solid black; }
+#img_food + p { column-count: 1; }
+
+/* HEADER */
+header { padding: 1em 1em 0; }
+.top_titles { font-family: darleston; font-size: 3em; }
+
+/* NAVIGATION (MENU) */
+nav a { box-sizing: border-box; color: black; text-decoration: none; padding: 0 1.5em; }
+nav > a:last-of-type { display: block; text-align: right; width: 100%; margin: -1.2em 0 -0.2em; }
+nav a:hover { color: gray; }
+nav hr { margin: 0.8em auto 0.7em; }
+
+/* PAGE CONTENT */
+main { padding: 0.5em 0 1em; }
+main p { padding: 2em 0.25em 1.5em; column-count: 2; column-gap: 6em; text-align: justify; line-height: 1.5em; }
+main a { text-decoration: underline; color: black; }
+main b { font-weight: bolder; }
+main img { width: 985px; }
+
+/* FOOTER */
+footer { text-align: center; font-size: 0.9em; }
+footer a { color: black; text-decoration: none; }
+footer hr { padding: 0 0 0.25em; }
+
+/* IMAGE SELECTOR (DOUBLE CLICK) */
+.img_selector_bg { z-index: 10; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+.img_selector { z-index: 12; width: 700px; height: 500px; border-radius: 8px; background: white; text-align: center; padding: 0.5em; overflow-y: scroll; }
+.img_selector h3 { padding-top: 2em; }
+.img_selector img { display: inline-block; width: 200px; vertical-align: middle; border: 0.5em solid white; box-sizing: border-box; }
+.img_selector img:hover { border: 0.5em solid black; }
+
+/* TEXT EDITOR (DOUBLE CLICK) */
+.editables { -webkit-user-select: none; /* Safari 3.1+ */ -moz-user-select: none; /* Firefox 2+ */ -ms-user-select: none; /* IE 10+ */ user-select: none; /* Standard syntax */ } /* INFO: MAKES TEXT UNSELECTABLE TO ALLOW DOUBLE CLICKS */
+.editor { display: inline-block; box-sizing: border-box; padding: 2em; border: 5px solid black; width: 985px; min-height: 1em; }
+.editor:focus { border: 5px solid black; }
+
+
+/********** INTRANET **********/
+/* GENERAL */
+#i_ p { column-count: 1; margin: 0; padding: 0; }
+
+/* NAVIGATION (MENU) */
+#i_ .sub { display: none; background: white; border: 1px solid black; position: absolute; margin-top: 21px; padding-bottom: 0.5em; }
+#i_ .sub_book { margin-left: -78px; }
+#i_ .sub_people { margin-left: -80px; }
+#i_ .sub_admin { margin-left: -70px; }
+#i_ .sub a { display: block; padding: 0.3em 1.2em; }
+
+/* PAGE CONTENT */
+#i_ .contentbox a { color: #09f; }
+#i_ .contentbox > div { padding: 1em; }
+
+/* LOGIN PAGE */
+#login { text-align: center; }
+#login input { display: block; margin: 2em auto; padding-bottom: 0.2em; border-bottom: 1px solid gray; width: 250px; text-align: center; }
+#login a { display: block; margin: 2em auto; }
+
+/* INFO PAGES */
+#front { column-count: 3; line-height: 2em; } /* INFO: FORSIDE */
+#food { line-height: 2.5em; } /* INFO: MADPLAN */
+#food i { padding-right: 0.5em; }
+#cal { line-height: 2em; } /* INFO: KALENDER */
+#cal table { box-sizing: border-box; width: 100%; }
+#cal i { display: inline-block; padding-right: 0.5em; }
+#cal td p { line-height: 2em; }
+#plan td, #plan td * { text-align: center; color: black; } /* INFO: VAGTPLANER */
+#plan table { width: 100%; margin-top: 1em; border-collapse: collapse; }
+#plan table td { padding: 0.5em 0; border: 1px solid gray; }
+#me { text-align: center; }
+#me div { display: inline; text-align: left; vertical-align: top; }
+#me div:last-child { padding: 2em 0 0 2em; }
+#me p { display: inline-block; vertical-align: top; }
+#me img { width: 200px; }
+
+/* ALUMNER */
+#current div div { column-count: 3; }
+#current ._1 { margin-top: 2em; }
+#previous div { column-count: 3; }
+#current b, #previous b { line-height: 2em; }
+
+/* BOOKING SYSTEMS */
+#laundry > a { font-size: 14px; padding: 1em; text-decoration: none; cursor: pointer; }
+#laundry div { white-space: nowrap; column-count: 3; padding-top: 1em; }
+#laundry div > p { box-sizing: border-box; margin: 0em 0em 0.5em 1em; padding-left: 2em; font-weight: bold; display: block; }
+#laundry table { width: 300px; display: inline-block; border-collapse: collapse; padding-left: 1em; }
+#laundry td { border: 1px solid gray; height: 26px; text-align: center; vertical-align: center; width: 32px; }
+#laundry td:first-child { width: 42px; }
+#laundry .availables { font-size: 10px; text-decoration: none; background: #09f; padding: 0 0.6em; cursor: pointer; border-radius: 100%; }
+#laundry .availables:hover { background: #9cf; }
+
+#bike > a { font-size: 14px; padding: 1em; text-decoration: none; cursor: pointer; }
+#bike div { padding-top: 2em; width: 100%; }
+#bike table { width: 100%; display: block; box-sizing: border-box; border-collapse: collapse; }
+#bike td { border: 1px solid gray; height: 30px; text-align: center; vertical-align: center; width: 115px; }
+#bike .availables { font-size: 10px; text-decoration: none; background: #09f; padding: 0 0.6em; cursor: pointer; border-radius: 100%; }
+#bike .availables:hover { background: #9cf; }
+
+#rooms > a { font-size: 14px; padding: 1em; text-decoration: none; cursor: pointer; }
+#rooms div { padding-top: 0; width: calc(100% - 1em); }
+#rooms div > p { box-sizing: border-box; margin: 2em 0em 0.5em 1em; padding-left: 2em; font-weight: bold; display: block; }
+#rooms table { width: 100%; display: block; box-sizing: border-box; border-collapse: collapse; padding-left: 1em; }
+#rooms td { border: 1px solid gray; height: 26px; text-align: center; vertical-align: center; width: 115px; }
+#rooms .availables { font-size: 10px; text-decoration: none; background: #09f; padding: 0 0.6em; cursor: pointer; border-radius: 100%; }
+#rooms .availables:hover { background: #9cf; }
+
+/* TABLE FORMATTING */
+#plan tr:first-child td, #laundry tr:first-child td, #bike tr:first-child td, #rooms tr:first-child td { font-style: italic; font-weight: bold; }
+#plan td:first-child, #laundry td:first-child, #bike td:first-child, #rooms td:first-child { font-style: italic; }
+#plan tr:nth-child(2n), #laundry tr:nth-child(2n), #bike tr:nth-child(2n), #rooms tr:nth-child(2n) { background: rgba(0,0,0,0.1); }

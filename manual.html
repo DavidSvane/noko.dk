@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+	<title>NOKO Web Manual</title>
+	<meta type="author" value="David Svane"></meta>
+	<style>
+		body { padding: 2em; }
+		.centered { display: block; margin: auto; text-align: center; }
+		h1 { color: #39f; }
+		h2 { color: #339; }
+		h3 { color: #015; }
+		p { column-count: 3; text-align: justify; column-gap: 42px; }
+	</style>
+
+</head>
+<body>
+
+<h1 class="centered">Velkommen</h1>
+
+<h2>Introduktion</h2>
+<p>Noko.dk og noko.dk/intranet er de to hovedgrene af projektet. Kollegiets ansigt udadtil og alumnernes interne system. Noko.dk består af en primær <i>index.php</i> fil, som i første linje tjekker for det valgte sprog (dansk/engelsk), meta-data følger, <i>langs.php</i> indeholder alle tekst-strenge og inkluderes som det første i body-tagget. Kroppen er delt i fire sektioner, <i>header</i> med kollegiets navn, <i>nav</i> med menuen, <i>main</i> som dynamisk viser de forskellige siders indhold og <i>footer</i> med kontakt-information. Mappestrukturen består af <i>css</i> til style-filer, <i>intranet</i>, <i>js</i> til scripts, <i>page</i> med sider, <i>php</i> med server-scripts, <i>res</i> med grafik og andre resourcer og <i>sql</i> med database-backups. <i>Style.css</i> indeholder simpel standard CSS. Scripts inkluderet er jQuery 3.3.1, en MD5 enkryptering JavaScript implementering, login-logik, menu-click listener, scroll lock for menuen, og en page loader som håndterer klik fra menuen, de sidste er dog til intranettet. En separat fil til hver side indeholder henvisning til siden billede og henvisning til sidens nøgle i <i>langs.php</i> arrayet. PHP scripts includerer Medoo, et nemt php framework til SQL queries, <i>pages.php</i> som loader en side, <i>utf8_encoder</i> som kan encode arrays til utf8 rekursivt, og <i>mysql.php</i> som indeholder kald til Medoo-biblioteket. Denne simple struktur erstatter tusindvis af filer grundet et tidligere setup i Joomla, hele siden er nu 24 filer og fylder omkring 1.5 Mb.</p>
+
+<h3>Intranettet</h3>
+<p>Strukturen er her simplificeret så meget som muligt grundet irritation over valget af Drupal som framework. Den sidste opdatering var foretaget for så mange år siden, at systemet var flere generationer bagud af både Drupal (v. 6), og grundet gamle krav herfra, også PHP (5.2). Alle bagvedliggende systemer har kunnet slettes efter overgangen til et hjemmelavet system, og den nyeste version af PHP er valgt hos hosten (gigahost.dk da dette blev skrevet). Grundfilen er igen en <i>index.php</i>, som indeholder en <i>header</i> med logo og titel samt et if-else valg mellem <i>login.html</i> og <i>content.php</i>. <i>Login.html</i> indeholder en HTML-form med tekst-felt, password-felt og submit-knap, som sender indholdet til <i>login.php</i> på serveren via AJAX. <i>Login.php</i> verificerer brugeren og sender en bekræftelse og brugerdata tilbage, som herefter gemmes i cookies til senere brug. <i>Content.php</i> indeholder henvisning til HTML-koden for menuen i et <i>nav</i> samt en splash-screen i et <i>main</i>-element. <i>Menu.php</i> genererer rekursivt automatisk en menu til <i>nav</i> baseret på et array af punkter og underpunkter. <i>Style.css</i> indeholder almindelig simpel CSS-styling. Menu-klik kalder filen <i>noko_menu_click.js</i> i "<i>../js</i>"-mappen, herfra kaldes <i>noko_page_loader.js</i>, som kontakter databasen via AJAX og <i>db.php</i> i <i>intranet</i>-mappen. <i>Db.php</i> indeholder et array-dictionary af SQL-statements, som bruges til at hente indholdet til intranettet, derefter logger scriptet ind i databasen, kører sin query og sender data tilbage.</p>
+
+<h2>Tilføj indhold</h2>
+<h3>Side på noko.dk</h3>
+<p>Først skal navnet (helst engelsk for kun at bruge a-z) på siden tilføjes til <i>$links</i>-variablen i <i>php/menu.php</i>-filen for at autogenerere en knap i menuen, og siden titel på dansk og engelsk tilføles til arrays i <i>php/langs.php</i>. En php-fil med sidens navn tilføjes i mappen <i>page</i>, dennes billed-src vælges og referencen til sidens indhold ændres og indholdet tilføjes i arrays i <i>langs.php</i>.</p>
+
+<h3>Side på noko.dk/intranet</h3>
+
+</body>
+</html>
