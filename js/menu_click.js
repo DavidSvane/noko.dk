@@ -5,9 +5,9 @@ function menu(n) {
 
   switch(n) {
 
+    case 'admin':
     case 'book':
     case 'people':
-    case 'admin':
 
       if ($('.sub_'+n).css('display') == 'none') {
 

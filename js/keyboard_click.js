@@ -2,14 +2,14 @@
 
 $(document).keyup(function(e) {
 
-  if (e.keyCode == 27) {
+    /*if (e.keyCode == 27) {
 
-    masterCleanUp();
+        masterCleanUp();
 
-	} else if (e.keyCode == 13) {
+    } else*/ if (e.keyCode == 13) {
 
-    $('#login a').click();
+        verifyUser();
 
-  }
+    }
 
 });

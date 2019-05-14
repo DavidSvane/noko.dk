@@ -51,9 +51,5 @@
 	<script src="js/jQuery.js"></script> <!-- https://jquery.com/download/ -->
 	<script src="js/FlexArea.js"></script> <!-- INFO: AUTO ADJUSTS THE HEIGHT OF TEXTAREAS -->
 
-	<!-- INFO: CUSTOM -->
-	<script src="js/double_click.js"></script> <!-- INFO: HANDLES DOUBLE CLICKS ON IMAGES AND PARAGRAPHS -->
-	<script src="js/keyboard_click.js"></script> <!-- INFO: HANDLES KEYBOARD CLICKS -->
-
 </body>
 </html>

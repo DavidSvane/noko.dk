@@ -2,24 +2,29 @@
 
   $pages = array(
     'front' => 'Forside',
-    'food' => 'Madplan',
-    'plan' => 'Vagtplan',
-    'cal' => 'Kalender',
     'book' => array('Booking',array(
       'laundry' => 'Vasketider',
       'bike' => 'Ladcykel',
-      'rooms' => 'Lokaler'
+      'rooms' => 'Lokaler',
+      'gym' => 'Gymnastiksal',
+      'speaker' => 'SoundBox'
     )),
+    'food' => 'Madplan',
+    'plan' => 'Vagtplan',
+    'cal' => 'Kalender',
     'people' => array('Alumner',array(
       'current' => 'Nuværende',
       'previous' => 'Tidligere'
     )),
-    'me' => 'Profil',
+    /*'plenum' => 'Plenum',*/
+    /*'me' => 'Profil',*/
     'admin' => array('Admin',array(
-      'a_front' => 'Forside',
+      'a_alumner' => 'Alumner',
+      'a_laundry' => 'Vaskeregnskab',
       'a_madplan' => 'Madplan',
-      'a_vagtplan' => 'Vagtplan',
-      'a_alumner' => 'Alumner'
+      'a_vagtplan' => 'Vagtplan'
+      //'a_front' => 'Forside'
+      //'master' => 'MASTER'
     )),
     'logud' => 'Log ud'
   );

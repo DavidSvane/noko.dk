@@ -8,6 +8,7 @@ $da = array(
   'facilities' => 'Faciliteter',
   'rooms' => 'Værelser',
   'contact' => 'Kontakt',
+  'donations' => 'Donationer',
   'intranet' => 'Intranet',
   'changelang' => 'English',
   'thislang' => 'da',
@@ -21,7 +22,7 @@ $da = array(
   'wd4' => 'Torsdag',
   'wd5' => 'Fredag',
   'wd6' => 'Lørdag',
-  'wd7' => 'Søndag'
+  'wd7' => 'Søndag',
 );
 
 $en = array(
@@ -32,6 +33,7 @@ $en = array(
   'facilities' => 'Facilities',
   'rooms' => 'Rooms',
   'contact' => 'Contact',
+  'donations' => 'Donations',
   'intranet' => 'Intranet',
   'changelang' => 'Danish',
   'thislang' => 'en',

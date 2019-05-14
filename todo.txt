@@ -1,0 +1,13 @@
+🔴 Admin login module
+    🔴 Admin server verification
+    🔴 Ongoing admin checker
+
+
+🔴 Create booking modules
+    🔴 "vasketider"
+    🔴 "ladcykel"
+    🔴 "lokaler"
+    🔴 "soundbox"
+
+
+🔴 Test app login correction

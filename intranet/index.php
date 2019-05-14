@@ -16,6 +16,7 @@
 	<link rel="icon" href="../res/icon.ico" type="image/x-icon">
 	<link rel="stylesheet" type="text/css" href="../css/style.css?v=<?php echo time();?>"></link>
 	<script src="../js/jQuery.js"></script>
+	<script src="../js/PapaParse.js"></script>
 	<script src="../js/MD5.js"></script>
 	<script src="../js/cookies.js"></script>
 
@@ -43,9 +44,9 @@
   </footer>
 
 
-	<script src="../js/double_click.js"></script>
+  <script src="../js/admin.js"></script>
+  <script src="../js/bookings.js"></script>
 	<script src="../js/menu_click.js"></script>
-	<script src="../js/keyboard_click.js"></script>
 	<script src="../js/dating.js"></script>
 	<script src="../js/tabs_n_tables.js"></script>
 	<script src="../js/page_loader.js"></script>

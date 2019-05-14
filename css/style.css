@@ -1,4 +1,15 @@
-:root { --page-width: 985px; }
+:root {
+    --page-width: 985px;
+    --book-free: #99ccff;
+    --book-free-hover: #0099ff;
+    --book-border: gray;
+    --vp-free: #ff8080;
+    --vp-extra: #80ff80;
+    --vp-closed: #ffdf80;
+    --vp-only: #ff80ff;
+    --vp-marked-c: #000000;
+    --vp-marked-b: 1px solid #000000;
+}
 @font-face { font-family: darleston; src: url(../res/darleston.otf); }
 @font-face { font-family: respective; src: url(../res/respective.ttf); }
 
@@ -69,24 +80,37 @@ footer hr { padding: 0 0 0.25em; }
 
 /* PAGE CONTENT */
 #i_ .contentbox a { color: #09f; }
+#i_ .contentbox .owner { cursor: pointer; }
+#i_ .contentbox .owner:hover { color: black !important; }
 #i_ .contentbox > div { padding: 1em; }
+#i_ .contentbox h1 { width: 100%; text-align: center; margin: 0.5em auto 1.5em; }
+#i_ .contentbox h2 { width: 100%; text-align: center; margin: 0 0 0.5em; }
 
 /* LOGIN PAGE */
 #login { text-align: center; }
 #login input { display: block; margin: 2em auto; padding-bottom: 0.2em; border-bottom: 1px solid gray; width: 250px; text-align: center; }
+#login input:last-child { border: none; background: none; color: #09f; }
 #login a { display: block; margin: 2em auto; }
 
 /* INFO PAGES */
 #front { column-count: 3; line-height: 2em; } /* INFO: FORSIDE */
-#food { line-height: 2.5em; } /* INFO: MADPLAN */
-#food i { padding-right: 0.5em; }
+#food { line-height: 2.5em; margin: 0 160px; } /* INFO: MADPLAN */
+#food i { padding-right: 0.5em; display: inline-block; width: 64px; }
+
 #cal { line-height: 2em; } /* INFO: KALENDER */
 #cal table { box-sizing: border-box; width: 100%; }
+#cal td { box-sizing: border-box; padding-left: 60px; }
+#cal > b { display: block; width: 100%; text-align: center; }
 #cal i { display: inline-block; padding-right: 0.5em; }
 #cal td p { line-height: 2em; }
+
 #plan td, #plan td * { text-align: center; color: black; } /* INFO: VAGTPLANER */
 #plan table { width: 100%; margin-top: 1em; border-collapse: collapse; }
 #plan table td { padding: 0.5em 0; border: 1px solid gray; }
+#explanation { width: 100%; text-align: center; }
+#explanation span { padding: 0 2em; font-style: italic; }
+#explanation p { text-align: center; color: gray; font-style: italic; }
+
 #me { text-align: center; }
 #me div { display: inline; text-align: left; vertical-align: top; }
 #me div:last-child { padding: 2em 0 0 2em; }
@@ -96,35 +120,71 @@ footer hr { padding: 0 0 0.25em; }
 /* ALUMNER */
 #current div div { column-count: 3; }
 #current ._1 { margin-top: 2em; }
+#current img { width: auto; height: 200px; display: none; position: fixed; border: 4px solid rgb(42,42,42); border-radius: 10px; }
 #previous div { column-count: 3; }
 #current b, #previous b { line-height: 2em; }
 
 /* BOOKING SYSTEMS */
-#laundry > a { font-size: 14px; padding: 1em; text-decoration: none; cursor: pointer; }
+.cnt_book > a { font-size: 14px; padding: 1em; text-decoration: none; cursor: pointer; }
+.cnt_book .availables { font-size: 10px; text-decoration: none; background: var(--book-free); padding: 0 0.6em; cursor: pointer; border-radius: 100%; }
+.cnt_book .availables:hover { background: var(--book-free-hover); }
+
 #laundry div { white-space: nowrap; column-count: 3; padding-top: 1em; }
 #laundry div > p { box-sizing: border-box; margin: 0em 0em 0.5em 1em; padding-left: 2em; font-weight: bold; display: block; }
 #laundry table { width: 300px; display: inline-block; border-collapse: collapse; padding-left: 1em; }
-#laundry td { border: 1px solid gray; height: 26px; text-align: center; vertical-align: center; width: 32px; }
+#laundry td { border: 1px solid var(--book-border); height: 30px; text-align: center; vertical-align: center; width: 32px; }
 #laundry td:first-child { width: 42px; }
-#laundry .availables { font-size: 10px; text-decoration: none; background: #09f; padding: 0 0.6em; cursor: pointer; border-radius: 100%; }
-#laundry .availables:hover { background: #9cf; }
+#laundry p i { font-weight: normal; font-style: normal; }
 
-#bike > a { font-size: 14px; padding: 1em; text-decoration: none; cursor: pointer; }
-#bike div { padding-top: 2em; width: 100%; }
-#bike table { width: 100%; display: block; box-sizing: border-box; border-collapse: collapse; }
-#bike td { border: 1px solid gray; height: 30px; text-align: center; vertical-align: center; width: 115px; }
-#bike .availables { font-size: 10px; text-decoration: none; background: #09f; padding: 0 0.6em; cursor: pointer; border-radius: 100%; }
-#bike .availables:hover { background: #9cf; }
+#bike div, #gym div { padding-top: 2em; width: 100%; }
+#bike table, #gym table { width: 100%; display: block; box-sizing: border-box; border-collapse: collapse; }
+#bike td, #gym td { border: 1px solid var(--book-border); height: 30px; text-align: center; vertical-align: center; width: 115px; }
 
-#rooms > a { font-size: 14px; padding: 1em; text-decoration: none; cursor: pointer; }
-#rooms div { padding-top: 0; width: calc(100% - 1em); }
-#rooms div > p { box-sizing: border-box; margin: 2em 0em 0.5em 1em; padding-left: 2em; font-weight: bold; display: block; }
-#rooms table { width: 100%; display: block; box-sizing: border-box; border-collapse: collapse; padding-left: 1em; }
-#rooms td { border: 1px solid gray; height: 26px; text-align: center; vertical-align: center; width: 115px; }
-#rooms .availables { font-size: 10px; text-decoration: none; background: #09f; padding: 0 0.6em; cursor: pointer; border-radius: 100%; }
-#rooms .availables:hover { background: #9cf; }
+#rooms div, #speaker div { padding-top: 0; width: calc(100% - 1em); }
+#rooms div > p, #speaker div > p { box-sizing: border-box; margin: 2em 0em 0.5em 1em; padding-left: 2em; font-weight: bold; display: block; }
+#rooms table, #speaker table { width: 100%; display: block; box-sizing: border-box; border-collapse: collapse; padding-left: 1em; }
+#rooms td, #speaker td { border: 1px solid var(--book-border); height: 30px; text-align: center; vertical-align: center; width: 115px; overflow: hidden; text-overflow: clip; }
+#speaker table { margin-top: 2em; }
 
 /* TABLE FORMATTING */
-#plan tr:first-child td, #laundry tr:first-child td, #bike tr:first-child td, #rooms tr:first-child td { font-style: italic; font-weight: bold; }
-#plan td:first-child, #laundry td:first-child, #bike td:first-child, #rooms td:first-child { font-style: italic; }
-#plan tr:nth-child(2n), #laundry tr:nth-child(2n), #bike tr:nth-child(2n), #rooms tr:nth-child(2n) { background: rgba(0,0,0,0.1); }
+.cnt_book tr:first-child td { font-style: italic; font-weight: bold; }
+.cnt_book td:first-child { font-style: italic; }
+.cnt_book tr:nth-child(2n) { background: rgba(0,0,0,0.1); }
+#plan b:not(:first-child) { display: inline-block; margin-top: 40px; }
+
+/* ADMIN MENU AND PAGES */
+#admin { display: none; }
+#i_ .admin_page #selector { display: flex; justify-content: center; }
+#i_ .admin_page #selector input { width: 70px; text-align: center; font-size: 1.25em; border: 1px solid gray; margin: 0 1em; }
+#i_ .admin_page select { font-size: 1.5em; border: 1px solid gray; margin: 0 1em; }
+#i_ .admin_page a { text-decoration: none; display: inline-block; margin: 0 1em; padding: 0.5em; cursor: pointer; border: 1px solid var(--book-free); }
+#i_ .admin_page a:hover { background: var(--book-free-hover); color: white !important; }
+#i_ .admin_page #downloadFix { display: none; }
+
+#i_ .admin_page .fweek { display: none; margin-bottom: 2em; }
+#i_ .admin_page .fweek div { display: grid; grid-template-columns: 100px auto; grid-row-gap: 1.5em; justify-content: center; align-items: center; }
+#i_ .admin_page .fweek h3 { font-style: italic; display: inline-block; }
+#i_ .admin_page .fweek input { border: 1px solid gray; padding: 0.5em; width: 600px; }
+
+#i_ .admin_page .alumner, #i_ .admin_page .dage { user-select: none; }
+#i_ .admin_page i { display: block; width: 100%; text-align: center; margin-bottom: 1em; color: gray; user-select: none; }
+#i_ .admin_page .alumner a { width: 30px; padding: 0.4em; margin: 0.25em; text-align: center; }
+#i_ .admin_page .dage a { width: 42px; padding: 0.4em; margin: 0.25em; text-align: center; }
+#i_ .admin_page .vp_free { background: var(--vp-free); color: var(--vp-marked-c); border: var(--vp-marked-b); }
+#i_ .admin_page .vp_extra { background: var(--vp-extra); color: var(--vp-marked-c); border: var(--vp-marked-b); }
+#i_ .admin_page .vp_closed { background: var(--vp-closed); color: var(--vp-marked-c); border: var(--vp-marked-b); }
+#i_ .admin_page .vp_only { background: var(--vp-only); color: var(--vp-marked-c); border: var(--vp-marked-b); }
+#i_ .admin_page .plan, #i_ .admin_page .plan table { width: 100%; }
+#i_ .admin_page .plan td { width: 20%; padding: 0.5em; text-align: center; border: 1px solid rgba(0,0,0,0.1); }
+#i_ .admin_page .plan tr { border-bottom: 1px solid gray; }
+#i_ .admin_page .plan tr:first-child td { font-weight: bold; }
+#i_ .admin_page .plan tr:not(:first-child) td:first-child { font-style: italic; font-weight: bold; }
+#i_ .admin_page .plan tr:nth-child(odd) { background: rgba(0,0,0,0.1); }
+
+/*#master { max-width: 950px; word-wrap: break-word; }*/
+
+@media print {
+  #i_ #a_vagtplan.admin_page > h1, #i_ #a_vagtplan.admin_page > div, #i_ #a_vagtplan.admin_page > br, #i_ #a_vagtplan.admin_page > h2, #i_ #a_vagtplan.admin_page > i { display: none; }
+  #i_ #a_vagtplan.admin_page > .plan { display: block; }
+  #i_ #a_vagtplan.admin_page > h2:last-of-type { display: block; margin: 1em 0 2em; }
+}

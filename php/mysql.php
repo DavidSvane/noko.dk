@@ -23,6 +23,13 @@ $db = New Medoo([
 	'username' => 'noko',
 	'password' => '7@aahWhd3#^Wy8YF'
 ]);
+$db_old = New Medoo([
+	'database_type' => 'mysql',
+	'database_name' => 'noko_web',
+	'server' => 'mysql5.gigahost.dk',
+	'username' => 'noko',
+	'password' => '7@aahWhd3#^Wy8YF'
+]);
 
 
 // INFO: PROJECT SPECIFIC SQL STATEMENTS
@@ -42,12 +49,12 @@ function updateImgSrc() {
 
 function getFoods() {
 
-	global $db;
+	global $db_old;
 	$min_week = new DateTime();
 	$min_week->setISODate(date('Y'),date('W')-1,5);
 	$min_week = $min_week->format('Y-m-d');
 
-	$data = $db->select('kitchen_plans', ['d1','d2','d3','d4','d5','d6','d7'], ["week[>]" => $min_week, "ORDER" => ["week" => 'ASC']]);
+	$data = $db_old->select('kitchen_plans', ['d1','d2','d3','d4','d5','d6','d7'], ["week[>]" => $min_week, "ORDER" => ["week" => 'ASC']]);
 
 	utf8_encode_deep($data);
 	return $data;
