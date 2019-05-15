@@ -38,7 +38,7 @@ ORDER BY uid ASC, date ASC
 
 /* INFO: MERGE OF THE TWO FOR A ONE TABLE SYSTEM */
 SELECT users_roles.uid AS uid,
-users.name AS name,
+  users.name AS name,
   users.pass AS pass,
   alumni_fields.nr AS nr,
   alumni_fields.room AS room,
@@ -67,4 +67,39 @@ LEFT JOIN alumni_status
 ORDER BY users.uid ASC, date ASC
 
 
-/* INFO: GETTING ONLY THE MOST RECENT DATA FROM STILL RELEVANT ALUMNI */
+/* INFO: GET ONLY THE MOST RECENT INFORMATION FOR RELEVANT USERS */
+SELECT r.uid AS uid,
+  u.name AS name,
+  u.pass AS pass,
+  f.nr AS nr,
+  f.room AS room,
+  f.status AS status,
+  sl.title AS title,
+  p.sex AS sex,
+  r.rid AS rid,
+  rl.name AS role,
+  p.study AS study,
+  u.mail AS mail,
+  p.phone AS phone,
+  f.date AS date,
+  p.first AS first,
+  p.last AS last
+FROM users AS u
+LEFT JOIN users_roles AS r
+  ON u.uid=r.uid
+INNER JOIN role AS rl
+  ON r.rid=rl.rid
+LEFT JOIN alumni_profile AS p
+  ON u.uid=p.uid
+LEFT JOIN alumni_fields AS f
+  ON u.uid=f.uid
+LEFT JOIN alumni_status AS sl
+  ON f.status=sl.status
+INNER JOIN (
+  SELECT CONCAT(uid, MAX(date)) AS tag
+  FROM alumni_fields
+  GROUP BY uid
+) AS t
+ON CONCAT(f.uid, f.date)=t.tag
+WHERE f.status IN (0,1,2,3,6)
+ORDER BY u.uid DESC

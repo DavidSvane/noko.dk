@@ -48,7 +48,7 @@ function load(p, reload = false) {
         if (data.length < 42) {
           loginPage(p);
         } else {
-          load('a_alumner');
+          load('news');
         }
 
       });
@@ -727,8 +727,39 @@ function load(p, reload = false) {
                     break;
 
                   case 'a_alumner':
+                    var stati = ["Indflyttet","Orlov","Orlov retur","Omflyttet","Fraflyttet","Andet","Orlov retur*"];
+                    var sexi = ["Mand","Kvinde"];
                     $('#'+p).addClass("admin_page");
-                    $('#'+p).text(data);
+                    console.log(obj);
+
+                    // INFO: ADD USER SELECTION REGION AT THE TOP
+                    $('#'+p).append('<h1>ALUMNER</h1>');
+                    $('#'+p).append('<div id="selector"></div><br /><br /><br />');
+                    $('#selector').append('<select id="alumni_list"><option value="new" selected>NY ALUMNE</option></select>');
+                    $('#alumni_list').change(function (e) { fetchAlumne(); });
+                    obj.forEach(function (e) { $('#selector select').append('<option value="'+e.uid+'">'+e.name+' '+e.room+' ('+e.uid+')</option>'); });
+                    $('#selector').append('<a onclick="javascript:updateAlumne()">Gem informationer</a>');
+
+                    // INFO: ADD USER INFO REGION WITH THE 10 NEEDED FIELDS INCLUDING FILLING OPTIONS IN
+                    $('#'+p).append('<div id="ainfo"></div>');
+                    $('#ainfo').append('<h2>NY BEBOER</h2>');
+                    $('#ainfo').attr('user-id','new');
+                    $('#ainfo').attr('new-user-id',(parseInt(obj[0][0])+1));
+                    $('#ainfo').append('<div class="ai_first"><p>Fornavn</p><input type="text"/></div>');
+                    $('#ainfo').append('<div class="ai_last"><p>Efternavn</p><input type="text"/></div>');
+                    $('#ainfo').append('<div class="ai_nr"><p>Løbenummer</p><input type="text"/></div>');
+                    $('#ainfo').append('<div class="ai_room"><p>Værelse</p><input type="text"/></div>');
+                    $('#ainfo').append('<div class="ai_mail"><p>Email</p><input type="text"/></div>');
+                    $('#ainfo').append('<div class="ai_phone"><p>Telefon</p><input type="text"/></div>');
+                    $('#ainfo').append('<div class="ai_status"><p>Status</p><select></select></div>');
+                    for (var j = 0; j < stati.length; j++) { $('#'+p+' .ai_status select').append('<option value="'+j+'">'+stati[j]+'</option>'); }
+                    $('#ainfo').append('<div class="ai_sex"><p>Køn</p><select></select></div>');
+                    for (var j = 0; j < 2; j++) { $('#'+p+' .ai_sex select').append('<option value="'+j+'">'+sexi[j]+'</option>'); }
+                    $('#ainfo').append('<div class="ai_study"><p>Studie</p><input type="text"/></div>');
+                    $('#ainfo').append('<div class="ai_pass"><p>Adgangskode</p><input type="text"/></div>');
+
+                    // INFO: AUTOMATIC MD5 ENCRYPTION ON PASSWORD FIELD
+                    $('.ai_pass input').change(function (e) { $(this).val() == "" ? $(this).val("") : $(this).val(MD5( $(this).val() )); });
                     break;
 
                   case 'a_laundry':
@@ -753,6 +784,10 @@ function load(p, reload = false) {
                     }
 
                     $('#'+p).append('<br /><br /><div id="a_cnt"></div>');
+                    break;
+
+                  case 'news':
+                    $('#'+p).append('hej');
                     break;
 
                   default:

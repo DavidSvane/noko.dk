@@ -45,18 +45,6 @@ function updateFood() {
 }
 
 
-// INFO: CREATE AND ALTER USER INFORMATION
-function createUser() {
-
-
-
-}
-function updateUser() {
-
-  
-
-}
-
 // INFO: CREATE AND PRINT ALUMNE KITCHEN SHIFTS
 function incr(n) {
 
@@ -200,5 +188,84 @@ function saveShifts() {
     }
 
   });
+
+}
+
+
+// INFO: RETRIEVE AND UPDATE USER INFORMATION
+function fetchAlumne() {
+
+  var uid = $('#alumni_list').val();
+
+  $.post('http://davidsvane.com/noko/db.php', {page: "a_alumner_fetch", u: uid, nr: getCookie("user")}, function (data) {
+
+    var obj = JSON.parse(data);
+
+    // INFO: THIS CHECKPOINT IS MET WHEN "NY ALUMNE" IS SELECTED
+    if (!obj[0].length) {
+
+      $('#ainfo h2').text('NY BEBOER');
+      $('#ainfo').attr('user-id','new');
+      $('#ainfo input').val("");
+      $('#ainfo .ai_status select').val(0);
+      $('#ainfo .ai_sex select').val(0);
+
+    } else {
+
+      obj = obj[0][0];
+
+      // INFO: CHANGE TITLE AND DATA TO USER ID
+      $('#ainfo h2').text('BEBOER '+obj.uid);
+      $('#ainfo').attr('user-id',obj.uid);
+
+      // INFO: INSERT USER INFORMATION IN RESPECTIVE FIELDS
+      var todo = ["first","last","nr","room","mail","phone","study","pass"];
+      todo.forEach(function (e) { $('#ainfo .ai_'+e+' input').val(obj[e]); });
+
+      // INFO: SELECT RELEVANT DROPDOWN OPTIONS
+      $('#ainfo .ai_status select').val(obj.status);
+      $('#ainfo .ai_sex select').val(obj.sex);
+
+    }
+
+  });
+
+}
+function updateAlumne() {
+
+  var uid = $('#ainfo').attr("user-id");
+  var info = new Object();
+
+  $('#ainfo input').each(function () { info[$(this).parent().attr("class").substr(3)] = $(this).val(); });
+  $('#ainfo select').each(function () { info[$(this).parent().attr("class").substr(3)] = $(this).val(); });
+
+  if (uid == "new") {
+
+    var check = confirm("Du er ved at oprette en ny bruger!")
+    if (!check) { return; }
+
+    $.post('http://davidsvane.com/noko/db.php', {page: "a_alumner_insert", inf: info, nr: getCookie("user")}, function (data) {
+
+      if (data == 'success') {
+        alert("Informationerne blev gemt");
+      } else {
+        alert("Der skete en fejl på serveren");
+      }
+
+    });
+
+  } else {
+
+    $.post('http://davidsvane.com/noko/db.php', {page: "a_alumner_update", u: uid, inf: info, nr: getCookie("user")}, function (data) {
+
+      if (data == 'success') {
+        alert("Informationerne blev gemt");
+      } else {
+        alert("Der skete en fejl på serveren");
+      }
+
+    });
+
+  }
 
 }

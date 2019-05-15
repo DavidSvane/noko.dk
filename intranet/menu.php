@@ -1,7 +1,8 @@
 <?php
 
   $pages = array(
-    'front' => 'Forside',
+    'news' => 'Forside',
+    'front' => 'Info',
     'book' => array('Booking',array(
       'laundry' => 'Vasketider',
       'bike' => 'Ladcykel',

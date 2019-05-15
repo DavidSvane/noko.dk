@@ -15,10 +15,12 @@
 	<title>NOKO Intranet</title>
 	<link rel="icon" href="../res/icon.ico" type="image/x-icon">
 	<link rel="stylesheet" type="text/css" href="../css/style.css?v=<?php echo time();?>"></link>
-	<script src="../js/jQuery.js"></script>
-	<script src="../js/PapaParse.js"></script>
-	<script src="../js/MD5.js"></script>
-	<script src="../js/cookies.js"></script>
+	<script src="../js/lib_jquery.js"></script>
+	<script src="../js/lib_papaparse.js"></script>
+	<script src="../js/lib_md5.js"></script>
+	<script src="../js/general_cookies.js"></script>
+  <script src="../js/general_dating.js"></script>
+	<script src="../js/general_tabs-n-tables.js"></script>
 
 </head>
 <body id="i_">
@@ -44,12 +46,10 @@
   </footer>
 
 
-  <script src="../js/admin.js"></script>
-  <script src="../js/bookings.js"></script>
-	<script src="../js/menu_click.js"></script>
-	<script src="../js/dating.js"></script>
-	<script src="../js/tabs_n_tables.js"></script>
-	<script src="../js/page_loader.js"></script>
+	<script src="../js/special_menu-click.js"></script>
+  <script src="../js/functional_admin.js"></script>
+  <script src="../js/functional_bookings.js"></script>
+	<script src="../js/functional_page-loader.js"></script>
 
 	<script> menu('login'); </script>
 

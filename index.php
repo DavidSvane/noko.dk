@@ -48,8 +48,8 @@
 
 	<!-- ***** JavaScripts ***** -->
 	<!-- INFO: LIBRAIRES -->
-	<script src="js/jQuery.js"></script> <!-- https://jquery.com/download/ -->
-	<script src="js/FlexArea.js"></script> <!-- INFO: AUTO ADJUSTS THE HEIGHT OF TEXTAREAS -->
+	<script src="js/lib_jquery.js"></script> <!-- https://jquery.com/download/ -->
+	<script src="js/lib_flexarea.js"></script> <!-- INFO: AUTO ADJUSTS THE HEIGHT OF TEXTAREAS -->
 
 </body>
 </html>

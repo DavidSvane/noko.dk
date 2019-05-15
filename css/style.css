@@ -181,6 +181,13 @@ footer hr { padding: 0 0 0.25em; }
 #i_ .admin_page .plan tr:not(:first-child) td:first-child { font-style: italic; font-weight: bold; }
 #i_ .admin_page .plan tr:nth-child(odd) { background: rgba(0,0,0,0.1); }
 
+/*#i_ #a_alumner #selector select { width: 600px; }*/
+#i_ #ainfo { width: 100%; box-sizing: border-box; padding: 0 120px; display: grid; grid-template-columns: 50% 50%; grid-gap: 1em; margin: 0 0 1em; }
+#i_ #ainfo h2 { grid-column: 1 / 3; }
+#i_ #ainfo p { width: 100px; text-align: right; display: inline-block; color: gray; font-style: italic; }
+#i_ #ainfo input { color: black; width: 200px; padding: 0.5em; margin: 0 1.4em; border: 1px solid gray; }
+#i_ #a_alumner select { font-size: 1em; width: 215px; padding: 0.4em 0.5em; margin: 0 1.5em; background: rgba(0,0,0,0.05); }
+
 /*#master { max-width: 950px; word-wrap: break-word; }*/
 
 @media print {
