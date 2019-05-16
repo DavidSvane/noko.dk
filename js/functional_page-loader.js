@@ -48,7 +48,7 @@ function load(p, reload = false) {
         if (data.length < 42) {
           loginPage(p);
         } else {
-          load('news_add');
+          load('news');
         }
 
       });
