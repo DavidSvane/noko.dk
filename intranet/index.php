@@ -15,9 +15,13 @@
 	<title>NOKO Intranet</title>
 	<link rel="icon" href="../res/icon.ico" type="image/x-icon">
 	<link rel="stylesheet" type="text/css" href="../css/style.css?v=<?php echo time();?>"></link>
+	<link rel="stylesheet" type="text/css" href="../css/flatpickr.css"></link>
 	<script src="../js/lib_jquery.js"></script>
 	<script src="../js/lib_papaparse.js"></script>
 	<script src="../js/lib_md5.js"></script>
+	<script src="../js/lib_muuri.js"></script>
+	<script src="../js/lib_flatpickr.js"></script>
+	<script src="../js/general_browsing.js"></script>
 	<script src="../js/general_cookies.js"></script>
   <script src="../js/general_dating.js"></script>
 	<script src="../js/general_tabs-n-tables.js"></script>
@@ -47,6 +51,7 @@
 
 
 	<script src="../js/special_menu-click.js"></script>
+	<script src="../js/special_events.js"></script>
   <script src="../js/functional_admin.js"></script>
   <script src="../js/functional_bookings.js"></script>
 	<script src="../js/functional_page-loader.js"></script>

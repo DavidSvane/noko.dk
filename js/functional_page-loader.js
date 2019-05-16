@@ -48,7 +48,7 @@ function load(p, reload = false) {
         if (data.length < 42) {
           loginPage(p);
         } else {
-          load('news');
+          load('news_add');
         }
 
       });
@@ -97,7 +97,7 @@ function load(p, reload = false) {
 
         } else {
 
-          var upgraded = ['rooms','speaker','a_vagtplan'];
+          var upgraded = ['rooms','speaker','a_vagtplan','news'];
           var version = upgraded.includes(p) ? 1 : 0;
 
           $.post('http://davidsvane.com/noko/db.php', {page: p, nr: getCookie('user'), ver: version}, function (data) {
@@ -787,7 +787,46 @@ function load(p, reload = false) {
                     break;
 
                   case 'news':
-                    $('#'+p).append('hej');
+                    $('#'+p).append('<a href="javascript:load(\'news_add\')">TILFØJ EVENT</a>');
+                    $('#'+p).append('<div class="grid"></div>');
+
+                    obj.forEach(function (e) {
+                      $('#'+p+' .grid').append('<div onclick="javascript:openNews(\''+e.link+'\')" class="item news_block p'+e.priority+'" style="background-image: url(\''+e.img+'\')"><div class="information"><div class="titles dotdotdot">'+e.title+'</div><div id="ddd_'+e.id+'" class="descriptions multidots"></div><div class="spacetime dotdotdot">'+dtFormat(e.time)+' '+e.place+'</div></div></div>');
+                    });
+
+                    var grid = new Muuri('.grid', {layout: {fillGaps: true}});
+                    /*$('#'+p+' .p1 .descriptions').each( function () { $(this).text( $(this).text().substr(0,1000)+"..." ) });
+                    $('#'+p+' .p2 .descriptions').each( function () { $(this).text( $(this).text().substr(0,500)+"..." ) });
+                    $('#'+p+' .p3 .descriptions').each( function () { $(this).text( $(this).text().substr(0,200)+"..." ) });*/
+                    break;
+
+                  case 'news_add':
+                    $('#'+p).append('<h1>NYT EVENT</h1>');
+                    $('#'+p).append('<div id="ev_menu"><a href="javascript:addEvent()">Tilføj</a></div>');
+                    $('#'+p).append('<div id="ne_fields"></div>')
+                    $('#ne_fields').append('<div><p>Titel</p><input type="text" id="ne_title"/></div>');
+                    $('#ne_fields').append('<div><p>Tid</p><input type="text" id="fp_"/></div>');
+                    $('#ne_fields').append('<div><p>Sted</p><input type="text" id="ne_place"/></div>');
+                    $('#ne_fields').append('<div><p>Beskrivelse</p><input type="text" id="ne_description" placeholder="Valgfrit..."/></div>');
+                    $('#ne_fields').append('<div><p>Link</p><input type="text" id="ne_link" placeholder="Valgfrit..."/></div>');
+                    $('#ne_fields').append('<div><p>Billede</p><input type="text" id="ne_img" placeholder="Valgfrit link til billede..."/></div>');
+                    $('#ne_fields').append('<div><p>Prioritet</p><select id="ne_priority"><option value="1">(1) Sjov for hele NOKO!</option><option value="2">(2) En del af os skal da med!</option><option value="3" selected>(3) Good to know!</option></select></div>');
+                    $('#ne_fields').append('<div><p>Type</p><select id="ne_type"></select></div>');
+
+                    $.post('http://davidsvane.com/noko/db.php', {page: 'news_types', nr: getCookie('user'), ver: 1}, function (data) {
+                      var types = JSON.parse(data);
+                      types = types[0];
+                      types.forEach(function (t) { $('#ne_type').append('<option value="'+t.id+'">'+t.type+'</option>') });
+                    });
+
+                    $('#fp_').flatpickr({
+                      dateFormat: "Y-m-d H:i",
+                      enableTime: true,
+                      minDate: "today",
+                      maxDate: new Date().fp_incr(365),
+                      minuteIncrement: 15,
+                      time_24hr: true
+                    });
                     break;
 
                   default:
