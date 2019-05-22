@@ -59,7 +59,7 @@ function load(p, reload = false) {
         if (data.length < 42) {
           loginPage(p);
         } else {
-          load('news');
+          load('laundry');
         }
 
       });
@@ -217,7 +217,7 @@ function load(p, reload = false) {
                       d2_2: 'Sen'
                     };
 
-                    $('#'+p).append('<br /><br /><div id="explanation"><b><span style="color:'+shift_cols['d1_1']+'">'+shift_names['d1_1']+'evagt (17-20)</span><span style="color:'+shift_cols['d2_1']+'">'+shift_names['d2_1']+'evagt (17-20)</span><span style="color:'+shift_cols['d1_2']+'">'+shift_names['d1_2']+' weekendvagt (8:15-11:30)</span><span style="color:'+shift_cols['d2_2']+'">'+shift_names['d2_2']+' weekendvagt (10-13)</span><br /><br /><br /><br /><br /><p>Der er to funktioner der skal udfyldes; servering/anretning og afrydning.<br />Det er muligt at bytte vagter; BYTTEDE VAGTER SKAL NOTERES PÅ SEDLEN I SPISESALEN VED DISKEN.<br />Har du valgt selv at passe din vagt, men er blevet forsinket på din vej hjem til kollegiet/køkkenet, da ring til køkkenet på tlf. nr. 35 27 46 56<br />Er du forsinket kan køkkenet tilkalde en afløser. Tilkaldes en afløser bliver det betragtet som en udeblivelse.<br />UDEBLIVELSE MEDFØRER EN BØDESTRAF PÅ KR 500,00</p></b></div>');
+                    //$('#'+p).append('<br /><br /><div id="explanation"><b><span style="color:'+shift_cols['d1_1']+'">'+shift_names['d1_1']+'evagt (17-20)</span><span style="color:'+shift_cols['d2_1']+'">'+shift_names['d2_1']+'evagt (17-20)</span><span style="color:'+shift_cols['d1_2']+'">'+shift_names['d1_2']+' weekendvagt (8:15-11:30)</span><span style="color:'+shift_cols['d2_2']+'">'+shift_names['d2_2']+' weekendvagt (10-13)</span><br /><br /><br /><br /><br /><p>Der er to funktioner der skal udfyldes; servering/anretning og afrydning.<br />Det er muligt at bytte vagter; BYTTEDE VAGTER SKAL NOTERES PÅ SEDLEN I SPISESALEN VED DISKEN.<br />Har du valgt selv at passe din vagt, men er blevet forsinket på din vej hjem til kollegiet/køkkenet, da ring til køkkenet på tlf. nr. 35 27 46 56<br />Er du forsinket kan køkkenet tilkalde en afløser. Tilkaldes en afløser bliver det betragtet som en udeblivelse.<br />UDEBLIVELSE MEDFØRER EN BØDESTRAF PÅ KR 500,00</p></b></div>');
 
                     obj.forEach(function (e) {
                       if (curr_year != e.month.substr(0,4) || curr_mth != e.month.substr(5,2)) {
@@ -259,7 +259,7 @@ function load(p, reload = false) {
                     var curr_week = date.toISOString().substr(0,19).replace("T"," ");
                     curr_week = weekFromISO(curr_week);
                     var curr_day = date.getDay();
-                    var curr_time = Math.floor(((date.getHours()*60)+date.getMinutes()-360)/45+1);
+                    var curr_time = Math.floor(((date.getHours()*60)+date.getMinutes()-360)/75)+2;
                     var week_id = 0;
                     var counter = 0;
                     var timer = 360;
@@ -321,7 +321,7 @@ function load(p, reload = false) {
                     // INFO: ADDING BOOKING BUTTONS
                     $('#'+p+' td:empty').html('<a class="availables"></a>');
                     $('.availables').each(function (e) {
-                      if ( $(this).closest("div").attr("tnt_tab") == 0 && (($(this).closest("td").attr("tnt_col") > 0 && $(this).closest("td").attr("tnt_col") < curr_day) || ($(this).closest("td").attr("tnt_col") == curr_day && $(this).closest("tr").attr("tnt_row") > 0 && $(this).closest("tr").attr("tnt_row") < curr_time)) ) {
+                      if ( $(this).closest("div").attr("tnt_tab") == 0 && (($(this).closest("td").attr("tnt_col") < curr_day) || ($(this).closest("td").attr("tnt_col") == curr_day && $(this).closest("tr").attr("tnt_row") < curr_time)) ) {
                         $(this).remove();
                       } else {
                         $(this).click(function (e) {
@@ -341,7 +341,7 @@ function load(p, reload = false) {
                     var curr_week = date.toISOString().substr(0,19).replace("T"," ");
                     curr_week = weekFromISO(curr_week);
                     var curr_day = date.getDay();
-                    var curr_time = Math.floor(((date.getHours()*60)+date.getMinutes())/120+1);
+                    var curr_time = Math.floor(((date.getHours()*60)+date.getMinutes())/120+2);
                     var week_id = 0;
                     var counter = 0;
                     var timer = 0;
@@ -394,7 +394,7 @@ function load(p, reload = false) {
                     // INFO: ADDING BOOKING BUTTONS
                     $('#'+p+' td:empty').html('<a class="availables"></a>');
                     $('.availables').each(function (e) {
-                      if ( $(this).closest("div").attr("tnt_tab") == 0 && (($(this).closest("td").attr("tnt_col") > 0 && $(this).closest("td").attr("tnt_col") < curr_day) || ($(this).closest("td").attr("tnt_col") == curr_day && $(this).closest("tr").attr("tnt_row") > 0 && $(this).closest("tr").attr("tnt_row") < curr_time)) ) {
+                      if ( $(this).closest("div").attr("tnt_tab") == 0 && (($(this).closest("td").attr("tnt_col") < curr_day) || ($(this).closest("td").attr("tnt_col") == curr_day && $(this).closest("tr").attr("tnt_row") < curr_time)) ) {
                         $(this).remove();
                       } else {
                         $(this).click(function (e) {
@@ -413,6 +413,7 @@ function load(p, reload = false) {
                     $('#'+p).addClass('cnt_book');
                     var curr_m = parseInt(date.getMonth()) + 1;
                     var curr_y = parseInt(date.getFullYear());
+                    var curr_d = parseInt(date.getDate()) + 1;
                     var count_c = 0;
                     var count_r = 0;
                     var year_id = 0;
@@ -478,20 +479,27 @@ function load(p, reload = false) {
                         $(this).html('<a class="availables"></a>');
                       }
                     });
-                    $('.availables').each(function (e) { $(this).click(function (e) {
-                      bookRooms(
-                        parseInt($(this).closest("div").attr("tnt_tab")),
-                        parseInt($(this).closest("tr").attr("tnt_row")),
-                        parseInt($(this).closest("td").attr("tnt_col")),
-                        parseInt($(this).closest("table").attr("tnt_table")),
-                      );
-                    }); });
+                    $('.availables').each(function (e) {
+                      if ( $(this).closest("div").attr("tnt_tab") == 0 && (($(this).closest("tr").attr("tnt_row") < curr_m) || ($(this).closest("tr").attr("tnt_row") == curr_m && $(this).closest("td").attr("tnt_col") < curr_d)) ) {
+                        $(this).remove();
+                      } else {
+                        $(this).click(function (e) {
+                          bookRooms(
+                            parseInt($(this).closest("div").attr("tnt_tab")),
+                            parseInt($(this).closest("tr").attr("tnt_row")),
+                            parseInt($(this).closest("td").attr("tnt_col")),
+                            parseInt($(this).closest("table").attr("tnt_table")),
+                          );
+                        });
+                      }
+                    });
                     break;
 
                   case 'speaker':
                     $('#'+p).addClass('cnt_book');
                     var curr_m = parseInt(date.getMonth()) + 1;
                     var curr_y = parseInt(date.getFullYear());
+                    var curr_d = parseInt(date.getDate()) + 1;
                     var count_c = 0;
                     var count_r = 0;
                     var year_id = 0;
@@ -544,14 +552,20 @@ function load(p, reload = false) {
                         $(this).html('<a class="availables"></a>');
                       }
                     });
-                    $('.availables').each(function (e) { $(this).click(function (e) {
-                      bookSpeaker(
-                        parseInt($(this).closest("div").attr("tnt_tab")),
-                        parseInt($(this).closest("tr").attr("tnt_row")),
-                        parseInt($(this).closest("td").attr("tnt_col")),
-                        parseInt($(this).closest("table").attr("tnt_table")),
-                      );
-                    }); });
+                    $('.availables').each(function (e) {
+                      if ( $(this).closest("div").attr("tnt_tab") == 0 && (($(this).closest("tr").attr("tnt_row") < curr_m) || ($(this).closest("tr").attr("tnt_row") == curr_m && $(this).closest("td").attr("tnt_col") < curr_d)) ) {
+                        $(this).remove();
+                      } else {
+                        $(this).click(function (e) {
+                          bookSpeaker(
+                            parseInt($(this).closest("div").attr("tnt_tab")),
+                            parseInt($(this).closest("tr").attr("tnt_row")),
+                            parseInt($(this).closest("td").attr("tnt_col")),
+                            parseInt($(this).closest("table").attr("tnt_table")),
+                          );
+                        });
+                      }
+                    });
                     break;
 
                   case 'gym':
@@ -559,7 +573,7 @@ function load(p, reload = false) {
                     var curr_week = date.toISOString().substr(0,19).replace("T"," ");
                     curr_week = weekFromISO(curr_week);
                     var curr_day = date.getDay();
-                    var curr_time = Math.floor(((date.getHours()*60)+date.getMinutes()-420)/90+1);
+                    var curr_time = Math.floor(((date.getHours()*60)+date.getMinutes()-420)/90+2);
                     var week_id = 0;
                     var timer = 420;
 
@@ -617,7 +631,7 @@ function load(p, reload = false) {
                     // INFO: ADDING BOOKING BUTTONS
                     $('#'+p+' td:empty').html('<a class="availables"></a>');
                     $('.availables').each(function (e) {
-                      if ( $(this).closest("div").attr("tnt_tab") == 0 && (($(this).closest("td").attr("tnt_col") > 0 && $(this).closest("td").attr("tnt_col") < curr_day) || ($(this).closest("td").attr("tnt_col") == curr_day && $(this).closest("tr").attr("tnt_row") > 0 && $(this).closest("tr").attr("tnt_row") < curr_time)) ) {
+                      if ( $(this).closest("div").attr("tnt_tab") == 0 && (($(this).closest("td").attr("tnt_col") < curr_day) || ($(this).closest("td").attr("tnt_col") == curr_day && $(this).closest("tr").attr("tnt_row") < curr_time)) ) {
                         $(this).remove();
                       } else {
                         $(this).click(function (e) {
