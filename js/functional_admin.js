@@ -4,7 +4,7 @@ function laundryAccounting() {
   var y = $('#vr_year').val();
   var w = $('#vr_week').val();
 
-  $.post('http://davidsvane.com/noko/db.php', {page: "laundry_accounting", year: y, week: w, nr: getCookie("user")}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "laundry_accounting", year: y, week: w, nr: getCookie("user")}, function (data) {
 
     var obj = JSON.parse(data);
     obj = obj[0];
@@ -40,7 +40,7 @@ function updateFood() {
   }
   menu = encodeURIComponent(JSON.stringify(menu));
 
-  $.post('http://davidsvane.com/noko/db.php', {page: db_function, w: week, m: menu}, function (data) { alert("Madplan gemt"); });
+  $.post('http://davidsvane.com/noko/server/db.php', {page: db_function, w: week, m: menu}, function (data) { alert("Madplan gemt"); });
 
 }
 
@@ -73,7 +73,7 @@ function getShifts() {
   year = $('#vr_year').val();
   month = $('#vr_month').val();
 
-  $.post('http://davidsvane.com/noko/db.php', {page: 'a_vagtplan', ver: 1, y: year, m: month}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: 'a_vagtplan', ver: 1, y: year, m: month}, function (data) {
 
     var obj = JSON.parse(data);
     var obj = obj[0];
@@ -179,7 +179,7 @@ function saveShifts() {
 
   shifts = JSON.stringify(shifts);
 
-  $.post('http://davidsvane.com/noko/db.php', {page: 'plan_insert', ver: 1, y: year, m: month, plan: shifts}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: 'plan_insert', ver: 1, y: year, m: month, plan: shifts}, function (data) {
 
     if (data == 'success') {
       alert("Vagtplanen blev gemt");
@@ -197,7 +197,7 @@ function fetchAlumne() {
 
   var uid = $('#alumni_list').val();
 
-  $.post('http://davidsvane.com/noko/db.php', {page: "a_alumner_fetch", u: uid, nr: getCookie("user")}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_fetch", u: uid, nr: getCookie("user")}, function (data) {
 
     var obj = JSON.parse(data);
 
@@ -244,7 +244,7 @@ function updateAlumne() {
     var check = confirm("Du er ved at oprette en ny bruger!")
     if (!check) { return; }
 
-    $.post('http://davidsvane.com/noko/db.php', {page: "a_alumner_insert", inf: info, nr: getCookie("user")}, function (data) {
+    $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_insert", inf: info, nr: getCookie("user")}, function (data) {
 
       if (data == 'success') {
         alert("Informationerne blev gemt");
@@ -256,7 +256,7 @@ function updateAlumne() {
 
   } else {
 
-    $.post('http://davidsvane.com/noko/db.php', {page: "a_alumner_update", u: uid, inf: info, nr: getCookie("user")}, function (data) {
+    $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_update", u: uid, inf: info, nr: getCookie("user")}, function (data) {
 
       if (data == 'success') {
         alert("Informationerne blev gemt");

@@ -20,7 +20,7 @@ function textEditorCleanUp() {
     var new_id = $(this).attr('id');
     var new_lang = $(this).attr('lang');
 
-    $.post('http://davidsvane.com/noko/mysql.php', {update_content: 'text', text: new_text, id: new_id, l: new_lang}, function (data) {
+    $.post('http://davidsvane.com/noko/server/mysql.php', {update_content: 'text', text: new_text, id: new_id, l: new_lang}, function (data) {
 
       location.reload();
 
@@ -62,7 +62,7 @@ $('img').dblclick(function() {
       var new_src = window.btoa($(this).attr('src').substr(4));
       //$('#'+img_id).attr('src', 'res/' + new_src);
 
-      $.post('http://davidsvane.com/noko/mysql.php', {update_content: 'img', id: img_id, src: new_src}, function (data) {
+      $.post('http://davidsvane.com/noko/server/mysql.php', {update_content: 'img', id: img_id, src: new_src}, function (data) {
 
         location.reload();
 

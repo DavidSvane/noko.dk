@@ -22,7 +22,7 @@ function dtFormat(datetime, kl=true) {
   var months = ['Januar','Februar','Marts','April','Maj','Juni','Juli','August','September','Oktober','November','December'];
 
   var year = datetime.substr(0,4);
-  var month = months[parseInt(datetime.substr(5,2))].toLowerCase();
+  var month = months[parseInt(datetime.substr(5,2))-1].toLowerCase();
   var date = datetime.substr(8,2);
 
   var hours = datetime.substr(11,2);

@@ -2,7 +2,6 @@
 
   $pages = array(
     'news' => 'Forside',
-    'front' => 'Info',
     'book' => array('Booking',array(
       'laundry' => 'Vasketider',
       'bike' => 'Ladcykel',
@@ -12,18 +11,24 @@
     )),
     'food' => 'Madplan',
     'plan' => 'Vagtplan',
-    'cal' => 'Kalender',
     'people' => array('Alumner',array(
-      'current' => 'Nuværende',
-      'previous' => 'Tidligere'
+      'current' => 'Nuværende (alfabetisk)',
+      'corridors' => 'Nuværende (gange)',
+      'photowall' => 'Nuværende (billeder)',
+      'previous' => 'Tidligere',
+      'changes' => 'Ændringer'
+    )),
+    'information' => array('Info',array(
+      'front' => 'Generel',
+      'cal' => 'Kalender',
+      'me' => 'Profil'
     )),
     /*'plenum' => 'Plenum',*/
-    /*'me' => 'Profil',*/
     'admin' => array('Admin',array(
       'a_alumner' => 'Alumner',
-      'a_laundry' => 'Vaskeregnskab',
       'a_madplan' => 'Madplan',
-      'a_vagtplan' => 'Vagtplan'
+      'a_vagtplan' => 'Vagtplan',
+      'a_laundry' => 'Vaskeregnskab'
       //'a_front' => 'Forside'
       //'master' => 'MASTER'
     )),

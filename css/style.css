@@ -1,7 +1,7 @@
 :root {
     --page-width: 985px;
-    --book-free: #99ccff;
-    --book-free-hover: #0099ff;
+    --book-free: rgba(153, 204, 255, 0.3);
+    --book-free-hover: rgba(0, 153, 255, 0.6);
     --book-border: gray;
     --vp-free: #ff8080;
     --vp-extra: #80ff80;
@@ -73,10 +73,11 @@ footer hr { padding: 0 0 0.25em; }
 #i_ p { column-count: 1; margin: 0; padding: 0; }
 
 /* NAVIGATION (MENU) */
-#i_ .sub { display: none; background: white; border: 1px solid black; position: absolute; margin-top: 21px; padding-bottom: 0.5em; }
+#i_ .sub { display: none; background: white; border: 1px solid black; position: absolute; margin-top: 21px; padding-bottom: 0.5em; z-index: 100; }
 #i_ .sub_book { margin-left: -78px; }
 #i_ .sub_people { margin-left: -80px; }
 #i_ .sub_admin { margin-left: -70px; }
+#i_ .sub_information { margin-left: -60px; }
 #i_ .sub a { display: block; padding: 0.3em 1.2em; }
 
 /* PAGE CONTENT */
@@ -96,10 +97,10 @@ footer hr { padding: 0 0 0.25em; }
 /* NEWS PAGE BOXES */
 #news * { user-select: none; box-sizing: border-box; }
 #news > a { display: block; text-decoration: none; color: #09f; margin-bottom: 1em; width: 100%; text-align: center; }
-#news .news_block { cursor: pointer; border-radius: 5px; margin: 8px; padding: 0; overflow: hidden; background-size: cover; background-position: center; }
+#news .news_block { cursor: pointer; border-radius: 5px; margin: 8px; padding: 0; overflow: hidden; background-size: cover; background-position: center; border: 1px solid black; }
 #news .information { width: 100%; height: 100%; color: black; display: grid; grid-template-rows: 40px auto 30px; }
 #news .titles { font-size: 1.2em; background: rgba(0,0,0,0.6); color: white; padding: 12px; transition: background-color 0.5s, color 0.5s; }
-#news .descriptions { overflow: hidden; padding: 10%; background: rgba(255,255,255,0); color: rgba(0,0,0,0); transition: color 0.5s, background-color 0.5s; display: flex; justify-content: center; align-items: center; }
+#news .descriptions { overflow: hidden; padding: 10%; background: rgba(255,255,255,0); color: rgba(0,0,0,0); display: flex; justify-content: center; align-items: center; }
 #news .spacetime { padding: 8px; background: rgba(255,255,255,0.85); font-style: italic; transition: background-color 0.5s, color 0.5s; text-align: right; }
 
 #news .grid { position: relative; }
@@ -116,10 +117,8 @@ footer hr { padding: 0 0 0.25em; }
 #news .news_block.p3 { width: 300px; height: 200px; }
 
 /* NEWS PAGE HOVER ANIMATION */
-#news .news_block:hover { transform: scale(1.05); }
 #news .news_block:hover .titles { background: rgba(255,255,255,0.95); color: black; }
 #news .news_block:hover .spacetime { background: rgba(0,0,0,0.7); color: white; }
-#news .news_block:hover .descriptions { background: rgba(255,255,255,0.6); color: black; }
 
 /* ADD NEWS PAGE */
 #ev_menu { display: flex; justify-content: center; margin-bottom: 2em; }
@@ -133,13 +132,13 @@ footer hr { padding: 0 0 0.25em; }
 
 /* INFO PAGES */
 #front { column-count: 3; line-height: 2em; } /* INFO: FORSIDE */
-#food { line-height: 2.5em; margin: 0 160px; } /* INFO: MADPLAN */
+#i_ #food { min-height: 380px; line-height: 2.5em; margin: 20px 120px; padding: 40px 140px 0 60px; background: url("../res/ornament-border-R-small.png") no-repeat right top; } /* INFO: MADPLAN */
 #food i { padding-right: 0.5em; display: inline-block; width: 64px; }
 
-#cal { line-height: 2em; } /* INFO: KALENDER */
+#i_ #cal { line-height: 2em; min-height: 380px; margin: 20px 120px; padding: 40px 140px 0 0; background: url("../res/ornament-border-R-small.png") no-repeat right top; } /* INFO: KALENDER */
 #cal table { box-sizing: border-box; width: 100%; }
-#cal td { box-sizing: border-box; padding-left: 60px; }
-#cal > b { display: block; width: 100%; text-align: center; }
+#cal td { box-sizing: border-box; padding-left: 60px; vertical-align: top; }
+#cal > b { display: block; padding-left: 60px; }
 #cal i { display: inline-block; padding-right: 0.5em; }
 #cal td p { line-height: 2em; }
 
@@ -148,24 +147,61 @@ footer hr { padding: 0 0 0.25em; }
 #plan table td { padding: 0.5em 0; border: 1px solid gray; }
 #explanation { width: 100%; text-align: center; }
 #explanation span { padding: 0 2em; font-style: italic; }
-#explanation p { text-align: center; color: gray; font-style: italic; }
+#explanation p { line-height: 2; text-align: center; color: gray; font-style: italic; }
 
-#me { text-align: center; }
-#me div { display: inline; text-align: left; vertical-align: top; }
-#me div:last-child { padding: 2em 0 0 2em; }
-#me p { display: inline-block; vertical-align: top; }
-#me img { width: 200px; }
+#me > div { margin: auto; display: grid; grid-template-columns: 230px auto; grid-gap: 2em; width: 600px; }
+#me_info { display: block; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 2em;}
+#me_info span { display: block; margin: 0 0 1em; }
+#me_info i { display: inline-block; width: 90px; }
+#me_info input { padding: 0.5em; border-radius: 4px; width: 180px; }
+#me_info .p_explained { width: 100%; text-align: center; color: gray; line-height: 2em; margin-bottom: 0; }
+
+#me_pic { position: relative; }
+#me_pic img { width: 225px; height: 300px; border-radius: 8px; object-fit: cover; }
+#me #img_form { display: none; }
+#i_ #img_new { color: rgba(0,0,0,0); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+#i_ #img_new i { font-size: 10em; }
+#me_pic:hover img { filter: brightness(0.75); }
+#me_pic:hover #img_new { color: white; cursor: pointer; }
 
 /* ALUMNER */
-#current div div { column-count: 3; }
-#current ._1 { margin-top: 2em; }
-#current img { width: auto; height: 200px; display: none; position: fixed; border: 4px solid rgb(42,42,42); border-radius: 10px; }
-#previous div { column-count: 3; }
-#current b, #previous b { line-height: 2em; }
+#current > div, #previous div, #corridors { column-count: 3; }
+#current ._1 { margin-top: 25px; padding-top: 25px; border-top: 1px solid lightgray; }
+/* #current img { width: auto; height: 200px; display: none; position: fixed; border: 4px solid rgb(42,42,42); border-radius: 10px; } */
+#current div div b { display: inline-block; margin-top: 1em; }
+#changes > div { display: grid; grid-template-columns: repeat(3, 1fr); }
+#changes b { font-style: italic; }
+#changes i { display: inline-block; border-bottom: 1px solid black; padding-bottom: 0.25em; margin-bottom: 0.5em; }
+#changes > div > div > div { padding: 1em 0;  }
+#changes ._0 { color: #292; }
+#changes ._4 { color: #922; }
+#corridors > div b { display: inline-block; padding-top: 1em; }
+#current .present p:hover, #corridors p:hover { color: lightgray; cursor: pointer; }
+#current b, #previous b, #changes b, #corridors b { line-height: 2em; }
+
+/* IMAGE GRID OF ALUMNI */
+#photowall .wall { display: grid; grid-template-columns: repeat(6, 1fr); grid-row-gap: 2em; }
+#photowall .wall div { width: 135px; height: 230px; border-radius: 8px; overflow: hidden; display: grid; grid-template-rows: 180px auto; }
+#photowall .wall div img { width: 135px; height: 180px; object-fit: cover; }
+#photowall .wall div p { padding: 0.5em; background: dimgray; color: white; text-align: left; }
+#photowall .wall div:hover { cursor: pointer; }
+#photowall .wall div:hover p { color: black; background: #eee; }
+#photowall .wall div:hover img { filter: brightness(1.15); }
+
+/* EXPANDED ALUMNE INFO */
+#alumne { background: rgba(0,0,0,0.5); position: fixed; display: none; z-index: 10; top: 0; left: 0; width: 100%; height: 100%; }
+#alumne > div { min-height: 400px; background: white; border-radius: 5px; position: fixed; top: 120px; left: 50%; transform: translate(-50%,0); padding: 2em; display: grid; grid-template-columns: 300px 300px; grid-gap: 1em; }
+#alumne img { display: block; height: 400px; width: 300px; border-radius: 4px; object-fit: cover; }
+#alumne .txt { background: rgba(0,0,0,0.05); border-radius: 4px; padding: 2em; }
+#alumne .txt h2 { padding-bottom: 1em; }
+#alumne .txt p { padding-bottom: 3em; }
+#alumne .txt b { display: block; }
+#alumne .txt .his { display: grid; grid-template-columns: 110px auto; }
 
 /* BOOKING SYSTEMS */
 .cnt_book > a { font-size: 14px; padding: 1em; text-decoration: none; cursor: pointer; }
-.cnt_book .availables { font-size: 10px; text-decoration: none; background: var(--book-free); padding: 0 0.6em; cursor: pointer; border-radius: 100%; }
+.cnt_book .availables { width: 100%; height: 100%; background: var(--book-free); display: block; }
+/*.cnt_book .availables { font-size: 10px; text-decoration: none; background: var(--book-free); padding: 0 0.6em; cursor: pointer; border-radius: 100%; }*/
 .cnt_book .availables:hover { background: var(--book-free-hover); }
 
 #laundry div { white-space: nowrap; column-count: 3; padding-top: 1em; }

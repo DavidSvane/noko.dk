@@ -8,6 +8,7 @@ function menu(n) {
     case 'admin':
     case 'book':
     case 'people':
+    case 'information':
 
       if ($('.sub_'+n).css('display') == 'none') {
 

@@ -7,3 +7,16 @@ function openNews(url) {
   }
 
 }
+
+
+function urlExists(path) {
+
+  $.ajax({
+
+    url: path,
+    error: function() { return false; },
+    success:function() { return true; }
+
+  });
+
+}
