@@ -32,15 +32,22 @@ function laundryAccounting() {
 // INFO: UPDATE FOOD PLAN FOR SELECTED WEEK
 function updateFood() {
 
+  var date = new Date();
+  var year = date.getFullYear();
+  var this_week = weekFromISO(date.toISOString());
+
   var db_function = $('.fweek:visible').attr("fw_filled") == "1" ? "food_update" : "food_insert";
-  var week = $('.fweek:visible').attr("id").split("_")[1]
+  var week = parseInt( $('.fweek:visible').attr("id").split("_")[1] );
+
+  if (week < this_week) { year++; }
+
   var menu = [];
   for (var i = 0; i < 7; i++) {
     menu.push($('.fweek:visible .fday'+i).val());
   }
   menu = encodeURIComponent(JSON.stringify(menu));
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: db_function, w: week, m: menu}, function (data) { alert("Madplan gemt"); });
+  $.post('http://davidsvane.com/noko/server/db.php', {page: db_function, y: year, w: week, m: menu}, function (data) { alert("Madplan gemt"); });
 
 }
 

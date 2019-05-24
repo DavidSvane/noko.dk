@@ -81,7 +81,7 @@ footer hr { padding: 0 0 0.25em; }
 #i_ .sub a { display: block; padding: 0.3em 1.2em; }
 
 /* PAGE CONTENT */
-#i_ .contentbox a { color: #09f; }
+#i_ .contentbox a { color: #09f; text-decoration: none; }
 #i_ .contentbox .owner { cursor: pointer; }
 #i_ .contentbox .owner:hover { color: black !important; }
 #i_ .contentbox > div { padding: 1em; }
@@ -132,10 +132,10 @@ footer hr { padding: 0 0 0.25em; }
 
 /* INFO PAGES */
 #front { column-count: 3; line-height: 2em; } /* INFO: FORSIDE */
-#i_ #food { min-height: 380px; line-height: 2.5em; margin: 20px 120px; padding: 40px 140px 0 60px; background: url("../res/ornament-border-R-small.png") no-repeat right top; } /* INFO: MADPLAN */
+#i_ #food { line-height: 2.5em; padding: 2em 180px; } /* INFO: MADPLAN */
 #food i { padding-right: 0.5em; display: inline-block; width: 64px; }
 
-#i_ #cal { line-height: 2em; min-height: 380px; margin: 20px 120px; padding: 40px 140px 0 0; background: url("../res/ornament-border-R-small.png") no-repeat right top; } /* INFO: KALENDER */
+#i_ #cal { line-height: 2em; padding: 2em 120px; } /* INFO: KALENDER */
 #cal table { box-sizing: border-box; width: 100%; }
 #cal td { box-sizing: border-box; padding-left: 60px; vertical-align: top; }
 #cal > b { display: block; padding-left: 60px; }
@@ -226,6 +226,12 @@ footer hr { padding: 0 0 0.25em; }
 .cnt_book td:first-child { font-style: italic; }
 .cnt_book tr:nth-child(2n) { background: rgba(0,0,0,0.1); }
 #plan b:not(:first-child) { display: inline-block; margin-top: 40px; }
+
+/* GUIDES */
+#guides .guide_cnt { display: none; border: 1px solid gray; border-radius: 8px; margin: 0 100px; padding: 20px; }
+#guides > i { display: block; width: 100%; text-align: center; color: gray; padding-bottom: 1em; }
+#guides > a { display: block; width: 100%; text-align: center; font-size: 1.5em; padding: 1em 0; }
+#i_ #guides img { width: 100%; }
 
 /* ADMIN MENU AND PAGES */
 #admin { display: none; }

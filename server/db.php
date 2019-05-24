@@ -50,7 +50,7 @@
   if ($_POST['page'] == 'food_insert' || $_POST['page'] == 'food_update') {
     $menu = json_decode(urldecode($_POST['m']), true);
     $fweek = new DateTime();
-    $fweek->setISODate(date('Y'),$_POST['w'],1);
+    $fweek->setISODate($_POST['y'],$_POST['w'],1);
     $fweek = date_format($fweek, 'Y-m-d 09:00:00');
   }
   if ($_POST['page'] == 'news_add') { $info = json_decode(urldecode($_POST['info']), true); }

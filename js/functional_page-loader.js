@@ -59,7 +59,7 @@ function load(p, reload = false) {
         if (data.length < 42) {
           loginPage(p);
         } else {
-          load('laundry');
+          load('news');
         }
 
       });
@@ -108,7 +108,7 @@ function load(p, reload = false) {
 
         } else {
 
-          var upgraded = ['rooms','speaker','a_vagtplan','news'];
+          var upgraded = ['rooms','speaker','a_vagtplan','news','guides'];
           var version = upgraded.includes(p) ? 1 : 0;
 
           $.post('http://davidsvane.com/noko/server/db.php', {page: p, nr: getCookie('user'), ver: version}, function (data) {
@@ -144,7 +144,7 @@ function load(p, reload = false) {
                   case 'food':
                     var denne_uge = true;
                     obj.forEach(function (e) {
-                      $('#'+p).append('<b>Uge '+weekFromISO(e.week)+'</b>'+'<br />');
+                      $('#'+p).append('<h2>Uge '+weekFromISO(e.week)+'</h2>');
                       for (var i=1; i<8; i++) { $('#'+p).append('<i>'+dage[i-1]+':</i> '+e[i]+'<br />'); }
                     });
                     break;
@@ -183,7 +183,7 @@ function load(p, reload = false) {
 
                   case 'cal':
                     var stadig_f = true;
-                    $('#'+p).append('<b style="font-size:1.3em;">'+date.getFullYear()+'</b><br />');
+                    $('#'+p).append('<h2>'+date.getFullYear()+'</h2>');
                     $('#'+p).append('<table><tr><td><b>Forår</b><br /></td></tr></table>');
                     obj.forEach(function (e) {
                       if (stadig_f && parseInt(e['date'].substr(5,2)) > 8) {
@@ -311,7 +311,7 @@ function load(p, reload = false) {
                     // INFO: ADDING ROOM NUMBERS TO RESERVED TIMES
                     obj.forEach(function (e) {
                       week_id = weekFromISO(e['week']) - curr_week;
-                      if (e['room'] == user_room) {
+                      if (adm || e['room'] == user_room) {
                         $('#'+p+' .d_'+week_id+' .t_'+(parseInt(e['nr'])-1)+' .r_'+(parseInt(e['time'])+1)+' .c_'+e['day']).html('<a id="b_'+e['id']+'" class="owner" onclick="javascript:removeLaundry('+e['id']+')">'+e['room']+'</a>');
                       } else {
                         $('#'+p+' .d_'+week_id+' .t_'+(parseInt(e['nr'])-1)+' .r_'+(parseInt(e['time'])+1)+' .c_'+e['day']).text(e['room']);
@@ -684,13 +684,17 @@ function load(p, reload = false) {
                     break;
 
                   case 'plenum':
-                    $('#'+p).append('<h1 style="width:100%;text-align:center;">PLENUM</h1>');
+                    $('#'+p).append('<h1>PLENUM</h1>');
+                    $('#'+p).append('<h2>TILLIDSHVERV</h2><div class="posts"></div>');
+                    $('#'+p).append('<h2>UDVALG</h2><div class="groups"></div>');
+
                     break;
 
                   case 'a_madplan':
-                    var years = date.getFullYear() - 2018; // INFO: THE NEW INTRANET WAS DEPLOYED IN 2019 AND COUNTING THEREFORE STARTS HERE
+                    var weeks_to_show = 5;
                     var this_week = weekFromISO(date.toISOString());
                     var weeks = obj.length;
+                    var w = 0;
                     $('#'+p).addClass("admin_page");
 
                     $('#'+p).append('<h1>MADPLAN</h1>')
@@ -699,13 +703,15 @@ function load(p, reload = false) {
                     //$('#selector').append('<a onclick="javascript:showFood()">Hent plan</a>');
                     $('#selector').append('<a onclick="javascript:updateFood()">Gem plan</a>');
 
-                    for (var j = this_week; j < this_week+5; j++) {
-                      if (j == this_week+1) { $('#vr_week').append('<option value="'+(j)+'" selected>Uge '+(j)+'</option>');
-                      } else { $('#vr_week').append('<option value="'+(j)+'">Uge '+(j)+'</option>'); }
+                    for (var j = this_week; j < this_week + weeks_to_show; j++) {
+                      w = ( (j-1) % 52 ) + 1;
 
-                      $('#'+p).append('<div class="fweek" id="fw_'+j+'"><h2>Uge '+j+'</h2><br /><div></div></div>');
-                      for (var k = 0; k < 7; k++) { $('#fw_'+j+' div').append('<h3>'+dage[k]+'</h3><input class="fday'+k+'" type="text"/>'); }
-                      $('#fw_'+j).attr("fw_filled", 0);
+                      if (j == this_week+1) { $('#vr_week').append('<option value="'+w+'" selected>Uge '+w+'</option>');
+                      } else { $('#vr_week').append('<option value="'+w+'">Uge '+w+'</option>'); }
+
+                      $('#'+p).append('<div class="fweek" id="fw_'+w+'"><h2>Uge '+w+'</h2><br /><div></div></div>');
+                      for (var k = 0; k < 7; k++) { $('#fw_'+w+' div').append('<h3>'+dage[k]+'</h3><input class="fday'+k+'" type="text"/>'); }
+                      $('#fw_'+w).attr("fw_filled", 0);
                     }
 
                     obj.forEach(function (e) {
@@ -931,6 +937,13 @@ function load(p, reload = false) {
                       url = "http://noko.dk/ds/alumner/"+e.nr+".jpg";
                       $('#'+p+' > .wall').append('<div onclick="javascript:showAlumne('+e.uid+')"><img src="'+url+'" onerror="javascript:$(this).parent().remove()"/><p>'+e.name+' ('+e.room+')</p></div>');
 
+                    });
+                    break;
+
+                  case 'guides':
+                    $('#'+p).append('<i>Klik på en guide herunder for at se indholdet</i>');
+                    obj.forEach(function (e) {
+                      $('#'+p).append('<a href="javascript:$(\'#guide_'+e.id+'\').toggle()">'+e.title+'</a><div class="guide_cnt" id="guide_'+e.id+'">'+e.content+'</div>');
                     });
                     break;
 

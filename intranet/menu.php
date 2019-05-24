@@ -12,16 +12,18 @@
     'food' => 'Madplan',
     'plan' => 'Vagtplan',
     'people' => array('Alumner',array(
-      'current' => 'Nuværende (alfabetisk)',
-      'corridors' => 'Nuværende (gange)',
-      'photowall' => 'Nuværende (billeder)',
-      'previous' => 'Tidligere',
-      'changes' => 'Ændringer'
+      'current' => 'Alfabetisk',
+      'corridors' => 'Gangoversigt',
+      'photowall' => 'Stalkervæggen',
+      'changes' => 'Nylige ændringer',
+      'previous' => 'Forhenværende'
     )),
     'information' => array('Info',array(
-      'front' => 'Generel',
+      'front' => 'Generelt',
+      'guides' => 'Guides',
       'cal' => 'Kalender',
-      'me' => 'Profil'
+      /*'plenum' => 'Plenum',*/
+      'me' => 'Min Profil'
     )),
     /*'plenum' => 'Plenum',*/
     'admin' => array('Admin',array(
