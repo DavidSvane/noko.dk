@@ -5,7 +5,7 @@
   // MENU IS REMOVED DUE TO OLD PHP VERSION
 
   /*$links = array('frontpage','history','application','facilities','rooms','contact','food','intranet','changelang');*/
-  $links = array('frontpage','history','application','facilities','rooms','contact','food','donations','intranet','changelang');
+  $links = array('frontpage','history','application','facilities','rooms','contact','donations','intranet','changelang');
 
   foreach ($links as $link) {
 

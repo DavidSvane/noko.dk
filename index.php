@@ -16,6 +16,7 @@
 	<title>Nordisk Kollegium</title>
 	<link rel="icon" href="res/icon.ico" type="image/x-icon">
 	<link rel="stylesheet" type="text/css" href="css/style.css?v=<?php echo time(); // INFO: AVOIDS CACHED VERSION ?>"></link>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 </head>
 <body>

@@ -53,7 +53,7 @@
     $fweek->setISODate($_POST['y'],$_POST['w'],1);
     $fweek = date_format($fweek, 'Y-m-d 09:00:00');
   }
-  if ($_POST['page'] == 'news_add') { $info = json_decode(urldecode($_POST['info']), true); }
+  if ($_POST['page'] == 'news_add' || $_POST['page'] == 'news_update') { $info = json_decode(urldecode($_POST['info']), true); }
   $blocked_users = [];
   if ($_POST['page'] == 'news_add' && in_array($_POST['nr'], $blocked_users)) { die("User access denied"); }
 
@@ -371,8 +371,21 @@
     'news_types' => 'SELECT id, type
                     FROM info_news_types',
 
+    'news_edit' => 'SELECT i.id, i.time, i.title, i.description, i.place, i.img, i.priority, i.type, i.user, i.link
+                    FROM info_news AS i
+                    WHERE i.id="'.$_POST['re'].'"
+                    LIMIT 1',
+
+    'news_update' => 'UPDATE info_news
+                      SET title="'.$info["title"].'", time="'.$info["time"].'", place="'.$info["place"].'", description="'.$info["description"].'", link="'.$info["link"].'", img="'.$info["img"].'", priority="'.$info["priority"].'", type="'.$info["type"].'"
+                      WHERE id="'.$info["eid"].'"',
+
     'news_add' => 'INSERT INTO info_news (title, time, place, description, link, img, priority, type, user)
                   VALUES ("'.$info["title"].'", "'.$info["time"].'", "'.$info["place"].'", "'.$info["description"].'", "'.$info["link"].'", "'.$info["img"].'", "'.$info["priority"].'", "'.$info["type"].'", "'.$_POST["nr"].'")',
+
+    'news_remove' => 'UPDATE info_news
+                      SET active=0
+                      WHERE id="'.$_POST['id'].'"',
 
     'changes' => 'SELECT f.date,
                     u.name AS name,
@@ -423,6 +436,9 @@
                   SET pass="'.$_POST['d'].'"
                   WHERE uid="'.$_POST['u'].'"',
 
+    'guides' => 'SELECT *
+                FROM guides',
+
     'logud' => '',
     'login' => ''
   );
@@ -437,7 +453,7 @@
     die("Connection failed: " . $conn->connect_error);
   }
 
-  $specialklassen = ['food_insert','food_update','news_add'];
+  $specialklassen = ['food_insert','food_update','news_add','news_update'];
   if (in_array($_POST['page'], $specialklassen)) { $conn->set_charset("utf8"); }
   $sql = $pages[$_POST['page']];
 
@@ -452,7 +468,14 @@
     $data = array();
     while($row = mysqli_fetch_array($result)){ $data[] = $row; }
 
-    $admins = ['admin',4202];
+    if ($_POST['page'] == 'news_edit') {
+      $sql = $pages['news_types'];
+      $result = $conn->query($sql);
+      $data['t'] = array();
+      while($row = mysqli_fetch_array($result)){ $data['t'][] = $row; }
+    }
+
+    $admins = ['admin', 4202];
     $package = [$data, in_array($_POST['nr'], $admins)];
 
     // INFO: UTF8 ENCODE ARRAY

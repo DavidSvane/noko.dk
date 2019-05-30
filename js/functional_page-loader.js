@@ -108,10 +108,10 @@ function load(p, reload = false) {
 
         } else {
 
-          var upgraded = ['rooms','speaker','a_vagtplan','news','guides'];
+          var upgraded = ['rooms','speaker','a_vagtplan','news','guides','news_types','news_edit'];
           var version = upgraded.includes(p) ? 1 : 0;
 
-          $.post('http://davidsvane.com/noko/server/db.php', {page: p, nr: getCookie('user'), ver: version}, function (data) {
+          $.post('http://davidsvane.com/noko/server/db.php', {page: p, nr: getCookie('user'), ver: version, re: reload}, function (data) {
 
             try {
               var obj = JSON.parse(data);
@@ -217,7 +217,8 @@ function load(p, reload = false) {
                       d2_2: 'Sen'
                     };
 
-                    //$('#'+p).append('<br /><br /><div id="explanation"><b><span style="color:'+shift_cols['d1_1']+'">'+shift_names['d1_1']+'evagt (17-20)</span><span style="color:'+shift_cols['d2_1']+'">'+shift_names['d2_1']+'evagt (17-20)</span><span style="color:'+shift_cols['d1_2']+'">'+shift_names['d1_2']+' weekendvagt (8:15-11:30)</span><span style="color:'+shift_cols['d2_2']+'">'+shift_names['d2_2']+' weekendvagt (10-13)</span><br /><br /><br /><br /><br /><p>Der er to funktioner der skal udfyldes; servering/anretning og afrydning.<br />Det er muligt at bytte vagter; BYTTEDE VAGTER SKAL NOTERES PÅ SEDLEN I SPISESALEN VED DISKEN.<br />Har du valgt selv at passe din vagt, men er blevet forsinket på din vej hjem til kollegiet/køkkenet, da ring til køkkenet på tlf. nr. 35 27 46 56<br />Er du forsinket kan køkkenet tilkalde en afløser. Tilkaldes en afløser bliver det betragtet som en udeblivelse.<br />UDEBLIVELSE MEDFØRER EN BØDESTRAF PÅ KR 500,00</p></b></div>');
+                    $('#'+p).append('<br /><br /><div id="explanation"><b><span style="color:'+shift_cols['d1_1']+'">'+shift_names['d1_1']+'evagt (17-20)</span><span style="color:'+shift_cols['d2_1']+'">'+shift_names['d2_1']+'evagt (17-20)</span><span style="color:'+shift_cols['d1_2']+'">'+shift_names['d1_2']+' weekendvagt (8:15-11:30)</span><span style="color:'+shift_cols['d2_2']+'">'+shift_names['d2_2']+' weekendvagt (10-13)</span>');
+                    /*<br /><br /><br /><br /><br /><p>Der er to funktioner der skal udfyldes; servering/anretning og afrydning.<br />Det er muligt at bytte vagter; BYTTEDE VAGTER SKAL NOTERES PÅ SEDLEN I SPISESALEN VED DISKEN.<br />Har du valgt selv at passe din vagt, men er blevet forsinket på din vej hjem til kollegiet/køkkenet, da ring til køkkenet på tlf. nr. 35 27 46 56<br />Er du forsinket kan køkkenet tilkalde en afløser. Tilkaldes en afløser bliver det betragtet som en udeblivelse.<br />UDEBLIVELSE MEDFØRER EN BØDESTRAF PÅ KR 500,00</p></b></div>');*/
 
                     obj.forEach(function (e) {
                       if (curr_year != e.month.substr(0,4) || curr_mth != e.month.substr(5,2)) {
@@ -845,31 +846,49 @@ function load(p, reload = false) {
                     break;
 
                   case 'news':
-                    $('#'+p).append('<a href="javascript:load(\'news_add\')">TILFØJ EVENT</a>');
+                    $('#'+p).append('<a href="javascript:load(\'news_types\')">TILFØJ EVENT</a>');
                     $('#'+p).append('<div class="grid"></div>');
+                    var curr_user = getCookie('user');
 
                     var appendix = '';
 
                     obj.forEach(function (e) {
 
-                      appendix = '<div ';
-                      if (e.link != null) { appendix += 'onclick="javascript:openNews(\''+e.link+'\')"'; }
+                      appendix = '<div data-nid="'+e.id+'"';
+                      if (adm || e.user == curr_user) { appendix += 'data-owner="true" '; }
                       appendix += 'class="item news_block p'+e.priority+'"';
                       if (e.img != null) { appendix += ' style="background-image: url(\''+e.img+'\')"'; }
                       appendix += '><div class="information"><div class="titles dotdotdot">'+e.title+'</div>';
-                      appendix += '<div id="ddd_'+e.id+'" class="descriptions multidots"></div>';
+                      appendix += '<div id="ddd_'+e.id+'" class="descriptions multidots" ';
+                      if (e.link != null) { appendix += 'onclick="javascript:openNews(\''+e.link+'\')" '; }
+                      appendix += '></div>';
                       appendix += '<div class="spacetime dotdotdot">'+dtFormat(e.time)+' '+e.place+'</div></div></div>';
 
                       $('#'+p+' .grid').append( appendix );
                     });
 
+                    $('.news_block[data-owner="true"] .titles').append('<div class="settings"><i class="material-icons delete">delete</i><i class="material-icons edit">edit</i></div>');
+
+                    $('.news_block .delete').click(function (e) {
+                      var nid = $(e.target).closest('.news_block').attr("data-nid");
+                      $(e.target).closest('.news_block').remove();
+                      grid.refreshItems().layout(true);
+                      $.post('http://davidsvane.com/noko/server/db.php', {page: "news_remove", id: nid, ver: 1}, function (data) { return; });
+                    });
+
+                    $('.news_block .edit').click(function (e) {
+                      var nid = $(e.target).closest('.news_block').attr("data-nid");
+                      load('news_edit', nid);
+                    });
+
                     var grid = new Muuri('.grid', {layout: {fillGaps: true}});
                     break;
 
-                  case 'news_add':
+                  case 'news_types':
                     $('#'+p).append('<h1>NYT EVENT</h1>');
                     $('#'+p).append('<div id="ev_menu"><a href="javascript:addEvent()">Tilføj</a></div>');
                     $('#'+p).append('<div id="ne_fields"></div>')
+
                     $('#ne_fields').append('<div><p>Titel</p><input type="text" id="ne_title"/></div>');
                     $('#ne_fields').append('<div><p>Tid</p><input type="text" id="fp_"/></div>');
                     $('#ne_fields').append('<div><p>Sted</p><input type="text" id="ne_place"/></div>');
@@ -879,11 +898,32 @@ function load(p, reload = false) {
                     $('#ne_fields').append('<div><p>Prioritet</p><select id="ne_priority"><option value="1">(1) Sjov for hele NOKO!</option><option value="2">(2) En del af os skal da med!</option><option value="3" selected>(3) Good to know!</option></select></div>');
                     $('#ne_fields').append('<div><p>Type</p><select id="ne_type"></select></div>');
 
-                    $.post('http://davidsvane.com/noko/server/db.php', {page: 'news_types', nr: getCookie('user'), ver: 1}, function (data) {
-                      var types = JSON.parse(data);
-                      types = types[0];
-                      types.forEach(function (t) { $('#ne_type').append('<option value="'+t.id+'">'+t.type+'</option>') });
+                    $('#fp_').flatpickr({
+                      dateFormat: "Y-m-d H:i",
+                      enableTime: true,
+                      minDate: "today",
+                      maxDate: new Date().fp_incr(365),
+                      minuteIncrement: 15,
+                      time_24hr: true
                     });
+
+                    obj.forEach(function (t) { $('#ne_type').append('<option value="'+t.id+'">'+t.type+'</option>') });
+                    break;
+
+                  case 'news_edit':
+                    $('#'+p).append('<h1>REDIGER EVENT</h1>');
+                    $('#'+p).append('<div id="ev_menu"><a href="javascript:updateEvent()">Opdater</a></div>');
+                    $('#'+p).append('<div id="ne_fields" data-eid="'+obj[0].id+'"></div>')
+
+                    $('#ne_fields').append('<div><p>Titel</p><input type="text" id="ne_title" value="'+obj[0].title+'"/></div>');
+                    $('#ne_fields').append('<div><p>Tid</p><input type="text" id="fp_" value="'+obj[0].time+'"/></div>');
+                    $('#ne_fields').append('<div><p>Sted</p><input type="text" id="ne_place" value="'+obj[0].place+'"/></div>');
+                    $('#ne_fields').append('<div><p>Beskrivelse</p><input type="text" id="ne_description" placeholder="Valgfrit..." value="'+obj[0].description+'"/></div>');
+                    $('#ne_fields').append('<div><p>Link</p><input type="text" id="ne_link" placeholder="Valgfrit..." value="'+obj[0].link+'"/></div>');
+                    $('#ne_fields').append('<div><p>Billede</p><input type="text" id="ne_img" placeholder="Valgfrit link til billede..." value="'+obj[0].img+'"/></div>');
+                    $('#ne_fields').append('<div><p>Prioritet</p><select id="ne_priority"><option value="1">(1) Sjov for hele NOKO!</option><option value="2">(2) En del af os skal da med!</option><option value="3">(3) Good to know!</option></select></div>');
+                    $('#ne_priority option:nth-child('+obj[0].priority+')').attr("selected",true);
+                    $('#ne_fields').append('<div><p>Type</p><select id="ne_type"></select></div>');
 
                     $('#fp_').flatpickr({
                       dateFormat: "Y-m-d H:i",
@@ -893,6 +933,9 @@ function load(p, reload = false) {
                       minuteIncrement: 15,
                       time_24hr: true
                     });
+
+                    obj['t'].forEach(function (t) { $('#ne_type').append('<option value="'+t.id+'">'+t.type+'</option>') });
+                    $('#ne_type option:nth-child('+obj[0].type+')').attr("selected",true);
                     break;
 
                   case 'changes':
