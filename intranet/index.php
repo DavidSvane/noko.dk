@@ -55,8 +55,11 @@
 	<script src="../js/special_menu-click.js"></script>
 	<script src="../js/special_events.js"></script>
 	<script src="../js/special_alumner.js"></script>
+	<script src="../js/special_keyboard.js"></script>
+	<script src="../js/special_mouse.js"></script>
   <script src="../js/functional_admin.js"></script>
   <script src="../js/functional_bookings.js"></script>
+  <script src="../js/functional_plenum.js"></script>
 	<script src="../js/functional_page-loader.js"></script>
 
 	<script> menu('login'); </script>

@@ -73,11 +73,12 @@ footer hr { padding: 0 0 0.25em; }
 #i_ p { column-count: 1; margin: 0; padding: 0; }
 
 /* NAVIGATION (MENU) */
-#i_ .sub { display: none; background: white; border: 1px solid black; position: absolute; margin-top: 21px; padding-bottom: 0.5em; z-index: 100; }
+#i_ .sub { display: none; background: white; border: 1px solid black; position: absolute; margin-top: 21px; padding: 0.5em 0 0.5em; z-index: 100; }
 #i_ .sub_book { margin-left: -78px; }
 #i_ .sub_people { margin-left: -80px; }
 #i_ .sub_admin { margin-left: -70px; }
 #i_ .sub_information { margin-left: -60px; }
+#i_ .sub_plenum { margin-left: -75px; }
 #i_ .sub a { display: block; padding: 0.3em 1.2em; }
 
 /* PAGE CONTENT */
@@ -122,7 +123,7 @@ footer hr { padding: 0 0 0.25em; }
 
 #news .titles i { display: block; position: absolute; top: 0; padding: 0.25em; }
 #news .titles i:first-child { right: 0.25em; }
-#news .titles i:first-child:hover { color: red; }
+#news .titles i:first-child:hover { color: #f00; }
 #news .titles i:last-child { right: 1.5em; }
 #news .titles i:last-child:hover { color: #0d0; }
 
@@ -139,8 +140,9 @@ footer hr { padding: 0 0 0.25em; }
 
 /* INFO PAGES */
 #front { column-count: 3; line-height: 2em; } /* INFO: FORSIDE */
-#i_ #food { line-height: 2.5em; padding: 2em 180px; } /* INFO: MADPLAN */
+#i_ #food { line-height: 2.5em; padding: 0 180px 2em; } /* INFO: MADPLAN */
 #food i { padding-right: 0.5em; display: inline-block; width: 64px; }
+#food h2 { padding-top: 2em; }
 
 #i_ #cal { line-height: 2em; padding: 2em 120px; } /* INFO: KALENDER */
 #cal table { box-sizing: border-box; width: 100%; }
@@ -177,14 +179,22 @@ footer hr { padding: 0 0 0.25em; }
 /* #current img { width: auto; height: 200px; display: none; position: fixed; border: 4px solid rgb(42,42,42); border-radius: 10px; } */
 #current div div b { display: inline-block; margin-top: 1em; }
 #changes > div { display: grid; grid-template-columns: repeat(3, 1fr); }
-#changes b { font-style: italic; }
-#changes i { display: inline-block; border-bottom: 1px solid black; padding-bottom: 0.25em; margin-bottom: 0.5em; }
+#i_ #changes h2 { text-align: left; margin: 1em 0; }
+#changes h3 { font-weight: bold; margin-bottom: 0.5em;}
 #changes > div > div > div { padding: 1em 0;  }
 #changes ._0 { color: #292; }
 #changes ._4 { color: #922; }
 #corridors > div b { display: inline-block; padding-top: 1em; }
 #current .present p:hover, #corridors p:hover { color: lightgray; cursor: pointer; }
 #current b, #previous b, #changes b, #corridors b { line-height: 2em; }
+
+#history select { font-size: 1.5em; border: 1px solid gray; padding: 0.5em; display: block; margin: 0.25em auto 1.5em; }
+#h_years > div { display: none; }
+#h_years h3 { font-weight:  bold; margin: 0.5em 0; }
+#h_years i { font-size: 0.9em; color: darkgray !important; }
+#h_years > div > div > div { display: grid; grid-template-columns: repeat(3, 1fr); margin-bottom: 2em; }
+#h_years > div ._0 * { color: #292; }
+#h_years > div ._4 * { color: #922; }
 
 /* IMAGE GRID OF ALUMNI */
 #photowall .wall { display: grid; grid-template-columns: repeat(6, 1fr); grid-row-gap: 2em; }
@@ -239,6 +249,7 @@ footer hr { padding: 0 0 0.25em; }
 #guides > i { display: block; width: 100%; text-align: center; color: gray; padding-bottom: 1em; }
 #guides > a { display: block; width: 100%; text-align: center; font-size: 1.5em; padding: 1em 0; }
 #i_ #guides img { width: 100%; }
+#guides li { padding: 0.5em 0.25em; line-height: 1.5em; }
 
 /* ADMIN MENU AND PAGES */
 #admin { display: none; }
@@ -276,7 +287,31 @@ footer hr { padding: 0 0 0.25em; }
 #i_ #ainfo input { color: black; width: 200px; padding: 0.5em; margin: 0 1.4em; border: 1px solid gray; }
 #i_ #a_alumner select { font-size: 1em; width: 215px; padding: 0.4em 0.5em; margin: 0 1.5em; background: rgba(0,0,0,0.05); }
 
-/*#master { max-width: 950px; word-wrap: break-word; }*/
+
+/* PLENUM RELATED STUFF */
+#i_ #stem { text-align: center; }
+#i_ #stem > a { display: inline-block; padding: 1em; border: 1px solid #09f; width: 160px; text-align: center; }
+#i_ #stem > select { margin: 0 2em 3em; padding: 0.75em 1em; border: 1px solid #09f; width: 187px; text-align: center; display: inline-block; color: #09f; }
+#i_ #stem > a:hover { color: white; background: #09f; }
+#i_ #v_menu { width: 100; text-align: left; }
+#i_ #v_menu a { font-size: 14px; padding: 1em; text-decoration: none; cursor: pointer; }
+#i_ #v_cnt { margin: 2em 0; border: 1px solid lightgray; border-radius: 6px; text-align: center; }
+#i_ #v_cnt > div { display: none; }
+
+#i_ #v_cnt > div h2 { padding: 1.5em 0 1em; }
+#i_ #v_cnt > div > input { width: 60%; margin: 21px auto 22px; border: 1px solid gray; padding: 1em; display: inline-block; }
+#i_ #v_cnt > .v_1 input, #i_ #v_cnt > .v_2 input { border: 1px solid gray; padding: 1em; }
+#i_ #v_cnt > .v_1 .v_options, #i_ #v_cnt > .v_2 .v_options { display: grid; grid-gap: 1em; margin: 30px 15% 50px; grid-template-columns: 1fr 1fr; }
+#i_ #v_cnt > .v_2 select { border: 1px solid #09f; color: #09f; padding: 10px 1em 11px; margin-right: 12px; display: inline-block; }
+#i_ #v_cnt > div a { display: inline-block; margin: 1em 1em 4em; padding: 1em; border: 1px solid #09f; }
+#i_ #v_cnt > div a:hover { color: white; background: #09f; }
+#i_ .v_code { font-weight: bold; margin: 2em 0; }
+
+#i_ .summaries, #i_ .files { display: grid; grid-template-columns: repeat(5, 1fr); grid-gap: 40px; margin: 2em 0 3em; }
+#i_ .summaries a, #i_ .files a { display: grid; text-align: center; color: black; width: 140px; height: 140px; align-self: center; justify-content: center; align-items: center; font-size: 1.25em; border-radius: 80px; overflow: hidden; border: 1px solid gray; transition: background-color 0.5s, color 0.5s, border-radius 0.5s; box-sizing: border-box; padding: 1em; }
+#i_ .summaries a:first-child, #i_ .files a:first-child { border: 3px solid #09f; }
+#i_ .summaries a:hover, #i_ .files a:hover { background-color: #09f; color: white; border-radius: 0px; }
+
 
 @media print {
   #i_ #a_vagtplan.admin_page > h1, #i_ #a_vagtplan.admin_page > div, #i_ #a_vagtplan.admin_page > br, #i_ #a_vagtplan.admin_page > h2, #i_ #a_vagtplan.admin_page > i { display: none; }

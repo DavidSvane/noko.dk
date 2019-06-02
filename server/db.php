@@ -5,6 +5,22 @@
   header('Access-Control-Allow-Origin: *');
   header('Content-Type: text/html; charset=utf-8');
 
+
+  if ($_POST['page'] == 'summaries') {
+
+    $files = scandir('../plenum');
+    echo(json_encode($files));
+    die();
+
+  } else if ($_POST['page'] == 'files') {
+
+    $files = scandir('../files');
+    echo(json_encode($files));
+    die();
+
+  }
+
+
   // INFO: VARIABLES
   $status = array(
     -2 => 'Slet seneste',
@@ -41,6 +57,9 @@
     $d_a2 = date_format($d_a2,'Y-m-d 23:59:59');
   }
 
+  // INFO: LIST OF UID WITH ADMIN ACCESS
+  $admins = ['admin',4202];
+
   // INFO: VARIABLE SETUP FOR BOOKING QUERIES
   if ($_POST['page'] == 'laundry_book') { $binfo = explode("_", $_POST['bid']); }
   if ($_POST['page'] == 'bike_book') { $binfo = explode("_", $_POST['bid']); }
@@ -64,6 +83,8 @@
     $vp_y = $_POST['y'];
     $vp_m = $_POST['m'];
   }
+
+  if ($_POST['page'] == 'poll_open') { $data = urldecode($_POST['q']); }
 
   // INFO: SQL STATEMTNS FOR ALLE PAGES
   $pages = array(
@@ -406,6 +427,19 @@
                   WHERE f.date>"'.date("Y-m",strtotime("-2 Months")).'"
                   ORDER BY f.date DESC, f.status ASC, u.name ASC',
 
+    'history' => 'SELECT f.date,
+                    u.name AS name,
+                    f.room AS room,
+                    f.status AS status,
+                    sl.title AS title
+                  FROM users AS u
+                  LEFT JOIN alumni_fields AS f
+                    ON u.uid=f.uid
+                  LEFT JOIN alumni_status AS sl
+                    ON f.status=sl.status
+                  WHERE f.date>"2007"
+                  ORDER BY f.status ASC, u.name ASC',
+
     'photowall' => 'SELECT u.uid, u.name, a.room, m.nr
                   FROM users AS u
                   INNER JOIN
@@ -437,10 +471,38 @@
                   WHERE uid="'.$_POST['u'].'"',
 
     'guides' => 'SELECT *
-                FROM guides',
+                FROM guides
+                ORDER BY title ASC',
+
+    'stem' => 'SELECT id, question, user, type
+              FROM vote_polls
+              WHERE active=1',
+
+    'stem_pid' => 'SELECT id
+                  FROM vote_polls
+                  WHERE (
+                    user="'.$_POST['nr'].'"
+                    AND active=1
+                  )
+                  ORDER BY id DESC
+                  LIMIT 1',
+
+    'poll_open' => 'INSERT INTO vote_polls (user, question, active, type)
+                    VALUES ("'.$_POST["nr"].'","'.$data.'","1","'.$_POST["t"].'")',
+
+    'poll_close' => 'UPDATE vote_polls
+                    SET active=0
+                    WHERE (
+                      id="'.$_POST['p'].'"
+                      AND user="'.$_POST['nr'].'"
+                    )',
+
+    'poll_close_all' => 'UPDATE vote_polls
+                        SET active=0
+                        WHERE active=1',
 
     'logud' => '',
-    'login' => ''
+    'login' => '',
   );
 
   // INFO: SETTING SERVER VARIABLES AND CREATING CONNECTION
@@ -475,7 +537,6 @@
       while($row = mysqli_fetch_array($result)){ $data['t'][] = $row; }
     }
 
-    $admins = ['admin', 4202];
     $package = [$data, in_array($_POST['nr'], $admins)];
 
     // INFO: UTF8 ENCODE ARRAY
@@ -485,8 +546,24 @@
 
   } else if (substr($sql,0,6) == 'UPDATE' || substr($sql,0,6) == 'DELETE' || substr($sql,0,6) == 'INSERT') {
 
-    $conn->query($sql);
-    echo('success');
+    if ($_POST['page'] == 'poll_close_all' && !in_array($_POST['nr'], $admins)) {
+
+      echo('failed');
+
+    } else if ($_POST['page'] == 'poll_open') {
+
+      $sql = $pages['stem_pid'];
+      $result = $conn->query($sql);
+      $data = array();
+      while($row = mysqli_fetch_array($result)){ $data[] = $row; }
+      echo($data[0]);
+
+    } else {
+
+      $conn->query($sql);
+      echo('success');
+
+    }
 
   }
 

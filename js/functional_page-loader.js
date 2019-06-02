@@ -108,7 +108,7 @@ function load(p, reload = false) {
 
         } else {
 
-          var upgraded = ['rooms','speaker','a_vagtplan','news','guides','news_types','news_edit'];
+          var upgraded = ['rooms','speaker','a_vagtplan','news','guides','news_types','news_edit','stem'];
           var version = upgraded.includes(p) ? 1 : 0;
 
           $.post('http://davidsvane.com/noko/server/db.php', {page: p, nr: getCookie('user'), ver: version, re: reload}, function (data) {
@@ -186,7 +186,7 @@ function load(p, reload = false) {
                     $('#'+p).append('<h2>'+date.getFullYear()+'</h2>');
                     $('#'+p).append('<table><tr><td><b>Forår</b><br /></td></tr></table>');
                     obj.forEach(function (e) {
-                      if (stadig_f && parseInt(e['date'].substr(5,2)) > 8) {
+                      if (stadig_f && parseInt(e['date'].substr(5,2)) > 7) {
                         $('#'+p+' tr').append('<td><b>Efterår</b><br /></td>');
                         stadig_f = false;
                       }
@@ -684,10 +684,36 @@ function load(p, reload = false) {
                     });
                     break;
 
-                  case 'plenum':
-                    $('#'+p).append('<h1>PLENUM</h1>');
-                    $('#'+p).append('<h2>TILLIDSHVERV</h2><div class="posts"></div>');
-                    $('#'+p).append('<h2>UDVALG</h2><div class="groups"></div>');
+                  case 'summaries':
+                    $('#'+p).append('<div class="summaries"></div>');
+
+                    var f = JSON.parse(data);
+                    var l = f.length;
+                    var variant = ["", "Forår", "Efterår"];
+
+                    for (var i = 1; i < l-1; i++) {
+                      $('#'+p+' .summaries').append('<a href="http://davidsvane.com/noko/plenum/'+f[l-i]+'" target="_blank">Referat<br />'+f[l-i].substr(7,4)+' '+variant[parseInt(f[l-i].substr(12,1))]+'</a>');
+                    }
+                    break;
+
+                  case 'files':
+                    $('#'+p).append('<div class="files"></div>');
+
+                    var f = JSON.parse(data);
+                    var l = f.length;
+
+                    for (var i = 0; i < l-2; i++) {
+                      $('#'+p+' .files').append('<a href="http://davidsvane.com/noko/files/'+f[i+2]+'" target="_blank">'+f[i+2].split(".")[0]+'</a>');
+                    }
+                    break;
+
+                  case 'groups':
+                    $('#'+p).append('<h1>UDVALG</h1><div class="groups"></div>');
+
+                    break;
+
+                  case 'posts':
+                    $('#'+p).append('<h1>TILLIDSHVERV</h1><div class="posts"></div>');
 
                     break;
 
@@ -789,7 +815,6 @@ function load(p, reload = false) {
                     var stati = ["Indflyttet","Orlov","Orlov retur","Omflyttet","Fraflyttet","Andet","Orlov retur*"];
                     var sexi = ["Mand","Kvinde"];
                     $('#'+p).addClass("admin_page");
-                    console.log(obj);
 
                     // INFO: ADD USER SELECTION REGION AT THE TOP
                     $('#'+p).append('<h1>ALUMNER</h1>');
@@ -857,7 +882,11 @@ function load(p, reload = false) {
                       appendix = '<div data-nid="'+e.id+'"';
                       if (adm || e.user == curr_user) { appendix += 'data-owner="true" '; }
                       appendix += 'class="item news_block p'+e.priority+'"';
-                      if (e.img != null) { appendix += ' style="background-image: url(\''+e.img+'\')"'; }
+                      if (e.img != "") {
+                        appendix += ' style="background-image: url(\''+e.img+'\')"';
+                      } else {
+                        appendix += ' style="background-image: url(\'../res/news_type_'+e.type+'.jpg\')"';
+                      }
                       appendix += '><div class="information"><div class="titles dotdotdot">'+e.title+'</div>';
                       appendix += '<div id="ddd_'+e.id+'" class="descriptions multidots" ';
                       if (e.link != null) { appendix += 'onclick="javascript:openNews(\''+e.link+'\')" '; }
@@ -939,16 +968,15 @@ function load(p, reload = false) {
                     break;
 
                   case 'changes':
-                    $('#'+p).append("<b>Seneste ændringer</b><div></div>");
+                    $('#'+p).append("<div></div>");
 
-                    console.log(obj);
                     obj.forEach(function (e) {
 
                       if ( $('#'+p+' ._'+e.date.substr(0,7)).length == 0 ) {
-                        $('#'+p+' > div').append('<div class="_'+e.date.substr(0,7)+'"><b>'+mths[parseInt(e.date.substr(5,7))-1]+' '+e.date.substr(0,4)+'</b></div>');
+                        $('#'+p+' > div').append('<div class="_'+e.date.substr(0,7)+'"><h2>'+mths[parseInt(e.date.substr(5,7))-1]+' '+e.date.substr(0,4)+'</h2></div>');
                       }
                       if ( $('#'+p+' ._'+e.date.substr(0,7)+' ._'+e.status).length == 0 ) {
-                        $('#'+p+' ._'+e.date.substr(0,7)).append('<div class="_'+e.status+'"><i>'+e.title+'</i></div>');
+                        $('#'+p+' ._'+e.date.substr(0,7)).append('<div class="_'+e.status+'"><h3>'+e.title+'</h3></div>');
                       }
 
                       $('#'+p+' ._'+e.date.substr(0,7)+' ._'+e.status).append('<p>'+e.name+' ('+e.room+')</p>');
@@ -956,6 +984,48 @@ function load(p, reload = false) {
                     });
 
                     $('#'+p+' > div').css("grid-template-columns", "repeat("+$('#'+p+' > div > div').length+", 1fr)")
+                    break;
+
+                  case 'history':
+                    var c_y = "";
+                    var c_s = "";
+
+                    $('#'+p).append('<select></select><div id="h_years"></div>');
+
+                    obj.forEach(function (e) {
+                      c_y = e.date.substr(0,4);
+                      c_s = e.status;
+
+                      if (!$('#h_years ._'+c_y).length) {
+                        $('#h_years').append('<div class="_'+c_y+'"></div>');
+                        $('#'+p+' select').append('<option value="'+c_y+'">'+c_y+'</option>');
+                      }
+                      if (!$('#h_years ._'+c_y+' ._'+c_s).length) { $('#h_years ._'+c_y).append('<div class="_'+c_s+'"><h3>'+e.title+'</h3><div></div></div>'); }
+
+                      $('#h_years ._'+c_y+' ._'+c_s+' div').append('<p>'+e.name+' ('+e.room+') <i>'+mths[parseInt(e.date.substr(5,2))-1].substr(0,3)+'</i></p>');
+                    });
+
+                    var sorted_list = $('#'+p+' select option');
+                    sorted_list.sort(function (a,b) {
+                      a = a.value;
+                      b = b.value;
+                      return b-a;
+                    });
+                    $('#'+p+' select').html(sorted_list);
+                    $('#'+p+' select option:first-child').attr("selected",true);
+                    c_y = $('#'+p+' select option:first-child').val();
+
+                    $('#h_years > ._'+c_y).show();
+                    $('#h_years > div ._0')
+
+                    $('#'+p+' select').change(function () {
+                      $('#h_years > div').hide();
+                      $('#h_years ._'+$('#'+p+' select').val()).show();
+                    });
+
+                    $('#h_years h3').each(function () {
+                      $(this).append(": " + $(this).next().find('p').length );
+                    });
                     break;
 
                   case 'corridors':
@@ -988,6 +1058,41 @@ function load(p, reload = false) {
                     obj.forEach(function (e) {
                       $('#'+p).append('<a href="javascript:$(\'#guide_'+e.id+'\').toggle()">'+e.title+'</a><div class="guide_cnt" id="guide_'+e.id+'">'+e.content+'</div>');
                     });
+                    break;
+
+                  case 'stem':
+                    var setup = ['For/Imod','En af Flere','Flere af Flere'];
+
+                    $('#'+p).append('<h1>AFSTEMNING</h1>');
+                    $('#'+p).append('<select><option disabled selected>Åbne afstemninger</option></select>');
+                    try {obj.forEach(function (e) {
+
+                    });} catch (err) {}
+
+                    if (true || adm) { $('#'+p).append('<a class="centered" href="javascript:pollCloseAll()">Luk alle afstemninger</a>'); }
+                    $('#'+p).append('<div id="v_menu"></div><div id="v_cnt"></div>');
+
+                    for (var i = 0; i < setup.length; i++) {
+                      $('#v_menu').append('<a data-type="'+i+'">'+setup[i]+'</a>');
+                      $('#v_cnt').append('<div class="v_'+i+'"></div>');
+                    }
+                    $('#v_menu a').click(function (e) {
+                      $('#v_cnt > div').hide();
+                      $('#v_cnt .v_'+ $(this).attr("data-type") ).show();
+                      $('#v_menu > a').css("font-weight","normal");
+                      $(this).css("font-weight","bold");
+                    });
+                    $('#v_menu > a:first-child').css("font-weight","bold");
+                    $('#v_cnt > div:first-child').show();
+
+                    var curr = 0;
+                    $('#v_cnt .v_'+curr).append('<h2>'+setup[0]+'</h2><input type="text" placeholder="Hvad skal der stemmes om?"/><h3 data-pid="null" class="v_code"></h3><a class="v_open" href="javascript:pollOpen('+curr+')">Åbn afstemning</a><a class="v_close" href="javascript:pollClose('+curr+')">Luk afstemning</a>');
+
+                    curr = 1;
+                    $('#v_cnt .v_'+curr).append('<h2>'+setup[1]+'</h2><input type="text" placeholder="Hvad skal der stemmes om?"/><div class="v_options"><input type="text" class="v_o_1" placeholder="Valgmulighed 1"/><input type="text" class="v_o_2" placeholder="Valgmulighed 2"/></div><h3 data-pid="null" class="v_code"></h3><a class="v_add" href="javascript:pollAddOption('+curr+')">Tilføj valgmulighed</a><a class="v_remove" href="javascript:pollRemoveOption('+curr+')">Fjern valgmulighed</a><a class="v_open" href="javascript:pollOpen('+curr+')">Åbn afstemning</a><a class="v_close" href="javascript:pollClose('+curr+')">Luk afstemning</a>');
+
+                    curr = 2;
+                    $('#v_cnt .v_'+curr).append('<h2>'+setup[2]+'</h2><input type="text" placeholder="Hvad skal der stemmes om?"/><div class="v_options"><input type="text" class="v_o_1" placeholder="Valgmulighed 1"/><input type="text" class="v_o_2" placeholder="Valgmulighed 2"/></div><h3 data-pid="null" class="v_code"></h3><select id="v_max"><option selected value="0">Maks valgte</option><option value="1">1</option><option value="2">2</option></select><a class="v_add" href="javascript:pollAddOption('+curr+')">Tilføj valgmulighed</a><a class="v_remove" href="javascript:pollRemoveOption('+curr+')">Fjern valgmulighed</a><a class="v_open" href="javascript:pollOpen('+curr+')">Åbn afstemning</a><a class="v_close" href="javascript:pollClose('+curr+')">Luk afstemning</a>');
                     break;
 
                   default:
