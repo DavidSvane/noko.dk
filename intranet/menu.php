@@ -37,6 +37,7 @@
       'a_madplan' => 'Madplan',
       'a_vagtplan' => 'Vagtplan',
       'a_laundry' => 'Vaskeregnskab',
+      'a_lists' => 'Lister',
     )),
     'logud' => 'Log ud',
   );

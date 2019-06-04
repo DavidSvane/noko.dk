@@ -276,3 +276,68 @@ function updateAlumne() {
   }
 
 }
+
+
+// INFO: GENERATE CUSTOM LIST OF ALUMNE DATA
+function listsAllNone() {
+
+  var a = $('#l_form .options a').length / 2;
+  var b = $('#l_form .options .chosen').length;
+
+  if (b > a) {
+
+    $('#l_form .options .chosen').click();
+
+  } else {
+
+    $('#l_form .options .chosen').click();
+    $('#l_form .options a').click();
+
+  }
+
+}
+function generateList() {
+
+  if ( $('#l_form .options .chosen').length == 0 ) { alert("Du skal vælge hvad din liste skal indeholde."); return; }
+
+  var options = [];
+  $('#l_form .date .sort option:enabled').each(function () { options.push( $(this).val() ); });
+
+  var params = {};
+
+  params['options'] = [];
+  $('#l_form .options .chosen').each(function () { params['options'].push( $(this).attr("data-select") ); });
+  params['options'] = params['options'].join(", ");
+
+  params['sort'] = $('#l_form .date .sort').val();
+  params['start'] = $('#l_start').val();
+  params['end'] = $('#l_end').val();
+
+  params['restrict'] = $('#l_form .chosen[data-setting="restrict"]').length > 0 ? 1 : 0;
+
+  params = JSON.stringify(params);
+
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "a_lists_fetch", p: params, nr: getCookie("user")}, function (data) {
+
+    var obj = JSON.parse(data);
+    obj = obj[0];
+    var CSVprep = [options];
+    var sum = 0;
+
+    obj.forEach(function (e) {
+      var temp = [];
+      for (var ee = 0; ee < Object.keys(obj[0]).length/2; ee++) {
+        temp.push(e[ee]);
+      }
+      CSVprep.push(temp);
+    });
+
+    CSVfile = Papa.unparse(CSVprep);
+    var link = document.getElementById("downloadFix");
+    link.setAttribute("download", "Alumneliste.csv");
+    link.setAttribute("href", "data:text/csv;charset=utf-8,"+encodeURI(CSVfile));
+    link.click();
+
+  });
+
+}

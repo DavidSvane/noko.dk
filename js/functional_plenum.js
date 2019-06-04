@@ -8,7 +8,8 @@ function pollClose(e) {
 
   $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_close', p: pid, nr: getCookie('user'), ver: 1}, function (data) {
 
-    $('#stem .v_'+e+' .v_code').attr("color","#f00");
+    $('#stem .v_'+e+' .v_code span').css("background","#f00");
+    $('#stem > select option[value="'+pid+'"]').remove();
     alert("Afstemning lukket");
 
   });
@@ -36,9 +37,53 @@ function pollOpen(e) {
 
   $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_open', t: e, q: data, nr: getCookie('user'), ver: 1}, function (data) {
 
-    $('#stem .v_'+e+' .v_code').text("ID: "+data);
-    $('#stem .v_'+e+' .v_code').attr("color","#0d0");
+    $('#stem .v_'+e+' .v_code').html("ID: <span>"+data+"</span>");
+    $('#stem .v_'+e+' .v_code span').css("background","#0a0");
+    $('#v_cnt .v_'+e+' h3').attr("data-pid",data);
     alert("Afstemning åbnet");
+
+  });
+
+}
+
+function pollReopen(vid) {
+
+  if (vid == "null") {
+
+    $('#stem div input').val("");
+    return;
+
+  }
+
+  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_reopen', id: vid, nr: getCookie('user'), ver: 1}, function (data) {
+
+    var obj = JSON.parse(data)[0][0];
+    var qs = JSON.parse(obj.question);
+    console.log(obj);
+    console.log(qs);
+
+    $('#v_cnt > div').hide();
+    $('#v_cnt .v_'+obj.type).show();
+
+    $('#v_menu > a').css("font-weight","normal");
+    $('#v_menu > a[data-type="'+obj.type+'"]').css("font-weight","bold");
+
+    qs.forEach(function (q, i) {
+      if (i == 0) {
+        $('#v_cnt .v_'+obj.type+' > input').val(q);
+      } else if (obj.type == "2" && i == qs.length-1) {
+        $('#v_max option[value="'+q+'"]').attr("selected",true);
+      } else if (i > 2) {
+        pollAddOption(obj.type);
+        $('#v_cnt .v_'+obj.type+' .v_options input:nth-child('+i+')').val(q);
+      } else {
+        $('#v_cnt .v_'+obj.type+' .v_options input:nth-child('+i+')').val(q);
+      }
+    });
+
+    $('#stem .v_'+obj.type+' .v_code').html("ID: <span>"+obj.id+"</span>");
+    $('#stem .v_'+obj.type+' .v_code span').css("background","#0a0");
+    $('#v_cnt .v_'+obj.type+' h3').attr("data-pid",obj.id);
 
   });
 
@@ -46,7 +91,15 @@ function pollOpen(e) {
 
 function pollCloseAll() {
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_close_all', nr: getCookie('user'), ver: 1}, function (data) { return; });
+  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_close_all', nr: getCookie('user'), ver: 1}, function (data) {
+
+    $('#stem > select').html('<option value="null" selected>Åbne afstemninger</option>');
+    $('#stem .v_1 .v_options input:gt(1)').remove();
+    $('#stem .v_2 .v_options input:gt(1)').remove();
+    alert("Alle afstemninger er blevet lukket.")
+    return;
+
+  });
 
 }
 
@@ -67,5 +120,26 @@ function pollAddOption(e) {
 function pollRemoveOption(e) {
 
   $('#v_cnt .v_'+e+' .v_options input:last-of-type').remove();
+
+}
+
+function pollResult(e) {
+
+  $('#v_res').empty();
+  if (e == "null") { return; }
+
+  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_result', id: e, nr: getCookie('user'), ver: 1}, function (data) {
+
+    var obj = JSON.parse(data)[0];
+    var qs = obj[0].type == "0" ? ["Imod","For"] : JSON.parse(obj[0].question);
+    if (obj[0].type == "2") { qs.pop(); }
+
+    $('#v_res').append('<table><thead><tr><td>Mulighed</td><td>Antal</td></tr></thead><tbody></tbody></table>');
+
+    obj.forEach(function (v,i) {
+      $('#v_res tbody').append('<tr><td>'+qs[v.vote]+'</td><td>'+v.count+'</td></tr>');
+    });
+
+  });
 
 }
