@@ -201,10 +201,7 @@
                     VALUES ("'.$_POST['id'].'",\''.$_POST['v'].'\')',
     'stem' => 'SELECT id, question, user, type
               FROM vote_polls
-              WHERE (
-                active=1
-                AND user="'.$_POST['nr'].'"
-              )
+              WHERE active=1
               ORDER BY id DESC',
     'stem_all' => 'SELECT id, question, type
               FROM vote_polls

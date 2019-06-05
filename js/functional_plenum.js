@@ -148,6 +148,14 @@ function pollResult(e) {
       });
     });
 
+    var sorted_list = $('#v_res tbody tr');
+    sorted_list.sort(function (a,b) {
+      a = a.lastChild.innerHTML;
+      b = b.lastChild.innerHTML;
+      return b-a;
+    });
+    $('#v_res tbody').html(sorted_list);
+
   });
 
 }

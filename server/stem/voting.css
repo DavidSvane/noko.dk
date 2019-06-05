@@ -1,0 +1,42 @@
+:root {
+  --col1: #d11553;
+  --col2: #009eb3;
+  --col3: #607D8B;
+  --dark: #444;
+  --bright: white;
+}
+
+/* INFO: RESETTING CSS STANDARD FOR DIFFERENT BROWSERS */
+body, body * { padding: 0; margin: 0; box-sizing: border-box; font-family: Georgia, Times, "Times New Roman", serif; font-weight: normal; text-decoration: none; color: black; display: block; text-align: center; width: 100%; border: none; }
+body { background: #eee; }
+nav, main { margin: 84px 0 48px; }
+
+
+
+/* INFO: HEADER AND FOOTER SECTIONS */
+header { background: var(--dark); position: fixed; top: 0; height: 64px; overflow: hidden; }
+header a { padding: 1em; font-size: 20px; color: var(--bright); }
+
+
+
+/* INFO: NAV SETUP WITH LINKS TO POLLS */
+nav a:nth-child(2n-1) { background: var(--col2); }
+nav a:nth-child(2n) { background: var(--col1); }
+/*nav a { background: var(--col2); }*/
+
+nav a { padding: 4em; color: var(--bright); font-size: 16px; margin-bottom: 20px; }
+nav b { font-weight: bold; color: var(--bright); }
+nav h1 { position: fixed; font-size: 30px; top: 50%; transform: translate(0, -50%); }
+
+
+
+/* INFO: MAIN PAGES WHERE THE VOST IS CAST */
+main { height: 100%; }
+main b { font-weight: bold; }
+
+main > div > h2 { padding: 32px 48px; font-size: 16px; }
+main > div > a { padding: 32px; margin: 20px 0; color: var(--bright); }
+main > div > button { padding: 32px; margin: 32px 0 64px; background: var(--col3); opacity: 1; color: var(--bright); }
+
+main > div > a { background: var(--col1); }
+main > div > a.sel { background: var(--col2); }
