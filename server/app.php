@@ -93,9 +93,9 @@
                   OR SUBSTRING(vagtplan_sider.month,1,7)="'.$d_p2.'"
                 ORDER BY month ASC, day ASC, type ASC',
 
-    'laundry' => 'SELECT week, day, nr, time, room, id
+    /*'laundry' => 'SELECT week, day, nr, time, room, id
                   FROM laundry
-                  WHERE week>"'.$d_l.'"',
+                  WHERE week>"'.$d_l.'"',*/
 
     'alumni' => 'SELECT u.uid, a.status, u.name, a.room, m.nr
                 FROM users AS u

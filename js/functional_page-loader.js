@@ -13,10 +13,16 @@ function verifyUser() {
     } else {
       var obj = JSON.parse(data);
       if (obj[0]['name'] == "admin") {
+        localStorage.setItem('user','admin');
+        localStorage.setItem('salt',obj['salt']);
+        localStorage.setItem('room','admin');
         setCookie('user','admin');
         setCookie('salt',obj['salt']);
         setCookie('room','admin');
       } else {
+        localStorage.setItem('user',obj[0].nr);
+        localStorage.setItem('salt',obj['salt']);
+        localStorage.setItem('room',obj[0].room);
         setCookie('user',obj[0].nr);
         setCookie('salt',obj['salt']);
         setCookie('room',obj[0].room);
@@ -52,14 +58,14 @@ function load(p, reload = false) {
 
   if (p == 'login') {
 
-    if (checkCookie('user') && checkCookie('salt')) {
+    if (localStorage.getItem('user') && localStorage.getItem('salt')) {
 
-      $.post('http://davidsvane.com/noko/server/verify.php', {usr: getCookie('user'), sal: getCookie('salt')}, function (data) {
+      $.post('http://davidsvane.com/noko/server/verify.php', {usr: localStorage.getItem('user'), sal: localStorage.getItem('salt')}, function (data) {
 
         if (data.length < 42) {
           loginPage(p);
         } else {
-          load('laundry');
+          load('stem');
         }
 
       });
@@ -68,28 +74,13 @@ function load(p, reload = false) {
 
       loginPage(p);
 
-      /*$('#'+p+' a').click(function (e) {
-        var user = $('#name_field').val();
-        var pass = MD5($('#pass_field').val());
-
-        $.post('http://davidsvane.com/noko/server/verify.php', {usr: user, pas: pass}, function (data) {
-
-          if (data.length < 200) {
-            alert('Forkert brugernavn eller password.');
-          } else {
-            var obj = JSON.parse(data);
-            setCookie('user',obj[0].nr);
-            setCookie('salt',obj['salt']);
-            load('front');
-          }
-
-        });
-      });*/
-
     }
 
   } else if (p == 'logud') {
 
+    localStorage.removeItem('user');
+    localStorage.removeItem('salt');
+    localStorage.removeItem('room');
     deleteCookie('user');
     deleteCookie('salt');
     deleteCookie('room');
@@ -98,9 +89,9 @@ function load(p, reload = false) {
 
   } else {
 
-    if (checkCookie('user') && checkCookie('salt')) {
+    if (localStorage.getItem('user') && localStorage.getItem('salt')) {
 
-      $.post('http://davidsvane.com/noko/server/verify.php', {usr: getCookie('user'), sal: getCookie('salt')}, function (data) {
+      $.post('http://davidsvane.com/noko/server/verify.php', {usr: localStorage.getItem('user'), sal: localStorage.getItem('salt')}, function (data) {
 
         if (data.length < 42) {
 
@@ -111,7 +102,7 @@ function load(p, reload = false) {
           var upgraded = ['rooms','speaker','a_vagtplan','news','guides','news_types','news_edit','stem'];
           var version = upgraded.includes(p) ? 1 : 0;
 
-          $.post('http://davidsvane.com/noko/server/db.php', {page: p, nr: getCookie('user'), ver: version, re: reload}, function (data) {
+          $.post('http://davidsvane.com/noko/server/db.php', {page: p, nr: localStorage.getItem('user'), ver: version, re: reload}, function (data) {
 
             try {
               var obj = JSON.parse(data);
@@ -127,7 +118,7 @@ function load(p, reload = false) {
                 var dinm = [31,28,31,30,31,30,31,31,30,31,30,31];
                 var date = new Date();
                 var stati = [0,2,3,6];
-                var user_room = getCookie('room');
+                var user_room = localStorage.getItem('room');
 
                 if (adm) { $('#admin').show(); }
                 $('main').html('<div id="'+p+'"></div>');
@@ -160,7 +151,7 @@ function load(p, reload = false) {
                       });
                     });
                     if (reload) {
-                      $('#'+p+' .b_'+getCookie('temp')).click();
+                      $('#'+p+' .b_'+localStorage.getItem('temp')).click();
                     } else {
                       $('#'+p+' .b_0').click();
                     }
@@ -340,7 +331,7 @@ function load(p, reload = false) {
                       });
                     });
                     if (reload) {
-                      $('#'+p+' .b_'+getCookie('temp')).click();
+                      $('#'+p+' .b_'+localStorage.getItem('temp')).click();
                     } else {
                       $('#'+p+' .b_0').click();
                     }
@@ -375,6 +366,11 @@ function load(p, reload = false) {
                     $('#'+p+' .r_9 .c_3').text('Floorball');
                     $('#'+p+' .r_8 .c_2').text('Pigefodbold');
                     $('#'+p+' .r_9 .c_2').text('Pigefodbold');
+
+                    $('#'+p+' .r_7 .c_1').text('Tabata');
+                    $('#'+p+' .r_8 .c_1').text('Tabata');
+                    $('#'+p+' .r_7 .c_4').text('Tabata');
+                    $('#'+p+' .r_8 .c_4').text('Tabata');
 
                     // INFO: ADDING BOOKING BUTTONS
                     $('#'+p+' td:empty').html('<a class="availables"></a>');
@@ -461,7 +457,7 @@ function load(p, reload = false) {
                       });
                     });
                     if (reload) {
-                      $('#'+p+' .b_'+getCookie('temp')).click();
+                      $('#'+p+' .b_'+localStorage.getItem('temp')).click();
                     } else {
                       $('#'+p+' .b_0').click();
                     }
@@ -524,15 +520,11 @@ function load(p, reload = false) {
                     var refresher = Math.random();
                     $('#me_pic').append('<img onclick="javascript:changeImage()" src="http://noko.dk/ds/alumner/'+obj[0].nr+'.jpg?time='+refresher+'" onerror="this.src=\'../res/missing_photo.png\'"/>');
                     $('#me_pic').append('<a id="img_new" onclick="javascript:changeImage()"><i class="material-icons">add_circle_outline</i></a>');
-                    //$('#me_pic').append('<a id="img_edit" onclick="javascript:editImage()"><i class="material-icons">edit</i></a>');
 
                     $('#me_info').append('<h2 user-id="'+obj[0].uid+'" user-nr="'+obj[0].nr+'">'+obj[0].first+' '+obj[0].last+' ('+obj[0].nr+')</h2><br />');
                     $('#me_info').append('<span><i>Mail</i><input id="p_mail" type="text" value="'+obj[0].mail+'"/></span>');
                     $('#me_info').append('<span><i>Telefon</i><input id="p_phone" type="text" value="'+obj[0].phone+'"/></span>');
-                    //$('#me_info').append('<span><i>Studie</i><input id="p_study" type="text" value="'+obj[0].study+'"/></span>');
                     $('#me_info').append('<span><i>Kode</i><input id="p_pass" type="text" value="'+obj[0].pass+'"/></span>');
-                    //$('#me_info').append('<span><i>Løbenummer</i>'+obj[0].nr+'</span>');
-                    //$('#me_info').append('<span><i>Værelse</i>'+obj[0].room+'</span>');
                     $('#me_info').append('<br /><span class="p_explained">Foretag en ændring og tryk på "enter"<br />Din kode bliver automatisk enkrypteret</span>');
                     $('#me_info').append('<form id="img_form" enctype="multipart/form-data" action="http://noko.dk/ds/image_uploader.php" method="post"><input id="p_img" name="new_image" type="file"/><input type="text" value="'+obj[0].nr+'" name="user-nr"/></form>');
 
@@ -544,7 +536,7 @@ function load(p, reload = false) {
                         if (field == "pass") { data = MD5(data); }
                         var uid = $('#me h2').attr("user-id");
 
-                        $.post('http://davidsvane.com/noko/server/db.php', {page: "me_"+field, d: data, u: uid, nr: getCookie("user")}, function (data) {
+                        $.post('http://davidsvane.com/noko/server/db.php', {page: "me_"+field, d: data, u: uid, nr: localStorage.getItem("user")}, function (data) {
                           if (data == "success") {
                             alert("Din info blev opdateret");
                           } else {
@@ -558,7 +550,7 @@ function load(p, reload = false) {
                   case 'news': // INFO: FORSIDE MED BRUGERGENERERET LISTE OVER KOMMEN EVENTS PÅ NOKO
                     $('#'+p).append('<a href="javascript:load(\'news_types\')">TILFØJ EVENT</a>');
                     $('#'+p).append('<div class="grid"></div>');
-                    var curr_user = getCookie('user');
+                    var curr_user = localStorage.getItem('user');
 
                     var appendix = '';
 
@@ -761,7 +753,7 @@ function load(p, reload = false) {
                       });
                     });
                     if (reload) {
-                      $('#'+p+' .b_'+getCookie('temp')).click();
+                      $('#'+p+' .b_'+localStorage.getItem('temp')).click();
                     } else {
                       $('#'+p+' .b_0').click();
                     }
@@ -847,7 +839,7 @@ function load(p, reload = false) {
                       });
                     });
                     if (reload) {
-                      $('#'+p+' .b_'+getCookie('temp')).click();
+                      $('#'+p+' .b_'+localStorage.getItem('temp')).click();
                     } else {
                       $('#'+p+' .b_0').click();
                     }
@@ -899,11 +891,11 @@ function load(p, reload = false) {
                   case 'stem': // INFO: AFSTEMNINGSSYSTEM TIL PLENUM
                     var setup = ['For/Imod','En af Flere','Flere af Flere','Resultat'];
 
-                    $('#'+p).append('<h1>AFSTEMNING</h1>');
+                    $('#'+p).append('<h1>AFSTEMNING</h1><p>Stemmerne afgives via <span>noko.dk/stem</span>.</p>');
                     $('#'+p).append('<select><option value="null" selected>Åbne afstemninger</option></select>');
                     $('#'+p+' > select').change(function () { pollReopen( $(this).val() ); });
                     obj.forEach(function (e) {
-                      if (e.user == getCookie("user")) {
+                      if (e.user == localStorage.getItem("user")) {
                         $('#'+p+' > select').append('<option value="'+e.id+'">'+e.id+': '+JSON.parse(e.question)[0]+'</option>');
                       }
                     });
@@ -936,10 +928,12 @@ function load(p, reload = false) {
                     curr++;
                     $('#v_cnt .v_'+curr).append('<h2>'+setup[curr]+'</h2><select><option value="null" selected>Vælg afstemning</option></select><div id="v_res"></div>');
                     $('#v_cnt .v_'+curr+' select').change(function () { pollResult( $(this).val() ); });
-                    obj.forEach(function (e) {
-                      if (e.user == getCookie("user")) {
+
+                    $.post('http://davidsvane.com/noko/server/db.php', {page: 'stem_all', nr: localStorage.getItem('user'), ver: 1}, function (data) {
+                      var results = JSON.parse(data)[0];
+                      results.forEach(function (e) {
                         $('#v_cnt .v_'+curr+' > select').append('<option value="'+e.id+'">'+e.id+': '+JSON.parse(e.question)[0]+'</option>');
-                      }
+                      });
                     });
                   break;
 

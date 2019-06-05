@@ -44,7 +44,7 @@ function hideAlumne() {
 
 function changeImage() {
 
-  alert("Billedet skal være under 500 kB.\nTitlen skal være dit løbenummer.\nFiltypen skal være \".jpg\".\nFormatet skal helst være 4:3 ellers vises dele af billedet ikke.");
+  alert("Billedet skal være under 2 MB.\nFiltypen skal være JPG.");
 
   var unr = $('#me h2').attr("user-nr");
 
@@ -54,7 +54,7 @@ function changeImage() {
     if ($('#p_img').val().length > 3) {
 
       $.ajax({
-        url: "http://noko.dk/ds/image_uploader.php",
+        url: "http://noko.dk/ds/image_uploader.php?nr="+unr,
         type: "POST",
         data: new FormData(document.getElementById("img_form")),
         contentType: false,

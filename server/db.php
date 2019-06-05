@@ -83,8 +83,7 @@
     $vp_y = $_POST['y'];
     $vp_m = $_POST['m'];
   }
-
-  if ($_POST['page'] == 'poll_open') { $data = urldecode($_POST['q']); }
+  if ($_POST['page'] == 'poll_open') { $poll_data = urldecode($_POST['q']); }
   if ($_POST['page'] == 'a_lists_fetch') {
     $lists_data = json_decode($_POST['p']);
     if ($lists_data->restrict) {
@@ -96,6 +95,132 @@
 
   // INFO: SQL STATEMTNS FOR ALLE PAGES
   $pages = array(
+    // INFO: UNCATEGORIZED PAGE FUNCTIONS
+    'cal' => 'SELECT date, name, who
+              FROM party
+              WHERE SUBSTRING(date,1,4)="'.date('Y').'"
+              ORDER BY date ASC',
+    'front' => 'SELECT id, text
+                FROM news
+                WHERE id
+                IN (1,2,3,5,7)',
+    'food' => 'SELECT week, d1, d2, d3, d4, d5, d6, d7
+                FROM kitchen_plans
+                WHERE week>"'.$d_f.'"
+                ORDER BY week ASC',
+    'guides' => 'SELECT *
+                FROM guides
+                ORDER BY title ASC',
+    'me' => 'SELECT p.first, p.last, f.room, f.nr, u.mail, p.phone, u.pass, p.study, u.uid
+            FROM users AS u
+            INNER JOIN
+            alumni_fields AS f
+            ON u.uid=f.uid
+            INNER JOIN
+            alumni_profile AS p
+            ON u.uid=p.uid
+            WHERE f.nr='.$_POST['nr'].'
+            ORDER BY f.date DESC',
+    'me_mail' => 'UPDATE users
+                  SET mail="'.$_POST['d'].'"
+                  WHERE uid="'.$_POST['u'].'"',
+    'me_pass' => 'UPDATE users
+                  SET pass="'.$_POST['d'].'"
+                  WHERE uid="'.$_POST['u'].'"',
+    'me_phone' => 'UPDATE alumni_profile
+                  SET phone="'.$_POST['d'].'"
+                  WHERE uid="'.$_POST['u'].'"',
+    'plan' => 'SELECT pid, day, d1, d2, month, type
+                FROM vagtplan_felter
+                INNER JOIN vagtplan_sider
+                  ON vagtplan_felter.pid=vagtplan_sider.id
+                WHERE SUBSTRING(vagtplan_sider.month,1,7)="'.$d_p1.'"
+                  OR SUBSTRING(vagtplan_sider.month,1,7)="'.$d_p2.'"',
+    'plan_insert' => 'INSERT INTO info_shifts (year, month, setting)
+                      VALUES ("'.$_POST['y'].'", "'.$_POST['m'].'", \''.$_POST['plan'].'\')',
+
+
+    // INFO: FUNCTIONS FOR THE FRONT PAGE EVENTS
+    'news' => 'SELECT i.id, i.time, i.title, i.description, i.place, i.img, i.priority, i.type, i.user, i.link
+              FROM info_news AS i
+              INNER JOIN info_news_types AS t
+              ON i.type=t.id
+              WHERE (
+                i.active=1
+                AND i.time>"'.date("Y-m-d").'"
+              )
+              ORDER BY i.time ASC',
+    'news_types' => 'SELECT id, type
+                    FROM info_news_types',
+    'news_edit' => 'SELECT i.id, i.time, i.title, i.description, i.place, i.img, i.priority, i.type, i.user, i.link
+                    FROM info_news AS i
+                    WHERE i.id="'.$_POST['re'].'"
+                    LIMIT 1',
+    'news_update' => 'UPDATE info_news
+                      SET title="'.$info["title"].'", time="'.$info["time"].'", place="'.$info["place"].'", description="'.$info["description"].'", link="'.$info["link"].'", img="'.$info["img"].'", priority="'.$info["priority"].'", type="'.$info["type"].'"
+                      WHERE id="'.$info["eid"].'"',
+    'news_add' => 'INSERT INTO info_news (title, time, place, description, link, img, priority, type, user)
+                  VALUES ("'.$info["title"].'", "'.$info["time"].'", "'.$info["place"].'", "'.$info["description"].'", "'.$info["link"].'", "'.$info["img"].'", "'.$info["priority"].'", "'.$info["type"].'", "'.$_POST["nr"].'")',
+    'news_remove' => 'UPDATE info_news
+                      SET active=0
+                      WHERE id="'.$_POST['id'].'"',
+
+
+    // INFO: FUNCTIONS FOR THE VOTING SYSTEM
+    'poll_close' => 'UPDATE vote_polls
+                    SET active=0
+                    WHERE (
+                      id="'.$_POST['p'].'"
+                      AND user="'.$_POST['nr'].'"
+                    )',
+    'poll_close_all' => 'UPDATE vote_polls
+                        SET active=0
+                        WHERE (
+                          user="'.$_POST["nr"].'"
+                          AND active=1
+                        )',
+    'poll_open' => 'INSERT INTO vote_polls (user, active, type, question)
+                    VALUES ("'.$_POST["nr"].'","1","'.$_POST["t"].'",\''.$poll_data.'\')',
+    'poll_reopen' => 'SELECT *
+                      FROM vote_polls
+                      WHERE id="'.$_POST['id'].'"',
+    'poll_result' => 'SELECT type, vote, question
+                      FROM vote_votes AS v
+                      INNER JOIN vote_polls AS p
+                        ON v.vid=p.id
+                      WHERE vid="'.$_POST['id'].'"',
+    'poll_check' => 'SELECT *
+                    FROM vote_voters
+                    WHERE (
+                      vid="'.$_POST['id'].'"
+                      AND nr="'.$_POST['nr'].'"
+                    )',
+    'poll_register' => 'INSERT INTO vote_voters (vid, nr)
+                        VALUES ("'.$_POST['id'].'","'.$_POST['nr'].'")',
+    'poll_vote' => 'INSERT INTO vote_votes (vid, vote)
+                    VALUES ("'.$_POST['id'].'",\''.$_POST['v'].'\')',
+    'stem' => 'SELECT id, question, user, type
+              FROM vote_polls
+              WHERE (
+                active=1
+                AND user="'.$_POST['nr'].'"
+              )
+              ORDER BY id DESC',
+    'stem_all' => 'SELECT id, question, type
+              FROM vote_polls
+              WHERE user="'.$_POST['nr'].'"
+              ORDER BY id DESC',
+    'stem_pid' => 'SELECT id
+                  FROM vote_polls
+                  WHERE (
+                    user="'.$_POST['nr'].'"
+                    AND active=1
+                  )
+                  ORDER BY id DESC
+                  LIMIT 1',
+
+
+    // INFO: FUNCTIONS FOR THE ALUMNI PAGES
     'alumne_fetch' => 'SELECT u.name AS name,
                         f.nr AS nr,
                         f.room AS room,
@@ -114,12 +239,6 @@
                         ON f.status=s.status
                       WHERE u.uid="'.$_POST['u'].'"
                       ORDER BY date ASC',
-
-    'cal' => 'SELECT date, name, who
-                FROM party
-                WHERE SUBSTRING(date,1,4)="'.date('Y').'"
-                ORDER BY date ASC',
-
     'changes' => 'SELECT f.date,
                     u.name AS name,
                     f.room AS room,
@@ -138,7 +257,6 @@
                   ON CONCAT(f.uid, f.date)=t.tag
                   WHERE f.date>"'.date("Y-m",strtotime("-2 Months")).'"
                   ORDER BY f.date DESC, f.status ASC, u.name ASC',
-
     'current' => 'SELECT u.uid, a.status, u.name, a.room, m.nr
                   FROM users AS u
                   INNER JOIN
@@ -156,7 +274,6 @@
                   ON a.md=m.md
                   WHERE (u.status=1 AND a.status IN (0,1,2,3,6))
                   ORDER BY u.name ASC',
-
     'corridors' => 'SELECT u.uid, a.status, u.name, a.room, m.nr
                     FROM users AS u
                     INNER JOIN
@@ -174,48 +291,6 @@
                     ON a.md=m.md
                     WHERE (u.status=1 AND a.status IN (0,2,3,6))
                     ORDER BY a.room ASC',
-
-    'bike' => 'SELECT week, day, time, room, id
-                FROM mcbike
-                WHERE week>"'.$d_l.'"',
-
-    'bike_book' => 'INSERT INTO mcbike (week, day, time, room)
-                      VALUES ("'.date('Y-m-d 00:00:00', strtotime("+".$binfo[0]." week")).'", '.$binfo[1].', '.$binfo[3].', '.$_POST['room'].')',
-
-    'bike_remove' => 'DELETE FROM mcbike
-                        WHERE id='.$_POST['bid'],
-
-    'front' => 'SELECT id, text
-                FROM news
-                WHERE id
-                IN (1,2,3,5,7)',
-
-    'food' => 'SELECT week, d1, d2, d3, d4, d5, d6, d7
-                FROM kitchen_plans
-                WHERE week>"'.$d_f.'"
-                ORDER BY week ASC',
-
-    'food_insert' => 'INSERT INTO kitchen_plans (week, d1, d2, d3, d4, d5, d6, d7)
-                      VALUES ("'.$fweek.'", "'.$menu[0].'", "'.$menu[1].'", "'.$menu[2].'", "'.$menu[3].'", "'.$menu[4].'", "'.$menu[5].'", "'.$menu[6].'")',
-
-    'food_update' => 'UPDATE kitchen_plans
-                        SET d1="'.$menu[0].'", d2="'.$menu[1].'", d3="'.$menu[2].'", d4="'.$menu[3].'", d5="'.$menu[4].'", d6="'.$menu[5].'", d7="'.$menu[6].'"
-                        WHERE week="'.$fweek.'"',
-
-    'guides' => 'SELECT *
-                FROM guides
-                ORDER BY title ASC',
-
-    'gym_book' => 'INSERT INTO gym (week, day, time, room)
-                      VALUES ("'.date('Y-m-d 00:00:00', strtotime("+".$binfo[0]." week")).'", '.$binfo[1].', '.$binfo[3].', '.$_POST['room'].')',
-
-    'gym' => 'SELECT week, day, time, room, id
-              FROM gym
-              WHERE week>"'.$d_l.'"',
-
-    'gym_remove' => 'DELETE FROM gym
-                        WHERE id='.$_POST['bid'],
-
     'history' => 'SELECT f.date,
                     u.name AS name,
                     f.room AS room,
@@ -228,90 +303,6 @@
                     ON f.status=sl.status
                   WHERE f.date>"2007"
                   ORDER BY f.status ASC, u.name ASC',
-
-    'laundry' => 'SELECT week, day, nr, time, room, id
-                  FROM laundry
-                  WHERE week>"'.$d_l.'"',
-
-    'laundry_accounting' => 'SELECT l.room AS "Vaerelse", COUNT(l.room) AS "Antal"
-                            FROM laundry AS l
-                            INNER JOIN (
-                              SELECT a.room AS room, a.nr AS nr
-                              FROM alumni_fields AS a
-                              INNER JOIN (
-                                SELECT room, MAX(date) AS date
-                                FROM alumni_fields
-                                GROUP BY room
-                              ) AS g
-                              ON (
-                                a.room=g.room
-                                AND a.date=g.date
-                              )
-                              GROUP BY a.room
-                            ) AS n
-                            ON l.room=n.room
-                            WHERE week BETWEEN "'.$d_a1.'" AND "'.$d_a2.'"
-                            GROUP BY l.room
-                            ORDER BY l.room ASC',
-
-    'laundry_book' => 'INSERT INTO laundry (week, day, nr, time, room)
-                      VALUES ("'.date('Y-m-d 00:00:00', strtotime("+".$binfo[0]." week")).'", '.$binfo[1].', '.$binfo[2].', '.$binfo[3].', '.$_POST['room'].')',
-
-    'laundry_remove' => 'DELETE FROM laundry
-                        WHERE id='.$_POST['bid'],
-
-    'me' => 'SELECT p.first, p.last, f.room, f.nr, u.mail, p.phone, u.pass, p.study, u.uid
-            FROM users AS u
-            INNER JOIN
-            alumni_fields AS f
-            ON u.uid=f.uid
-            INNER JOIN
-            alumni_profile AS p
-            ON u.uid=p.uid
-            WHERE f.nr='.$_POST['nr'].'
-            ORDER BY f.date DESC',
-
-    'me_mail' => 'UPDATE users
-                  SET mail="'.$_POST['d'].'"
-                  WHERE uid="'.$_POST['u'].'"',
-
-    'me_pass' => 'UPDATE users
-                  SET pass="'.$_POST['d'].'"
-                  WHERE uid="'.$_POST['u'].'"',
-
-    'me_phone' => 'UPDATE alumni_profile
-                  SET phone="'.$_POST['d'].'"
-                  WHERE uid="'.$_POST['u'].'"',
-
-    'news' => 'SELECT i.id, i.time, i.title, i.description, i.place, i.img, i.priority, i.type, i.user, i.link
-                      FROM info_news AS i
-                      INNER JOIN info_news_types AS t
-                      ON i.type=t.id
-                      WHERE (
-                        i.active=1
-                        AND i.time>"'.date("Y-m-d").'"
-                      )
-                      ORDER BY i.time ASC',
-
-    'news_types' => 'SELECT id, type
-                            FROM info_news_types',
-
-    'news_edit' => 'SELECT i.id, i.time, i.title, i.description, i.place, i.img, i.priority, i.type, i.user, i.link
-                            FROM info_news AS i
-                            WHERE i.id="'.$_POST['re'].'"
-                            LIMIT 1',
-
-    'news_update' => 'UPDATE info_news
-                              SET title="'.$info["title"].'", time="'.$info["time"].'", place="'.$info["place"].'", description="'.$info["description"].'", link="'.$info["link"].'", img="'.$info["img"].'", priority="'.$info["priority"].'", type="'.$info["type"].'"
-                              WHERE id="'.$info["eid"].'"',
-
-    'news_add' => 'INSERT INTO info_news (title, time, place, description, link, img, priority, type, user)
-                          VALUES ("'.$info["title"].'", "'.$info["time"].'", "'.$info["place"].'", "'.$info["description"].'", "'.$info["link"].'", "'.$info["img"].'", "'.$info["priority"].'", "'.$info["type"].'", "'.$_POST["nr"].'")',
-
-    'news_remove' => 'UPDATE info_news
-                              SET active=0
-                              WHERE id="'.$_POST['id'].'"',
-
     'photowall' => 'SELECT u.uid, u.name, a.room, m.nr
                   FROM users AS u
                   INNER JOIN
@@ -329,42 +320,17 @@
                   ON a.md=m.md
                   WHERE (u.status=1 AND a.status IN (0,2,3,6))
                   ORDER BY u.name ASC',
-
-    'plan' => 'SELECT pid, day, d1, d2, month, type
-                FROM vagtplan_felter
-                INNER JOIN vagtplan_sider
-                  ON vagtplan_felter.pid=vagtplan_sider.id
-                WHERE SUBSTRING(vagtplan_sider.month,1,7)="'.$d_p1.'"
-                  OR SUBSTRING(vagtplan_sider.month,1,7)="'.$d_p2.'"',
-
-    'plan_insert' => 'INSERT INTO info_shifts (year, month, setting)
-                      VALUES ("'.$_POST['y'].'", "'.$_POST['m'].'", \''.$_POST['plan'].'\')',
-
-    'poll_close' => 'UPDATE vote_polls
-                    SET active=0
-                    WHERE (
-                      id="'.$_POST['p'].'"
-                      AND user="'.$_POST['nr'].'"
-                    )',
-
-    'poll_close_all' => 'UPDATE vote_polls
-                        SET active=0
-                        WHERE active=1',
-
-    'poll_open' => 'INSERT INTO vote_polls (user, question, active, type)
-                    VALUES ("'.$_POST["nr"].'","'.$data.'","1","'.$_POST["t"].'")',
-
     'previous' => 'SELECT u.name, a.room, u.mail, a.date
                   FROM users AS u
                   INNER JOIN
                   (
-                  	SELECT CONCAT(date,uid) AS md, uid, date, status, room
+                    SELECT CONCAT(date,uid) AS md, uid, date, status, room
                       FROM alumni_fields
                   ) AS a
                   ON a.uid=u.uid
                   INNER JOIN
                   (
-                  	SELECT CONCAT(MAX(date),uid) AS md
+                    SELECT CONCAT(MAX(date),uid) AS md
                       FROM alumni_fields
                       GROUP BY uid
                   ) AS m
@@ -372,49 +338,67 @@
                   WHERE u.status=0
                   ORDER BY u.name ASC',
 
-    'rooms' => 'SELECT id, year, month, day, room, user
-                  FROM book_rooms
-                  WHERE year>="'.date('Y').'"
-                  AND status=true',
 
+    // INFO: FUNCTIONS FOR THE BOOKING SYSTEMS
+    'bike' => 'SELECT week, day, time, room, id
+                FROM mcbike
+                WHERE week>"'.$d_l.'"',
+    'bike_book' => 'INSERT INTO mcbike (week, day, time, room)
+                      VALUES ("'.date('Y-m-d 00:00:00', strtotime("+".$binfo[0]." week")).'", '.$binfo[1].', '.$binfo[3].', '.$_POST['room'].')',
+    'bike_remove' => 'DELETE FROM mcbike
+                      WHERE id='.$_POST['bid'],
+    'gym' => 'SELECT week, day, time, room, id
+              FROM gym
+              WHERE week>"'.$d_l.'"',
+    'gym_book' => 'INSERT INTO gym (week, day, time, room)
+                  VALUES ("'.date('Y-m-d 00:00:00', strtotime("+".$binfo[0]." week")).'", '.$binfo[1].', '.$binfo[3].', '.$_POST['room'].')',
+    'gym_remove' => 'DELETE FROM gym
+                    WHERE id='.$_POST['bid'],
+    'laundry' => 'SELECT week, day, nr, time, room, id
+                  FROM laundry
+                  WHERE week>"'.$d_l.'"',
+    'laundry_book' => 'INSERT INTO laundry (week, day, nr, time, room)
+                      VALUES ("'.date('Y-m-d H:i:s', strtotime("+".$binfo[0]." week")).'", '.$binfo[1].', '.$binfo[2].', '.$binfo[3].', '.$_POST['room'].')',
+    'laundry_check' => 'SELECT id
+                        FROM laundry
+                        WHERE (
+                          week>="'.date('Y-m-d 23:59:59', strtotime("+".$binfo[0]." week", strtotime("sunday last week"))).'"
+                          AND week<"'.date('Y-m-d', strtotime("+".($binfo[0]+1)." week", strtotime("monday this week"))).'"
+                          AND day='.$binfo[1].'
+                          AND nr='.$binfo[2].'
+                          AND time='.$binfo[3].'
+                        )',
+    'laundry_remove' => 'DELETE FROM laundry
+                        WHERE id='.$_POST['bid'],
+    'rooms' => 'SELECT id, year, month, day, room, user
+                FROM book_rooms
+                WHERE year>="'.date('Y').'"
+                AND status=true',
     'rooms_book' => 'INSERT INTO book_rooms (year, month, day, room, user)
                       VALUES ('.(date('Y')+$binfo[0]).', '.$binfo[1].', '.$binfo[2].', '.$binfo[3].', '.$_POST['room'].')',
-
     'rooms_remove' => 'UPDATE book_rooms
-                        SET status=0
-                        WHERE id='.$_POST['bid'],
-
+                      SET status=0
+                      WHERE id='.$_POST['bid'],
     'rooms_taken' => 'SELECT date
                       FROM party
                       WHERE date>"'.date('Y').'"',
-
     'speaker' => 'SELECT id, year, month, day, user
                   FROM book_speaker
                   WHERE year>="'.date('Y').'"
                   AND status=true',
-
     'speaker_book' => 'INSERT INTO book_speaker (year, month, day, user)
                       VALUES ('.(date('Y')+$binfo[0]).', '.$binfo[1].', '.$binfo[2].', '.$_POST['room'].')',
-
     'speaker_remove' => 'UPDATE book_speaker
                         SET status=0
                         WHERE id='.$_POST['bid'],
 
-    'stem' => 'SELECT id, question, user, type
-              FROM vote_polls
-              WHERE active=1',
 
-    'stem_pid' => 'SELECT id
-                  FROM vote_polls
-                  WHERE (
-                    user="'.$_POST['nr'].'"
-                    AND active=1
-                  )
-                  ORDER BY id DESC
-                  LIMIT 1',
-
-
-
+    // INFO: FUNCTIONS FOR THE ADMIN PAGES
+    'food_insert' => 'INSERT INTO kitchen_plans (week, d1, d2, d3, d4, d5, d6, d7)
+                      VALUES ("'.$fweek.'", "'.$menu[0].'", "'.$menu[1].'", "'.$menu[2].'", "'.$menu[3].'", "'.$menu[4].'", "'.$menu[5].'", "'.$menu[6].'")',
+    'food_update' => 'UPDATE kitchen_plans
+                      SET d1="'.$menu[0].'", d2="'.$menu[1].'", d3="'.$menu[2].'", d4="'.$menu[3].'", d5="'.$menu[4].'", d6="'.$menu[5].'", d7="'.$menu[6].'"
+                      WHERE week="'.$fweek.'"',
     'a_alumner' => 'SELECT u.uid AS uid,
                       u.name AS name,
                       f.nr AS nr,
@@ -436,7 +420,6 @@
                     )
                     GROUP BY u.uid
                     ORDER BY u.name ASC',
-
     'a_alumner_fetch' => 'SELECT r.uid AS uid,
                       /*u.name AS name,*/
                       u.pass AS pass,
@@ -477,29 +460,11 @@
                     )
                     GROUP BY r.uid
                     ORDER BY p.first ASC',
-
     'a_alumner_insert' => '',
-
     'a_alumner_update' => '',
-
     'a_front' => 'SELECT *
                   FROM news',
-
     'a_lists' => '',
-
-    /*'a_lists_fetch' => 'SELECT f.date, '.$lists_data->options.'
-                  FROM users AS u
-                  LEFT JOIN alumni_fields AS f
-                    ON u.uid=f.uid
-                  LEFT JOIN alumni_status AS sl
-                    ON f.status=sl.status
-                  '.$lists_data->restrict.'
-                  WHERE (
-                    f.date>"'.$lists_data->start.'"
-                    AND f.date<"'.$lists_data->end.'"
-                  )
-                  ORDER BY '.$lists_data->sort,*/
-
     'a_lists_fetch' => 'SELECT r.uid AS uid,
                           f.date AS date,
                           '.$lists_data->options.'
@@ -520,11 +485,9 @@
                           AND f.date<"'.$lists_data->end.'"
                         )
                         ORDER BY '.$lists_data->sort,
-
     'a_madplan' => 'SELECT *
                     FROM kitchen_plans
                     WHERE week>"'.$d_f.'"',
-
     'a_vagtplan' => 'SELECT s.year, s.month, s.setting
                     FROM info_shifts AS s
                     INNER JOIN (
@@ -537,6 +500,26 @@
                       s.year="'.$vp_y.'"
                       AND s.month="'.$vp_m.'"
                     )',
+    'laundry_accounting' => 'SELECT l.room AS "Vaerelse", COUNT(l.room) AS "Antal"
+                            FROM laundry AS l
+                            INNER JOIN (
+                              SELECT a.room AS room, a.nr AS nr
+                              FROM alumni_fields AS a
+                              INNER JOIN (
+                                SELECT room, MAX(date) AS date
+                                FROM alumni_fields
+                                GROUP BY room
+                              ) AS g
+                              ON (
+                                a.room=g.room
+                                AND a.date=g.date
+                              )
+                              GROUP BY a.room
+                            ) AS n
+                            ON l.room=n.room
+                            WHERE week BETWEEN "'.$d_a1.'" AND "'.$d_a2.'"
+                            GROUP BY l.room
+                            ORDER BY l.room ASC',
 
 
     'logud' => '',
@@ -553,7 +536,7 @@
     die("Connection failed: " . $conn->connect_error);
   }
 
-  $specialklassen = ['food_insert','food_update','news_add','news_update'];
+  $specialklassen = ['food_insert','food_update','news_add','news_update','poll_open'];
   if (in_array($_POST['page'], $specialklassen)) { $conn->set_charset("utf8"); }
   $sql = $pages[$_POST['page']];
 
@@ -591,11 +574,36 @@
 
     } else if ($_POST['page'] == 'poll_open') {
 
+      $conn->query($sql);
       $sql = $pages['stem_pid'];
       $result = $conn->query($sql);
       $data = array();
       while($row = mysqli_fetch_array($result)){ $data[] = $row; }
-      echo($data[0]);
+      echo($data[0]["id"]);
+
+    } else if ($_POST['page'] == 'laundry_book') {
+
+      $sql = $pages['laundry_check'];
+      $result = $conn->query($sql);
+      $data = array();
+      while($row = mysqli_fetch_array($result)){ $data[] = $row; }
+      if (sizeof($data) == 0) {
+        $sql = $pages['laundry_book'];
+        $conn->query($sql);
+      }
+
+    } else if ($_POST['page'] == 'poll_vote') {
+
+      $sql = $pages['poll_check'];
+      $result = $conn->query($sql);
+      $data = array();
+      while($row = mysqli_fetch_array($result)){ $data[] = $row; }
+      if (sizeof($data) == 0) {
+        $sql = $pages['poll_register'];
+        $conn->query($sql);
+        $sql = $pages['poll_vote'];
+        $conn->query($sql);
+      }
 
     } else {
 

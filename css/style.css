@@ -1,18 +1,18 @@
 :root {
-    --page-width: 985px;
-    --book-free: rgba(153, 204, 255, 0.3);
-    --book-free-hover: rgba(0, 153, 255, 0.6);
-    --book-border: gray;
-    --vp-free: #ff8080;
-    --vp-extra: #80ff80;
-    --vp-closed: #ffdf80;
-    --vp-only: #ff80ff;
-    --vp-marked-c: #000000;
-    --vp-marked-b: 1px solid #000000;
-    --v_link: #0099ff;
-    --v_menu: #0055bb;
-    --v_gray: gray;
-    --std_link: #0099ff;
+  --page-width: 985px;
+  --book-free: rgba(153, 204, 255, 0.3);
+  --book-free-hover: rgba(0, 153, 255, 0.6);
+  --book-border: gray;
+  --vp-free: #ff8080;
+  --vp-extra: #80ff80;
+  --vp-closed: #ffdf80;
+  --vp-only: #ff80ff;
+  --vp-marked-c: #000000;
+  --vp-marked-b: 1px solid #000000;
+  --v_link: #0099ff;
+  --v_menu: #0055bb;
+  --v_gray: gray;
+  --std_link: #0099ff;
 }
 @font-face { font-family: darleston; src: url(../res/darleston.otf); }
 @font-face { font-family: respective; src: url(../res/respective.ttf); }
@@ -294,12 +294,14 @@ footer hr { padding: 0 0 0.25em; }
 
 /* PLENUM RELATED STUFF */
 #i_ #stem { text-align: center; }
+#i_ #stem > p { color: gray; text-align: center; display: block; margin: auto; padding-bottom: 2em; }
+#i_ #stem > p span { color: black; font-weight: bold; }
 #i_ #stem > a { display: inline-block; padding: 1em; border: 1px solid var(--v_link); width: 160px; text-align: center; }
 #i_ #stem > select, #i_ .v_3 > select { margin: 0 2em 3em; padding: 0.75em 1em; border: 1px solid var(--v_link); width: 300px; text-align: center; display: inline-block; color: var(--v_link); }
 #i_ #stem > a:hover { color: white; background: var(--v_link); }
 #i_ #v_menu { width: 100; text-align: left; }
 #i_ #v_menu a { color: var(--v_menu); font-size: 14px; padding: 1em; text-decoration: none; cursor: pointer; }
-#i_ #v_menu a:last-child { color: #e00; }
+/*#i_ #v_menu a:last-child { color: #e00; }*/
 #i_ #v_cnt { margin: 2em 0; border: 1px solid lightgray; border-radius: 6px; text-align: center; }
 #i_ #v_cnt > div { display: none; }
 #i_ #v_cnt .v_code span { padding: 0.5em; color: white; border-radius: 6px; margin-left: 1em; font-size: 2em; }

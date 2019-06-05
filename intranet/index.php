@@ -60,7 +60,7 @@
   <script src="../js/functional_admin.js"></script>
   <script src="../js/functional_bookings.js"></script>
   <script src="../js/functional_plenum.js"></script>
-	<script src="../js/functional_page-loader.js"></script>
+	<script src="../js/functional_page-loader.js?v=<?php echo time();?>"></script>
 
 	<script> menu('login'); </script>
 

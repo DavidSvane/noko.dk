@@ -131,13 +131,21 @@ function pollResult(e) {
   $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_result', id: e, nr: getCookie('user'), ver: 1}, function (data) {
 
     var obj = JSON.parse(data)[0];
-    var qs = obj[0].type == "0" ? ["Imod","For"] : JSON.parse(obj[0].question);
-    if (obj[0].type == "2") { qs.pop(); }
+    try { var type = parseInt(obj[0].type); } catch (err) { return; }
+    var lim = [[0,0], [1,0], [1,1]];
+    var qs = type == 0 ? ["Imod","For"] : JSON.parse(obj[0].question);
 
     $('#v_res').append('<table><thead><tr><td>Mulighed</td><td>Antal</td></tr></thead><tbody></tbody></table>');
+    for (var i = lim[type][0]; i < qs.length-lim[type][1]; i++) {
+      $('#v_res tbody').append('<tr class="o_'+i+'"><td>'+qs[i]+'</td><td>0</td></tr>');
+    }
 
-    obj.forEach(function (v,i) {
-      $('#v_res tbody').append('<tr><td>'+qs[v.vote]+'</td><td>'+v.count+'</td></tr>');
+    obj.forEach(function (e) {
+      var vote = JSON.parse(e.vote);
+      vote.forEach(function(v) {
+        var sel = '#v_res tbody .o_'+v+' td:last-child';
+        $(sel).text( (parseInt($(sel).text())+1) );
+      });
     });
 
   });
