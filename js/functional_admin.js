@@ -4,7 +4,7 @@ function laundryAccounting() {
   var y = $('#vr_year').val();
   var w = $('#vr_week').val();
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "laundry_accounting", year: y, week: w, nr: getCookie("user")}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "laundry_accounting", year: y, week: w, nr: localStorage.getItem("user")}, function (data) {
 
     var obj = JSON.parse(data);
     obj = obj[0];
@@ -204,7 +204,7 @@ function fetchAlumne() {
 
   var uid = $('#alumni_list').val();
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_fetch", u: uid, nr: getCookie("user")}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_fetch", u: uid, nr: localStorage.getItem("user")}, function (data) {
 
     var obj = JSON.parse(data);
 
@@ -251,7 +251,7 @@ function updateAlumne() {
     var check = confirm("Du er ved at oprette en ny bruger!")
     if (!check) { return; }
 
-    $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_insert", inf: info, nr: getCookie("user")}, function (data) {
+    $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_insert", inf: info, nr: localStorage.getItem("user")}, function (data) {
 
       if (data == 'success') {
         alert("Informationerne blev gemt");
@@ -263,7 +263,7 @@ function updateAlumne() {
 
   } else {
 
-    $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_update", u: uid, inf: info, nr: getCookie("user")}, function (data) {
+    $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_update", u: uid, inf: info, nr: localStorage.getItem("user")}, function (data) {
 
       if (data == 'success') {
         alert("Informationerne blev gemt");
@@ -317,7 +317,7 @@ function generateList() {
 
   params = JSON.stringify(params);
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "a_lists_fetch", p: params, nr: getCookie("user")}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "a_lists_fetch", p: params, nr: localStorage.getItem("user")}, function (data) {
 
     var obj = JSON.parse(data);
     obj = obj[0];

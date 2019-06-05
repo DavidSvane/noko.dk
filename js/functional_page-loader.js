@@ -65,7 +65,7 @@ function load(p, reload = false) {
         if (data.length < 42) {
           loginPage(p);
         } else {
-          load('stem');
+          load('news');
         }
 
       });
@@ -128,7 +128,7 @@ function load(p, reload = false) {
 
                   case 'bike': // INFO: SYSTEM TIL BOOKING AF LADCYKLEN
                     $('#'+p).addClass('cnt_book');
-                    var curr_week = date.toISOString().substr(0,19).replace("T"," ");
+                    var curr_week = date.toISOString().substr(0,19).replace("T"," ").replace(/-/g, '/');
                     curr_week = weekFromISO(curr_week);
                     var curr_day = date.getDay();
                     var curr_time = Math.floor(((date.getHours()*60)+date.getMinutes())/120+2);
@@ -173,7 +173,7 @@ function load(p, reload = false) {
 
                     // INFO: ADDING ROOM NUMBERS TO RESERVED TIMES
                     obj.forEach(function (e) {
-                      week_id = weekFromISO(e['week']) - curr_week;
+                      week_id = weekFromISO(e['week'].replace(/-/g,'/')) - curr_week;
                       if (e['room'] == user_room) {
                         $('#'+p+' .d_'+week_id+' .r_'+(parseInt(e['time'])+1)+' .c_'+e['day']).html('<a id="b_'+e['id']+'" class="owner" onclick="javascript:removeBike('+e['id']+')">'+e['room']+'</a>');
                       } else {
@@ -283,7 +283,7 @@ function load(p, reload = false) {
                   case 'food': // INFO: DENNE OG KOMMEN UGES MADPLAN
                     var denne_uge = true;
                     obj.forEach(function (e) {
-                      $('#'+p).append('<h2>Uge '+weekFromISO(e.week)+'</h2>');
+                      $('#'+p).append('<h2>Uge '+weekFromISO(e.week.replace(/-/g,'/'))+'</h2>');
                       for (var i=1; i<8; i++) { $('#'+p).append('<i>'+dage[i-1]+':</i> '+e[i]+'<br />'); }
                     });
                   break;
@@ -309,7 +309,7 @@ function load(p, reload = false) {
 
                   case 'gym': // INFO: SYSTEM TIL BOOKING AF GYMNASTIKSALEN
                     $('#'+p).addClass('cnt_book');
-                    var curr_week = date.toISOString().substr(0,19).replace("T"," ");
+                    var curr_week = date.toISOString().substr(0,19).replace("T"," ").replace(/-/g,'/');
                     curr_week = weekFromISO(curr_week);
                     var curr_day = date.getDay();
                     var curr_time = Math.floor(((date.getHours()*60)+date.getMinutes()-420)/90+2);
@@ -353,7 +353,7 @@ function load(p, reload = false) {
 
                     // INFO: ADDING ROOM NUMBERS TO RESERVED TIMES
                     obj.forEach(function (e) {
-                      week_id = weekFromISO(e['week']) - curr_week;
+                      week_id = weekFromISO(e['week'].replace(/-/g,'/')) - curr_week;
                       if (e['room'] == user_room) {
                         $('#'+p+' .d_'+week_id+' .r_'+(parseInt(e['time'])+1)+' .c_'+e['day']).html('<a id="b_'+e['id']+'" class="owner" onclick="javascript:removeGym('+e['id']+')">'+e['room']+'</a>');
                       } else {
@@ -488,7 +488,7 @@ function load(p, reload = false) {
 
                     // INFO: ADDING ROOM NUMBERS TO RESERVED TIMES
                     obj.forEach(function (e) {
-                      week_id = weekFromISO(e['week']) - curr_week;
+                      week_id = weekFromISO(e['week'].replace(/-/g,'/')) - curr_week;
                       if (adm || e['room'] == user_room) {
                         $('#'+p+' .d_'+week_id+' .t_'+(parseInt(e['nr'])-1)+' .r_'+(parseInt(e['time'])+1)+' .c_'+e['day']).html('<a id="b_'+e['id']+'" class="owner" onclick="javascript:removeLaundry('+e['id']+')">'+e['room']+'</a>');
                       } else {
@@ -687,11 +687,12 @@ function load(p, reload = false) {
                         curr_year = e.month.substr(0,4);
                         curr_mth = e.month.substr(5,2);
 
-                        first_week = weekFromISO(curr_year+'-'+curr_mth+'-01 00:00:00');
+                        first_week = weekFromISO(curr_year+'/'+curr_mth+'/01 00:00:00');
+                        counter = dinm[parseInt(curr_mth)-1];
                         do {
+                          last_week = weekFromISO(curr_year+'/'+curr_mth+'/'+counter+' 00:00:00');
                           counter--;
-                          last_week = weekFromISO(curr_year+'-'+curr_mth+'-'+counter+' 00:00:00');
-                        } while (date.getTime(curr_year+'-'+curr_mth+'-'+counter+' 00:00:00') == 'NaN');
+                        } while (date.getTime(curr_year+'/'+curr_mth+'/'+counter+' 00:00:00') == 'NaN');
                         num_weeks = ((last_week - first_week) % 52) + 1;
 
                         $('#'+p).append('<b>'+mths[parseInt(curr_mth)-1]+' '+curr_year+'</b><br />');
@@ -708,8 +709,8 @@ function load(p, reload = false) {
                       }
 
                       curr_day = ('00'+e.day).substr(-2);
-                      curr_week = weekFromISO(curr_year+'-'+curr_mth+'-'+curr_day+' 00:00:00');
-                      curr_day = new Date(curr_year+'-'+curr_mth+'-'+curr_day+' 00:00:00');
+                      curr_week = weekFromISO(curr_year+'/'+curr_mth+'/'+curr_day+' 00:00:00');
+                      curr_day = new Date(curr_year+'/'+curr_mth+'/'+curr_day+' 00:00:00');
                       curr_day = curr_day.getDay();
                       if (curr_day == 0) { curr_day += 7; }
 
@@ -1060,7 +1061,7 @@ function load(p, reload = false) {
 
                   case 'a_madplan':
                     var weeks_to_show = 5;
-                    var this_week = weekFromISO(date.toISOString());
+                    var this_week = weekFromISO(date.toISOString().substr(0,19).replace("T",' ').replace(/-/g,'/'));
                     var weeks = obj.length;
                     var w = 0;
                     $('#'+p).addClass("admin_page");
@@ -1083,8 +1084,8 @@ function load(p, reload = false) {
                     }
 
                     obj.forEach(function (e) {
-                      for (var j = 0; j < 7; j++) { $('#fw_'+weekFromISO(e['week'])+' .fday'+j).val(e['d'+(j+1)]); }
-                      $('#fw_'+weekFromISO(e['week'])).attr("fw_filled", 1);
+                      for (var j = 0; j < 7; j++) { $('#fw_'+weekFromISO(e['week'].replace(/-/g,'/'))+' .fday'+j).val(e['d'+(j+1)]); }
+                      $('#fw_'+weekFromISO(e['week'].replace(/-/g,'/'))).attr("fw_filled", 1);
                     });
 
                     $('#fw_'+(this_week+1)).show();

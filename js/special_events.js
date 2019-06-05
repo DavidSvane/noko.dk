@@ -25,7 +25,7 @@ function addEvent() {
 
   einfo = encodeURIComponent(JSON.stringify(einfo));
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: 'news_add', nr: getCookie('user'), info: einfo, ver: 1}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: 'news_add', nr: localStorage.getItem('user'), info: einfo, ver: 1}, function (data) {
 
     if (data == "success") {
       alert("Eventet blev tilføjet");
@@ -62,7 +62,7 @@ function updateEvent() {
 
   einfo = encodeURIComponent(JSON.stringify(einfo));
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: 'news_update', nr: getCookie('user'), info: einfo, ver: 1}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: 'news_update', nr: localStorage.getItem('user'), info: einfo, ver: 1}, function (data) {
 
     if (data == "success") {
       alert("Eventet blev opdateret");

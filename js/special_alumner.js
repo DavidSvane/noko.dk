@@ -3,7 +3,7 @@ function showAlumne(uid) {
   $('#alumne').remove();
   $('main').append('<div id="alumne" onclick="javascript:hideAlumne()"><div></div></div>');
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "alumne_fetch", u: uid, nr: getCookie("user")}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "alumne_fetch", u: uid, nr: localStorage.getItem("user")}, function (data) {
 
     var mths = ['Januar','Februar','Marts','April','Maj','Juni','Juli','August','September','Oktober','November','December'];
     var gangs = ["Stuen Nord", "1. Nord", "2. Nord", "3. Nord", "4. Nord", "5. Nord", "Stuen Syd", "1. Syd", "2. Syd", "3. Syd", "4. Syd", "5. Syd"];

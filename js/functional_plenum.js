@@ -6,7 +6,7 @@ function pollClose(e) {
 
   if (pid == "null") { alert('Ingen åben afstemning at lukke.'); return; }
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_close', p: pid, nr: getCookie('user'), ver: 1}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_close', p: pid, nr: localStorage.getItem('user'), ver: 1}, function (data) {
 
     $('#stem .v_'+e+' .v_code span').css("background","#f00");
     $('#stem > select option[value="'+pid+'"]').remove();
@@ -35,7 +35,7 @@ function pollOpen(e) {
 
   data = encodeURIComponent(JSON.stringify(data));
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_open', t: e, q: data, nr: getCookie('user'), ver: 1}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_open', t: e, q: data, nr: localStorage.getItem('user'), ver: 1}, function (data) {
 
     $('#stem .v_'+e+' .v_code').html("ID: <span>"+data+"</span>");
     $('#stem .v_'+e+' .v_code span').css("background","#0a0");
@@ -55,7 +55,7 @@ function pollReopen(vid) {
 
   }
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_reopen', id: vid, nr: getCookie('user'), ver: 1}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_reopen', id: vid, nr: localStorage.getItem('user'), ver: 1}, function (data) {
 
     var obj = JSON.parse(data)[0][0];
     var qs = JSON.parse(obj.question);
@@ -91,7 +91,7 @@ function pollReopen(vid) {
 
 function pollCloseAll() {
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_close_all', nr: getCookie('user'), ver: 1}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_close_all', nr: localStorage.getItem('user'), ver: 1}, function (data) {
 
     $('#stem > select').html('<option value="null" selected>Åbne afstemninger</option>');
     $('#stem .v_1 .v_options input:gt(1)').remove();
@@ -128,7 +128,7 @@ function pollResult(e) {
   $('#v_res').empty();
   if (e == "null") { return; }
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_result', id: e, nr: getCookie('user'), ver: 1}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_result', id: e, nr: localStorage.getItem('user'), ver: 1}, function (data) {
 
     var obj = JSON.parse(data)[0];
     try { var type = parseInt(obj[0].type); } catch (err) { return; }
