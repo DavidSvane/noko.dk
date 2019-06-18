@@ -42,7 +42,7 @@
 
   } else if (isset($_POST['usr']) && isset($_POST['pas'])) {
 
-    $sql = 'SELECT u.name, p.first, p.last, f.room, f.nr, u.mail, u.pass, f.id
+    $sql = 'SELECT u.name, p.first, p.last, f.room, f.nr, u.mail, u.pass, f.uid
             FROM users AS u
             INNER JOIN
             alumni_fields AS f
@@ -56,7 +56,8 @@
               OR (f.nr="'.$_POST["usr"].'" AND f.nr!=0)
               OR u.mail="'.$_POST["usr"].'"
             )
-            ORDER BY f.id DESC';
+            ORDER BY f.id DESC
+            LIMIT 1';
 
     $result = $conn->query($sql);
     $data = array();

@@ -35,7 +35,7 @@
 
   // INFO: GETS THURSDAY OF LAST WEEK, FOOD TABLE IS ORDERED BY MONDAY OF EVERY WEEK
   $d_f = new DateTime();
-  $d_f->setISODate(date('Y'),date('W')-1,4);
+  $d_f->setISODate(date('Y'),date('W')-2,4);
   $d_f = date_format($d_f,'Y-m-d');
 
   // INFO: GETS CURRENT AND NEXT MONTH, VAGTPLAN TABLES ARE ORDERED BY 1ST OF EVERY MONTH
@@ -58,7 +58,7 @@
   }
 
   // INFO: LIST OF UID WITH ADMIN ACCESS
-  $admins = ['admin',4202];
+  $admins = ['admin',4202,'kontor'];
 
   // INFO: VARIABLE SETUP FOR BOOKING QUERIES
   if ($_POST['page'] == 'laundry_book') { $binfo = explode("_", $_POST['bid']); }
@@ -107,7 +107,20 @@
     'food' => 'SELECT week, d1, d2, d3, d4, d5, d6, d7
                 FROM kitchen_plans
                 WHERE week>"'.$d_f.'"
-                ORDER BY week ASC',
+                ORDER BY week DESC',
+    'food_favs' => 'SELECT week, day
+                    FROM user_favorite_food
+                    WHERE user="'.$_POST['nr'].'"
+                    ORDER BY time DESC
+                    LIMIT 25',
+    'food_fav_add' => 'INSERT INTO user_favorite_food (user, week, day)
+                      VALUES ("'.$_POST['nr'].'","'.$_POST['w'].'","'.$_POST['d'].'")',
+    'food_fav_remove' => 'DELETE FROM user_favorite_food
+                          WHERE (
+                            user="'.$_POST['nr'].'"
+                            AND week="'.$_POST['w'].'"
+                            AND day="'.$_POST['d'].'"
+                          )',
     'guides' => 'SELECT *
                 FROM guides
                 ORDER BY title ASC',
@@ -396,6 +409,8 @@
     'food_update' => 'UPDATE kitchen_plans
                       SET d1="'.$menu[0].'", d2="'.$menu[1].'", d3="'.$menu[2].'", d4="'.$menu[3].'", d5="'.$menu[4].'", d6="'.$menu[5].'", d7="'.$menu[6].'"
                       WHERE week="'.$fweek.'"',
+    'a_madfavs' => 'SELECT *
+                    FROM user_favorite_food',
     'a_alumner' => 'SELECT u.uid AS uid,
                       u.name AS name,
                       f.nr AS nr,
@@ -485,6 +500,8 @@
     'a_madplan' => 'SELECT *
                     FROM kitchen_plans
                     WHERE week>"'.$d_f.'"',
+    'a_pass' => 'SELECT *
+                FROM admin_pass',
     'a_vagtplan' => 'SELECT s.year, s.month, s.setting
                     FROM info_shifts AS s
                     INNER JOIN (

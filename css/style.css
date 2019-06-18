@@ -2,7 +2,8 @@
   --page-width: 985px;
   --book-free: rgba(153, 204, 255, 0.3);
   --book-free-hover: rgba(0, 153, 255, 0.6);
-  --book-border: gray;
+  --book-border: lightgray;
+  --book-bg: #efefef;
   --vp-free: #ff8080;
   --vp-extra: #80ff80;
   --vp-closed: #ffdf80;
@@ -145,7 +146,15 @@ footer hr { padding: 0 0 0.25em; }
 /* INFO PAGES */
 #front { column-count: 3; line-height: 2em; } /* INFO: FORSIDE */
 #i_ #food { line-height: 2.5em; padding: 0 180px 2em; } /* INFO: MADPLAN */
-#food i { padding-right: 0.5em; display: inline-block; width: 64px; }
+#food table { width: 100%; }
+#food td { padding: 0.25em 0.75em; vertical-align: top; }
+#food td:first-child { width: 60px; text-align: right; font-style: italic; }
+#food .favorite { width: 20px; padding: 0.5em 0.75em 0; }
+#food .favorite i:last-child { display: none; }
+#food i { color: hotpink; cursor: pointer; }
+#food i:hover { color: lightpink; }
+#food .selected .favorite i:first-child { display: none; }
+#food .selected .favorite i:last-child { display: inline-block; }
 #food h2 { padding-top: 2em; }
 
 #i_ #cal { line-height: 2em; padding: 2em 120px; } /* INFO: KALENDER */
@@ -157,7 +166,7 @@ footer hr { padding: 0 0 0.25em; }
 
 #plan td, #plan td * { text-align: center; color: black; } /* INFO: VAGTPLANER */
 #plan table { width: 100%; margin-top: 1em; border-collapse: collapse; }
-#plan table td { padding: 0.5em 0; border: 1px solid gray; }
+#plan table td { padding: 0.5em 0; border: 1px solid var(--book-border); }
 #explanation { width: 100%; text-align: center; }
 #explanation span { padding: 0 2em; font-style: italic; }
 #explanation p { line-height: 2; text-align: center; color: gray; font-style: italic; }
@@ -245,7 +254,7 @@ footer hr { padding: 0 0 0.25em; }
 /* TABLE FORMATTING */
 .cnt_book tr:first-child td { font-style: italic; font-weight: bold; }
 .cnt_book td:first-child { font-style: italic; }
-.cnt_book tr:nth-child(2n) { background: rgba(0,0,0,0.1); }
+.cnt_book tr:nth-child(2n) { background: var(--book-bg); }
 #plan b:not(:first-child) { display: inline-block; margin-top: 40px; }
 
 /* GUIDES */
@@ -345,6 +354,12 @@ footer hr { padding: 0 0 0.25em; }
 #i_ #a_lists form > input:hover { background: var(--std_link); color: white; cursor: pointer; }
 #i_ #a_lists #downloadFix { display: none; }
 #i_ #a_lists #l_allnone { width: 200px; margin: 3em auto 0; display: block; }
+
+
+#i_ #a_pass h3 { margin: 2em 0 1em; }
+#i_ #a_pass table { width: 100%; }
+#i_ #a_pass thead td { font-weight: bold; }
+#i_ #a_pass td { width: 33%; padding: 0.5em; border: 1px solid var(--book-border); }
 
 
 @media print {

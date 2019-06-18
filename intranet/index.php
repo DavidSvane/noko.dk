@@ -57,6 +57,7 @@
 	<script src="../js/special_alumner.js"></script>
 	<script src="../js/special_keyboard.js"></script>
 	<script src="../js/special_mouse.js"></script>
+	<script src="../js/special_users.js"></script>
   <script src="../js/functional_admin.js"></script>
   <script src="../js/functional_bookings.js"></script>
   <script src="../js/functional_plenum.js"></script>

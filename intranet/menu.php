@@ -35,9 +35,11 @@
     'admin' => array('Admin',array(
       'a_alumner' => 'Alumner',
       'a_madplan' => 'Madplan',
+      'a_madfavs' => 'Favoritretter',
       'a_vagtplan' => 'Vagtplan',
       'a_laundry' => 'Vaskeregnskab',
       'a_lists' => 'Lister',
+      'a_pass' => 'Passwords',
     )),
     'logud' => 'Log ud',
   );

@@ -18,7 +18,9 @@ function laundryAccounting() {
     });
     CSVprep.push(['Total',sum]);
 
-    CSVfile = Papa.unparse(CSVprep);
+    CSVfile = Papa.unparse(CSVprep, {
+      delimiter: ";"
+    });
     var link = document.getElementById("downloadFix");
     link.setAttribute("download", "vaskeregnskab_uge_"+w+"_"+y+".csv");
     link.setAttribute("href", "data:text/csv;charset=utf-8,"+encodeURI(CSVfile));
@@ -332,7 +334,9 @@ function generateList() {
       CSVprep.push(temp);
     });
 
-    CSVfile = Papa.unparse(CSVprep);
+    CSVfile = Papa.unparse(CSVprep, {
+      delimiter: ";"
+    });
     var link = document.getElementById("downloadFix");
     link.setAttribute("download", "Alumneliste.csv");
     link.setAttribute("href", "data:text/csv;charset=utf-8,"+encodeURI(CSVfile));

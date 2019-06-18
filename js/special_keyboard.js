@@ -5,6 +5,7 @@ document.addEventListener("keyup", event => {
   if (event.code == 'Escape' || event.keyCode == 27) {
 
     $('.sub').hide();
+    hideAlumne();
 
   }
 

@@ -65,7 +65,7 @@ function load(p, reload = false) {
         if (data.length < 42) {
           loginPage(p);
         } else {
-          load('news');
+          load('a_madfavs');
         }
 
       });
@@ -99,7 +99,7 @@ function load(p, reload = false) {
 
         } else {
 
-          var upgraded = ['rooms','speaker','a_vagtplan','news','guides','news_types','news_edit','stem'];
+          var upgraded = ['rooms','speaker','a_vagtplan','news','guides','news_types','news_edit','stem','a_madfavs','a_pass'];
           var version = upgraded.includes(p) ? 1 : 0;
 
           $.post('http://davidsvane.com/noko/server/db.php', {page: p, nr: localStorage.getItem('user'), ver: version, re: reload}, function (data) {
@@ -282,9 +282,21 @@ function load(p, reload = false) {
 
                   case 'food': // INFO: DENNE OG KOMMEN UGES MADPLAN
                     var denne_uge = true;
+                    var week_nr = 0;
                     obj.forEach(function (e) {
-                      $('#'+p).append('<h2>Uge '+weekFromISO(e.week.replace(/-/g,'/'))+'</h2>');
-                      for (var i=1; i<8; i++) { $('#'+p).append('<i>'+dage[i-1]+':</i> '+e[i]+'<br />'); }
+                      week_nr = weekFromISO(e.week.replace(/-/g,'/'));
+                      $('#'+p).append('<h2>Uge '+week_nr+'</h2><table id="fweek_'+week_nr+'"></table>');
+                      for (var i=1; i<8; i++) { $('#'+p+' table:last-of-type').append('<tr><td>'+dage[i-1]+'</td><td class="favorite"><div><i class="material-icons" onclick="javascript:toggleFoodFavorite(true,'+week_nr+','+i+')">favorite_border</i><i class="material-icons" onclick="javascript:toggleFoodFavorite(false,'+week_nr+','+i+')">favorite</i></div></td><td>'+e[i]+'</td></tr>'); }
+                    });
+
+                    $.post('http://davidsvane.com/noko/server/db.php', {page: "food_favs", nr: localStorage.getItem('user'), ver: 1}, function (data) {
+
+                      var u_favs = JSON.parse(data)[0];
+
+                      u_favs.forEach(function (e) {
+                        $('#fweek_'+e.week+' tr:nth-child('+e.day+')').toggleClass("selected");
+                      });
+
                     });
                   break;
 
@@ -1092,6 +1104,19 @@ function load(p, reload = false) {
                     $('#vr_week').change(function () {
                       $('.fweek').hide();
                       $('#fw_'+$('#vr_week').val()).show();
+                    });
+                  break;
+
+                  case 'a_madfavs':
+                    console.log(obj);
+                    $('#'+p).text(data);
+                  break;
+
+                  case 'a_pass':
+                    $('#'+p).append('<h1>PASSWORDS</h1><h3>Aktive</h3><table class="a_1"><thead><tr><td>Anvendelse</td><td>Brugernavn</td><td>Password</td></tr></thead><tbody></tbody></table><h3>Inaktive</h3><table class="a_0"><thead><tr><td>Anvendelse</td><td>Brugernavn</td><td>Password</td></tr></thead><tbody></tbody></table>');
+
+                    obj.forEach(function (e) {
+                      $('#'+p+' .a_'+e.active+' tbody').append('<tr><td>'+e.name+'</td><td>'+e.username+'</td><td>'+e.password+'</td></tr>');
                     });
                   break;
 
