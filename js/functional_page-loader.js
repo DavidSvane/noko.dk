@@ -65,7 +65,7 @@ function load(p, reload = false) {
         if (data.length < 42) {
           loginPage(p);
         } else {
-          load('a_madfavs');
+          load('speaker');
         }
 
       });
@@ -138,7 +138,7 @@ function load(p, reload = false) {
 
                     // INFO: GENERATES BTNS, TABS AND TABLES
                     $('#'+p).html(generateTabsNTables(5,1,8,13));
-                    $('#'+p).prepend('<h2>LADCYKEL</h2>');
+                    $('#'+p).prepend('<h2>LADCYKEL</h2><p>Ladcyklen er fællesansvar, så husk lige at sige det videre, hvis den kommer til skade, så vi kan fikse den.</p>');
 
                     // INFO: ADD TEXT TO BUTTONS
                     $('#'+p+' .tnt_btn').each(function (e) {
@@ -456,7 +456,7 @@ function load(p, reload = false) {
 
                     // INFO: GENERATES BTNS, TABS AND TABLES
                     $('#'+p).html(generateTabsNTables(3,3,8,19));
-                    $('#'+p).prepend('<h2>VASKETIDER</h2>');
+                    $('#'+p).prepend('<h2>VASKETIDER</h2><p>Det gamle kort-system, hvor alumner betaler ved anvendelsen af en maskine, er nedlagt og dyrt for os alle at genindføre.<br />Det betyder at vi nu alle sammen skal være gode til at booke vasketider her, så vi får betalt for vores forbrug hver især. Tak!</p>');
 
                     // INFO: ADD TEXT TO BUTTONS
                     $('#'+p+' .tnt_btn').each(function (e) {
@@ -752,8 +752,8 @@ function load(p, reload = false) {
                     var year_id = 0;
 
                     // INFO: GENERATE BTN, TABS AND TABLES
-                    $('#'+p).html(generateTabsNTables(2,2,32,13));
-                    $('#'+p).prepend('<h2>LOKALER</h2>');
+                    $('#'+p).html(generateTabsNTables(2,3,32,13));
+                    $('#'+p).prepend('<h2>LOKALER</h2><p>"N" er de officielle NOKO-fester, hvorfor lokalerne ikke kan bookes her.<br />Lejlighedsbeboere skal skrive til en web-ansvarlig for at lave en booking, så der ikke blot står "0".</p>');
 
                     // INFO: ADD TEXT TO BUTTONS
                     $('#'+p+' .tnt_btn').each(function (e) {
@@ -772,7 +772,7 @@ function load(p, reload = false) {
                     }
 
                     // INFO: ADD TABLE TITLES
-                    var room_opt = ['Biblioteket &amp; Billardstuen','Spisesalen']
+                    var room_opt = ['Biblioteket','Billardstuen','Spisesalen']
                     $('#'+p+' .tnt_table').each(function (e) {
                       $(this).before('<p>' + room_opt[ parseInt($(this).attr('tnt_table')) ] + '</p>');
                     });
@@ -839,7 +839,7 @@ function load(p, reload = false) {
 
                     // INFO: GENERATE BTN, TABS AND TABLES
                     $('#'+p).html(generateTabsNTables(2,1,32,13));
-                    $('#'+p).prepend('<h2>SOUNDBOX</h2>');
+                    $('#'+p).prepend('<h2>SOUNDBOX</h2><p>Soundboxen er at finde i gymnastiksalen, og nøglen hænger i computerrummet.<br />Pas godt på vores alle sammens anlæg, og sig det videre, hvis der sker noget, så vi kan få det fikset.</p>');
 
                     // INFO: ADD TEXT TO BUTTONS
                     $('#'+p+' .tnt_btn').each(function (e) {
@@ -899,6 +899,10 @@ function load(p, reload = false) {
                         });
                       }
                     });
+
+                    $('#'+p).append('<div id="speaker_rules"></div>');
+                    $('#speaker_rules').append('<h3>Regler for lån af NOKO’s anlæg</h3>');
+                    $('#speaker_rules').append('<p>Vigtigst for brug af anlægget er at huske, at det er en fantastisk luksus, som hele kollegiet gerne skulle have glæde af mange år frem! Det vil sige, at den skal behandles, som var det dit eget anlæg, måske næsten bedre!</p><ol><li>Anlæggets primære plads er i gymnastiksalen, hvor det skal låses vha. kæden og vandrørene.</li><li>Ved brug uden for gymnastiksalen, skal anlægget altid bookes inden via intranettet. – nøglen hænger i computerrummet</li><li>Når anlægget benyttes uden for kollegiet, er det vigtigt altid at passe meget på det, og låse det når det ikke er under opsyn (fx på festival).</li><li>Anlægget er kun til brug for kollegiets alumner og skal derfor ikke lånes ud.</li><li>Husk at stille det tilbage og låse det i salen igen, så hurtigt du overhovedet kan.</li></ol><p>Note: Anlægget er ikke forsikret, så pas godt på det!<br />Hvis anlægget går i stykker på nogen måde – kontakt Vicki<br />Nyd det for katten!!</p>');
                   break;
 
                   case 'stem': // INFO: AFSTEMNINGSSYSTEM TIL PLENUM

@@ -233,6 +233,7 @@ footer hr { padding: 0 0 0.25em; }
 .cnt_book .availables { width: 100%; height: 100%; background: var(--book-free); display: block; }
 /*.cnt_book .availables { font-size: 10px; text-decoration: none; background: var(--book-free); padding: 0 0.6em; cursor: pointer; border-radius: 100%; }*/
 .cnt_book .availables:hover { background: var(--book-free-hover); }
+#laundry > p, #bike > p, #rooms > p, #speaker > p { color: gray; font-style: italic; width: 100%; box-sizing: border-box; text-align: center; margin: 1em 0 2em; }
 
 #laundry div { white-space: nowrap; column-count: 3; padding-top: 1em; }
 #laundry div > p { box-sizing: border-box; margin: 0em 0em 0.5em 1em; padding-left: 2em; font-weight: bold; display: block; }
@@ -246,10 +247,15 @@ footer hr { padding: 0 0 0.25em; }
 #bike td, #gym td { border: 1px solid var(--book-border); height: 30px; text-align: center; vertical-align: center; width: 115px; }
 
 #rooms div, #speaker div { padding-top: 0; width: calc(100% - 1em); }
-#rooms div > p, #speaker div > p { box-sizing: border-box; margin: 2em 0em 0.5em 1em; padding-left: 2em; font-weight: bold; display: block; }
+#rooms div > p { box-sizing: border-box; margin: 2em 0em 0.5em 1em; padding-left: 2em; font-weight: bold; display: block; }
 #rooms table, #speaker table { width: 100%; display: block; box-sizing: border-box; border-collapse: collapse; padding-left: 1em; }
 #rooms td, #speaker td { border: 1px solid var(--book-border); height: 30px; text-align: center; vertical-align: center; width: 115px; overflow: hidden; text-overflow: clip; }
 #speaker table { margin-top: 2em; }
+
+#speaker_rules { width: 100%; display: block; margin-top: 42px; padding: 20px; box-sizing: border-box; }
+#speaker_rules h3 { width: 100%; box-sizing: border-box; text-align: center; margin-bottom: 1.5em; }
+#speaker_rules p { padding: 1em 2em; color: gray; font-style: italic; }
+#speaker_rules li { padding: 0.5em; color: gray; font-style: italic; }
 
 /* TABLE FORMATTING */
 .cnt_book tr:first-child td { font-style: italic; font-weight: bold; }
