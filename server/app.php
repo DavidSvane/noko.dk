@@ -41,14 +41,14 @@
   // INFO: SQL STATEMTNS FOR ALLE PAGES
   $pages = array(
 
-    'i_food' => "SELECT d" . date("N") . "
+    'i_food' => "SELECT d" . date("N") . ", week
         				FROM kitchen_plans
         				WHERE week
         				LIKE '" . date('Y-m-d', strtotime(date('Y') . 'W' . date('W'))) . "%'",
 
     'i_shifts' => "SELECT day, pid
           				FROM vagtplan_felter
-          				WHERE (d1=" . $output['room'] . " OR d2=" . $output['room'] . ")
+          				WHERE (d1=" . $_POST['rm'] . " OR d2=" . $_POST['rm'] . ")
           				AND pid IN (
           					SELECT id
           					FROM vagtplan_sider
@@ -58,7 +58,7 @@
     'i_laundry' => "SELECT SUBSTRING(week,1,10) AS week, nr, day, time
             				FROM laundry
             				WHERE (
-            					room=" . $output['room'] . "
+            					room=" . $_POST['rm'] . "
             					AND week>='" . $week1 . "'
             					AND week<='" . $week2 . "'
             					)

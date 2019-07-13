@@ -6,16 +6,23 @@
   header('Content-Type: text/html; charset=utf-8');
 
 
+  // INFO: LIST OF UID WITH ADMIN ACCESS
+  $admins = ['admin',4202,'kontor','Køkkenet'];
+
+
+  // INFO: PAGES LOADING LIST OF FILES INSTEAD OF REGULAR DB CONTENT
   if ($_POST['page'] == 'summaries') {
 
     $files = scandir('../plenum');
-    echo(json_encode($files));
+    $package = [$files, in_array($_POST['nr'], $admins)];
+    echo(json_encode($package));
     die();
 
   } else if ($_POST['page'] == 'files') {
 
     $files = scandir('../files');
-    echo(json_encode($files));
+    $package = [$files, in_array($_POST['nr'], $admins)];
+    echo(json_encode($package));
     die();
 
   }
@@ -57,9 +64,6 @@
     $d_a2 = date_format($d_a2,'Y-m-d 23:59:59');
   }
 
-  // INFO: LIST OF UID WITH ADMIN ACCESS
-  $admins = ['admin',4202,'kontor'];
-
   // INFO: VARIABLE SETUP FOR BOOKING QUERIES
   if ($_POST['page'] == 'laundry_book') { $binfo = explode("_", $_POST['bid']); }
   if ($_POST['page'] == 'bike_book') { $binfo = explode("_", $_POST['bid']); }
@@ -87,25 +91,22 @@
   if ($_POST['page'] == 'a_lists_fetch') {
     $lists_data = json_decode($_POST['p']);
     if ($lists_data->restrict) {
-      $lists_data->restrict = 'INNER JOIN (SELECT CONCAT(uid, MAX(date)) AS tag FROM alumni_fields GROUP BY uid) AS t ON CONCAT(f.uid, f.date)=t.tag';
+      $lists_data->restrict = 'AND active=1';
     } else {
       $lists_data->restrict = null;
     }
   }
+  if ($_POST['page'] == 'a_alumner_insert' || $_POST['page'] == 'a_alumner_update') { $info = json_decode(urldecode($_POST['inf']), true); }
 
   // INFO: SQL STATEMTNS FOR ALLE PAGES
   $pages = array(
-    // INFO: UNCATEGORIZED PAGE FUNCTIONS
+    // INFO: UNCATEGORIZED PAGE FUNCTIONS (!! vagtplan)
     'cal' => 'SELECT date, name, who
-              FROM party
+              FROM info_cal
               WHERE SUBSTRING(date,1,4)="'.date('Y').'"
               ORDER BY date ASC',
-    'front' => 'SELECT id, text
-                FROM news
-                WHERE id
-                IN (1,2,3,5,7)',
     'food' => 'SELECT week, d1, d2, d3, d4, d5, d6, d7
-                FROM kitchen_plans
+                FROM info_menu
                 WHERE week>"'.$d_f.'"
                 ORDER BY week DESC',
     'food_favs' => 'SELECT week, day
@@ -124,23 +125,17 @@
     'guides' => 'SELECT *
                 FROM guides
                 ORDER BY title ASC',
-    'me' => 'SELECT p.first, p.last, f.room, f.nr, u.mail, p.phone, u.pass, p.study, u.uid
-            FROM users AS u
-            INNER JOIN
-            alumni_fields AS f
-            ON u.uid=f.uid
-            INNER JOIN
-            alumni_profile AS p
-            ON u.uid=p.uid
-            WHERE f.nr='.$_POST['nr'].'
-            ORDER BY f.date DESC',
-    'me_mail' => 'UPDATE users
+    'me' => 'SELECT first, last, room, nr, mail, phone, pass, study, uid
+            FROM user
+            WHERE nr='.$_POST['nr'].'
+            ORDER BY date DESC',
+    'me_mail' => 'UPDATE user
                   SET mail="'.$_POST['d'].'"
                   WHERE uid="'.$_POST['u'].'"',
-    'me_pass' => 'UPDATE users
+    'me_pass' => 'UPDATE user
                   SET pass="'.$_POST['d'].'"
                   WHERE uid="'.$_POST['u'].'"',
-    'me_phone' => 'UPDATE alumni_profile
+    'me_phone' => 'UPDATE user
                   SET phone="'.$_POST['d'].'"
                   WHERE uid="'.$_POST['u'].'"',
     'plan' => 'SELECT pid, day, d1, d2, month, type
@@ -153,7 +148,7 @@
                       VALUES ("'.$_POST['y'].'", "'.$_POST['m'].'", \''.$_POST['plan'].'\')',
 
 
-    // INFO: FUNCTIONS FOR THE FRONT PAGE EVENTS
+    // INFO: FUNCTIONS FOR THE FRONT PAGE EVENTS (update not needed)
     'news' => 'SELECT i.id, i.time, i.title, i.description, i.place, i.img, i.priority, i.type, i.user, i.link
               FROM info_news AS i
               INNER JOIN info_news_types AS t
@@ -170,7 +165,8 @@
                     WHERE i.id="'.$_POST['re'].'"
                     LIMIT 1',
     'news_update' => 'UPDATE info_news
-                      SET title="'.$info["title"].'", time="'.$info["time"].'", place="'.$info["place"].'", description="'.$info["description"].'", link="'.$info["link"].'", img="'.$info["img"].'", priority="'.$info["priority"].'", type="'.$info["type"].'"
+                      SET title="'.$info["title"].'", time="'.$info["time"].'", place="'.$info["place"].'", description="'.$info["description"].'",
+                        link="'.$info["link"].'", img="'.$info["img"].'", priority="'.$info["priority"].'", type="'.$info["type"].'"
                       WHERE id="'.$info["eid"].'"',
     'news_add' => 'INSERT INTO info_news (title, time, place, description, link, img, priority, type, user)
                   VALUES ("'.$info["title"].'", "'.$info["time"].'", "'.$info["place"].'", "'.$info["description"].'", "'.$info["link"].'", "'.$info["img"].'", "'.$info["priority"].'", "'.$info["type"].'", "'.$_POST["nr"].'")',
@@ -179,7 +175,7 @@
                       WHERE id="'.$_POST['id'].'"',
 
 
-    // INFO: FUNCTIONS FOR THE VOTING SYSTEM
+    // INFO: FUNCTIONS FOR THE VOTING SYSTEM (update not needed)
     'poll_close' => 'UPDATE vote_polls
                     SET active=0
                     WHERE (
@@ -230,139 +226,51 @@
                   LIMIT 1',
 
 
-    // INFO: FUNCTIONS FOR THE ALUMNI PAGES
-    'alumne_fetch' => 'SELECT u.name AS name,
-                        f.nr AS nr,
-                        f.room AS room,
-                        f.status AS status,
-                        s.title AS title,
-                        p.study AS study,
-                        u.mail AS mail,
-                        p.phone AS phone,
-                        f.date AS date
-                      FROM users AS u
-                      LEFT JOIN alumni_profile AS p
-                        ON u.uid=p.uid
-                      LEFT JOIN alumni_fields AS f
-                        ON u.uid=f.uid
-                      LEFT JOIN alumni_status AS s
-                        ON f.status=s.status
-                      WHERE u.uid="'.$_POST['u'].'"
+    // INFO: FUNCTIONS FOR THE ALUMNI PAGES (updated)
+    'alumne_fetch' => 'SELECT first, last, nr, room, status, study, mail, phone, date
+                      FROM user
+                      WHERE uid="'.$_POST['u'].'"
                       ORDER BY date ASC',
-    'changes' => 'SELECT f.date,
-                    u.name AS name,
-                    f.room AS room,
-                    f.status AS status,
-                    sl.title AS title
-                  FROM users AS u
-                  LEFT JOIN alumni_fields AS f
-                    ON u.uid=f.uid
-                  LEFT JOIN alumni_status AS sl
-                    ON f.status=sl.status
-                  INNER JOIN (
-                    SELECT CONCAT(uid, MAX(date)) AS tag
-                    FROM alumni_fields
-                    GROUP BY uid
-                  ) AS t
-                  ON CONCAT(f.uid, f.date)=t.tag
-                  WHERE f.date>"'.date("Y-m",strtotime("-2 Months")).'"
-                  ORDER BY f.date DESC, f.status ASC, u.name ASC',
-    'current' => 'SELECT u.uid, a.status, u.name, a.room, m.nr
-                  FROM users AS u
-                  INNER JOIN
-                  (
-                  	SELECT CONCAT(date,uid) AS md, uid, date, status, room
-                    FROM alumni_fields
-                  ) AS a
-                  ON a.uid=u.uid
-                  INNER JOIN
-                  (
-                  	SELECT CONCAT(MAX(date),uid) AS md, nr
-                    FROM alumni_fields
-                    GROUP BY uid
-                  ) AS m
-                  ON a.md=m.md
-                  WHERE (u.status=1 AND a.status IN (0,1,2,3,6))
-                  ORDER BY u.name ASC',
-    'corridors' => 'SELECT u.uid, a.status, u.name, a.room, m.nr
-                    FROM users AS u
-                    INNER JOIN
-                    (
-                    	SELECT CONCAT(date,uid) AS md, uid, date, status, room
-                      FROM alumni_fields
-                    ) AS a
-                    ON a.uid=u.uid
-                    INNER JOIN
-                    (
-                    	SELECT CONCAT(MAX(date),uid) AS md, nr
-                      FROM alumni_fields
-                      GROUP BY uid
-                    ) AS m
-                    ON a.md=m.md
-                    WHERE (u.status=1 AND a.status IN (0,2,3,6))
-                    ORDER BY a.room ASC',
-    'history' => 'SELECT f.date,
-                    u.name AS name,
-                    f.room AS room,
-                    f.status AS status,
-                    sl.title AS title
-                  FROM users AS u
-                  LEFT JOIN alumni_fields AS f
-                    ON u.uid=f.uid
-                  LEFT JOIN alumni_status AS sl
-                    ON f.status=sl.status
-                  WHERE f.date>"2007"
-                  ORDER BY f.status ASC, u.name ASC',
-    'photowall' => 'SELECT u.uid, u.name, a.room, m.nr
-                  FROM users AS u
-                  INNER JOIN
-                  (
-                  	SELECT CONCAT(date,uid) AS md, uid, date, status, room
-                    FROM alumni_fields
-                  ) AS a
-                  ON a.uid=u.uid
-                  INNER JOIN
-                  (
-                  	SELECT CONCAT(MAX(date),uid) AS md, nr
-                    FROM alumni_fields
-                    GROUP BY uid
-                  ) AS m
-                  ON a.md=m.md
-                  WHERE (u.status=1 AND a.status IN (0,2,3,6))
-                  ORDER BY u.name ASC',
-    'previous' => 'SELECT u.name, a.room, u.mail, a.date
-                  FROM users AS u
-                  INNER JOIN
-                  (
-                    SELECT CONCAT(date,uid) AS md, uid, date, status, room
-                      FROM alumni_fields
-                  ) AS a
-                  ON a.uid=u.uid
-                  INNER JOIN
-                  (
-                    SELECT CONCAT(MAX(date),uid) AS md
-                      FROM alumni_fields
-                      GROUP BY uid
-                  ) AS m
-                  ON a.md=m.md
-                  WHERE u.status=0
-                  ORDER BY u.name ASC',
+    'changes' => 'SELECT date, first, last, room, status
+                  FROM user
+                  WHERE date>"'.date("Y-m",strtotime("-2 Months")).'"
+                  ORDER BY date DESC, status ASC, first ASC',
+    'current' => 'SELECT uid, status, first, last, room, nr
+                  FROM user
+                  WHERE (active=1 AND status IN (0,1,2,3,6))
+                  ORDER BY first ASC',
+    'corridors' => 'SELECT uid, status, first, last, room, nr
+                    FROM user
+                    WHERE (active=1 AND status IN (0,2,3,6))
+                    ORDER BY CHAR_LENGTH(room) ASC, room ASC',
+    'history' => 'SELECT date, first, last, room, status
+                  FROM user
+                  WHERE date>"2007"
+                  ORDER BY status ASC, first ASC',
+    'photowall' => 'SELECT uid, first, last, room, nr
+                  FROM user
+                  WHERE (active=1 AND status IN (0,2,3,6))
+                  ORDER BY first ASC',
+    'previous' => 'SELECT first, last, room, mail, date
+                  FROM user
+                  WHERE (active=0 AND date>"2000")
+                  ORDER BY first ASC',
 
 
-    // INFO: FUNCTIONS FOR THE BOOKING SYSTEMS
-    'bike' => 'SELECT week, day, time, room, id
-                FROM mcbike
+    // INFO: FUNCTIONS FOR THE BOOKING SYSTEMS (!! laundry)
+    'bike' => 'SELECT week, day, time, user, id
+                FROM book_bike
                 WHERE week>"'.$d_l.'"',
-    'bike_book' => 'INSERT INTO mcbike (week, day, time, room)
+    'bike_book' => 'INSERT INTO book_bike (week, day, time, user)
                       VALUES ("'.date('Y-m-d 00:00:00', strtotime("+".$binfo[0]." week")).'", '.$binfo[1].', '.$binfo[3].', '.$_POST['room'].')',
-    'bike_remove' => 'DELETE FROM mcbike
+    'bike_remove' => 'DELETE FROM book_bike
                       WHERE id='.$_POST['bid'],
-    'gym' => 'SELECT week, day, time, room, id
-              FROM gym
+    'gym' => 'SELECT week, day, time, user, id
+              FROM book_gym
               WHERE week>"'.$d_l.'"',
-    'gym_book' => 'INSERT INTO gym (week, day, time, room)
+    'gym_book' => 'INSERT INTO book_gym (week, day, time, user)
                   VALUES ("'.date('Y-m-d 00:00:00', strtotime("+".$binfo[0]." week")).'", '.$binfo[1].', '.$binfo[3].', '.$_POST['room'].')',
-    'gym_remove' => 'DELETE FROM gym
+    'gym_remove' => 'DELETE FROM book_gym
                     WHERE id='.$_POST['bid'],
     'laundry' => 'SELECT week, day, nr, time, room, id
                   FROM laundry
@@ -403,102 +311,39 @@
                         WHERE id='.$_POST['bid'],
 
 
-    // INFO: FUNCTIONS FOR THE ADMIN PAGES
-    'food_insert' => 'INSERT INTO kitchen_plans (week, d1, d2, d3, d4, d5, d6, d7)
+    // INFO: FUNCTIONS FOR THE ADMIN PAGES (!! vagtplan | laundry)
+    'food_insert' => 'INSERT INTO info_menu (week, d1, d2, d3, d4, d5, d6, d7)
                       VALUES ("'.$fweek.'", "'.$menu[0].'", "'.$menu[1].'", "'.$menu[2].'", "'.$menu[3].'", "'.$menu[4].'", "'.$menu[5].'", "'.$menu[6].'")',
-    'food_update' => 'UPDATE kitchen_plans
+    'food_update' => 'UPDATE info_menu
                       SET d1="'.$menu[0].'", d2="'.$menu[1].'", d3="'.$menu[2].'", d4="'.$menu[3].'", d5="'.$menu[4].'", d6="'.$menu[5].'", d7="'.$menu[6].'"
                       WHERE week="'.$fweek.'"',
     'a_madfavs' => 'SELECT *
                     FROM user_favorite_food',
-    'a_alumner' => 'SELECT u.uid AS uid,
-                      u.name AS name,
-                      f.nr AS nr,
-                      f.room AS room
-                    FROM users AS u
-                    LEFT JOIN users_roles AS r
-                      ON u.uid=r.uid
-                    LEFT JOIN alumni_fields AS f
-                      ON u.uid=f.uid
-                    INNER JOIN (
-                      SELECT CONCAT(uid, MAX(date)) AS tag
-                      FROM alumni_fields
-                      GROUP BY uid
-                    ) AS t
-                    ON CONCAT(f.uid, f.date)=t.tag
-                    WHERE (
-                      f.status IN (0,1,2,3,6)
-                      AND r.rid=12
-                    )
-                    GROUP BY u.uid
-                    ORDER BY u.name ASC',
-    'a_alumner_fetch' => 'SELECT r.uid AS uid,
-                      /*u.name AS name,*/
-                      u.pass AS pass,
-                      f.nr AS nr,
-                      f.room AS room,
-                      f.status AS status,
-                      sl.title AS title,
-                      p.sex AS sex,
-                      /*r.rid AS rid,
-                      rl.name AS role,*/
-                      p.study AS study,
-                      u.mail AS mail,
-                      p.phone AS phone,
-                      /*f.date AS date,*/
-                      p.first AS first,
-                      p.last AS last
-                    FROM users AS u
-                    LEFT JOIN users_roles AS r
-                      ON u.uid=r.uid
-                    INNER JOIN role AS rl
-                      ON r.rid=rl.rid
-                    LEFT JOIN alumni_profile AS p
-                      ON u.uid=p.uid
-                    LEFT JOIN alumni_fields AS f
-                      ON u.uid=f.uid
-                    LEFT JOIN alumni_status AS sl
-                      ON f.status=sl.status
-                    INNER JOIN (
-                      SELECT CONCAT(uid, MAX(date)) AS tag
-                      FROM alumni_fields
-                      GROUP BY uid
-                    ) AS t
-                    ON CONCAT(f.uid, f.date)=t.tag
-                    WHERE (
-                      f.status IN (0,1,2,3,6)
-                      AND r.rid=12
-                      AND r.uid="'.$_POST['u'].'"
-                    )
-                    GROUP BY r.uid
-                    ORDER BY p.first ASC',
-    'a_alumner_insert' => '',
-    'a_alumner_update' => '',
-    'a_front' => 'SELECT *
-                  FROM news',
-    'a_lists' => '',
-    'a_lists_fetch' => 'SELECT r.uid AS uid,
-                          f.date AS date,
+    'a_alumner' => 'SELECT uid, first, last, room
+                    FROM user
+                    WHERE status in (0,1,2,3,6)
+                    ORDER BY first ASC',
+    'a_alumner_fetch' => 'SELECT *
+                          FROM user
+                          WHERE uid="'.$_POST['u'].'"',
+    'a_alumner_insert' => 'INSERT INTO user (pass, first, last, nr, room, mail, phone, status, sex, study)
+                          VALUES ("'.$info["pass"].'", "'.$info["first"].'", "'.$info["last"].'", "'.$info["nr"].'", "'.$info["room"].'",
+                            "'.$info["mail"].'", "'.$info["phone"].'", "'.$info["status"].'", "'.$info["sex"].'", "'.$info["study"].'")',
+    'a_alumner_update' => 'UPDATE user
+                          SET pass="'.$info["pass"].'", first="'.$info["first"].'", last="'.$info["last"].'", nr="'.$info["nr"].'", room="'.$info["room"].'",
+                            mail="'.$info["mail"].'", phone="'.$info["phone"].'", status="'.$info["status"].'", sex="'.$info["sex"].'", study="'.$info["study"].'"
+                          WHERE uid="'.$_POST['u'].'"',
+    'a_lists_fetch' => 'SELECT uid, date,
                           '.$lists_data->options.'
-                        FROM users AS u
-                        LEFT JOIN users_roles AS r
-                          ON u.uid=r.uid
-                        INNER JOIN role AS rl
-                          ON r.rid=rl.rid
-                        LEFT JOIN alumni_profile AS p
-                          ON u.uid=p.uid
-                        LEFT JOIN alumni_fields AS f
-                          ON u.uid=f.uid
-                        LEFT JOIN alumni_status AS sl
-                          ON f.status=sl.status
-                        '.$lists_data->restrict.'
+                        FROM user
                         WHERE (
                           f.date>"'.$lists_data->start.'"
                           AND f.date<"'.$lists_data->end.'"
+                          '.$lists_data->restrict.'
                         )
                         ORDER BY '.$lists_data->sort,
     'a_madplan' => 'SELECT *
-                    FROM kitchen_plans
+                    FROM info_menu
                     WHERE week>"'.$d_f.'"',
     'a_pass' => 'SELECT *
                 FROM admin_pass',
@@ -536,6 +381,193 @@
                             ORDER BY l.room ASC',
 
 
+    // INFO: BACKUP OF OLD DATABASE QUERIES (before update)
+    /*
+    'BU_a_alumner' => 'SELECT u.uid AS uid,
+                      u.name AS name,
+                      f.nr AS nr,
+                      f.room AS room
+                    FROM users AS u
+                    LEFT JOIN users_roles AS r
+                      ON u.uid=r.uid
+                    LEFT JOIN alumni_fields AS f
+                      ON u.uid=f.uid
+                    INNER JOIN (
+                      SELECT CONCAT(uid, MAX(date)) AS tag
+                      FROM alumni_fields
+                      GROUP BY uid
+                    ) AS t
+                    ON CONCAT(f.uid, f.date)=t.tag
+                    WHERE (
+                      f.status IN (0,1,2,3,6)
+                      AND r.rid=12
+                    )
+                    GROUP BY u.uid
+                    ORDER BY u.name ASC',
+    'BU_a_alumner_fetch' => 'SELECT r.uid AS uid,
+                      u.pass AS pass,
+                      f.nr AS nr,
+                      f.room AS room,
+                      f.status AS status,
+                      sl.title AS title,
+                      p.sex AS sex,
+                      p.study AS study,
+                      u.mail AS mail,
+                      p.phone AS phone,
+                      p.first AS first,
+                      p.last AS last
+                    FROM users AS u
+                    LEFT JOIN users_roles AS r
+                      ON u.uid=r.uid
+                    INNER JOIN role AS rl
+                      ON r.rid=rl.rid
+                    LEFT JOIN alumni_profile AS p
+                      ON u.uid=p.uid
+                    LEFT JOIN alumni_fields AS f
+                      ON u.uid=f.uid
+                    LEFT JOIN alumni_status AS sl
+                      ON f.status=sl.status
+                    INNER JOIN (
+                      SELECT CONCAT(uid, MAX(date)) AS tag
+                      FROM alumni_fields
+                      GROUP BY uid
+                    ) AS t
+                    ON CONCAT(f.uid, f.date)=t.tag
+                    WHERE (
+                      f.status IN (0,1,2,3,6)
+                      AND r.rid=12
+                      AND r.uid="'.$_POST['u'].'"
+                    )
+                    GROUP BY r.uid
+                    ORDER BY p.first ASC',
+    'BU_a_alumner_insert' => '',
+    'BU_a_alumner_update' => '',
+    'BU_laundry_accounting' => 'SELECT l.room AS "Vaerelse", COUNT(l.room) AS "Antal"
+                            FROM book_laundry AS l
+                            WHERE week BETWEEN "'.$d_a1.'" AND "'.$d_a2.'"
+                            GROUP BY l.room
+                            ORDER BY l.room ASC',
+    'BU_alumne_fetch' => 'SELECT u.name AS name,
+                        f.nr AS nr,
+                        f.room AS room,
+                        f.status AS status,
+                        s.title AS title,
+                        p.study AS study,
+                        u.mail AS mail,
+                        p.phone AS phone,
+                        f.date AS date
+                      FROM users AS u
+                      LEFT JOIN alumni_profile AS p
+                        ON u.uid=p.uid
+                      LEFT JOIN alumni_fields AS f
+                        ON u.uid=f.uid
+                      LEFT JOIN alumni_status AS s
+                        ON f.status=s.status
+                      WHERE u.uid="'.$_POST['u'].'"
+                      ORDER BY date ASC',
+    'BU_changes' => 'SELECT f.date,
+                    u.name AS name,
+                    f.room AS room,
+                    f.status AS status,
+                    sl.title AS title
+                  FROM users AS u
+                  LEFT JOIN alumni_fields AS f
+                    ON u.uid=f.uid
+                  LEFT JOIN alumni_status AS sl
+                    ON f.status=sl.status
+                  INNER JOIN (
+                    SELECT CONCAT(uid, MAX(date)) AS tag
+                    FROM alumni_fields
+                    GROUP BY uid
+                  ) AS t
+                  ON CONCAT(f.uid, f.date)=t.tag
+                  WHERE f.date>"'.date("Y-m",strtotime("-2 Months")).'"
+                  ORDER BY f.date DESC, f.status ASC, u.name ASC',
+    'BU_current' => 'SELECT u.uid, a.status, u.name, a.room, m.nr
+                  FROM users AS u
+                  INNER JOIN
+                  (
+                  	SELECT CONCAT(date,uid) AS md, uid, date, status, room
+                    FROM alumni_fields
+                  ) AS a
+                  ON a.uid=u.uid
+                  INNER JOIN
+                  (
+                  	SELECT CONCAT(MAX(date),uid) AS md, nr
+                    FROM alumni_fields
+                    GROUP BY uid
+                  ) AS m
+                  ON a.md=m.md
+                  WHERE (u.status=1 AND a.status IN (0,1,2,3,6))
+                  ORDER BY u.name ASC',
+    'BU_corridors' => 'SELECT u.uid, a.status, u.name, a.room, m.nr
+                    FROM users AS u
+                    INNER JOIN
+                    (
+                    	SELECT CONCAT(date,uid) AS md, uid, date, status, room
+                      FROM alumni_fields
+                    ) AS a
+                    ON a.uid=u.uid
+                    INNER JOIN
+                    (
+                    	SELECT CONCAT(MAX(date),uid) AS md, nr
+                      FROM alumni_fields
+                      GROUP BY uid
+                    ) AS m
+                    ON a.md=m.md
+                    WHERE (u.status=1 AND a.status IN (0,2,3,6))
+                    ORDER BY a.room ASC',
+    'BU_history' => 'SELECT f.date,
+                    u.name AS name,
+                    f.room AS room,
+                    f.status AS status,
+                    sl.title AS title
+                  FROM users AS u
+                  LEFT JOIN alumni_fields AS f
+                    ON u.uid=f.uid
+                  LEFT JOIN alumni_status AS sl
+                    ON f.status=sl.status
+                  WHERE f.date>"2007"
+                  ORDER BY f.status ASC, u.name ASC',
+    'BU_photowall' => 'SELECT u.uid, u.name, a.room, m.nr
+                  FROM users AS u
+                  INNER JOIN
+                  (
+                  	SELECT CONCAT(date,uid) AS md, uid, date, status, room
+                    FROM alumni_fields
+                  ) AS a
+                  ON a.uid=u.uid
+                  INNER JOIN
+                  (
+                  	SELECT CONCAT(MAX(date),uid) AS md, nr
+                    FROM alumni_fields
+                    GROUP BY uid
+                  ) AS m
+                  ON a.md=m.md
+                  WHERE (u.status=1 AND a.status IN (0,2,3,6))
+                  ORDER BY u.name ASC',
+    'BU_previous' => 'SELECT u.name, a.room, u.mail, a.date
+                  FROM users AS u
+                  INNER JOIN
+                  (
+                    SELECT CONCAT(date,uid) AS md, uid, date, status, room
+                      FROM alumni_fields
+                  ) AS a
+                  ON a.uid=u.uid
+                  INNER JOIN
+                  (
+                    SELECT CONCAT(MAX(date),uid) AS md
+                      FROM alumni_fields
+                      GROUP BY uid
+                  ) AS m
+                  ON a.md=m.md
+                  WHERE u.status=0
+                  ORDER BY u.name ASC',
+    */
+
+
+    'front' => '',
+    'a_lists' => '',
     'logud' => '',
     'login' => '',
   );
@@ -550,7 +582,7 @@
     die("Connection failed: " . $conn->connect_error);
   }
 
-  $specialklassen = ['food_insert','food_update','news_add','news_update','poll_open'];
+  $specialklassen = ['food_insert','food_update','news_add','news_update','poll_open','a_alumner_insert','a_alumner_update'];
   if (in_array($_POST['page'], $specialklassen)) { $conn->set_charset("utf8"); }
   $sql = $pages[$_POST['page']];
 

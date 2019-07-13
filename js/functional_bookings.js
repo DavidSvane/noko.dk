@@ -30,12 +30,12 @@ function reloadBike() {
 function bookBike(week, day, nr, time) {
 
   book_id = week+'_'+day+'_'+nr+'_'+time;
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "bike_book", nr: localStorage.getItem('user'), room: localStorage.getItem('room'), bid: book_id}, function (data) { reloadBike(); });
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "bike_book", nr: localStorage.getItem('user'), room: localStorage.getItem('room'), bid: book_id, ver: 1}, function (data) { reloadBike(); });
 
 }
 function removeBike(book_id) {
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "bike_remove", nr: localStorage.getItem('user'), room: localStorage.getItem('room'), bid: book_id}, function (data) { reloadBike(); });
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "bike_remove", nr: localStorage.getItem('user'), room: localStorage.getItem('room'), bid: book_id, ver: 1}, function (data) { reloadBike(); });
 
 }
 
@@ -93,11 +93,11 @@ function reloadGym() {
 function bookGym(week, day, nr, time) {
 
   book_id = week+'_'+day+'_'+nr+'_'+time;
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "gym_book", nr: localStorage.getItem('user'), room: localStorage.getItem('room'), bid: book_id}, function (data) { reloadGym(); });
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "gym_book", nr: localStorage.getItem('user'), room: localStorage.getItem('room'), bid: book_id, ver: 1}, function (data) { reloadGym(); });
 
 }
 function removeGym(book_id) {
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "gym_remove", nr: localStorage.getItem('user'), room: localStorage.getItem('room'), bid: book_id}, function (data) { reloadGym(); });
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "gym_remove", nr: localStorage.getItem('user'), room: localStorage.getItem('room'), bid: book_id, ver: 1}, function (data) { reloadGym(); });
 
 }

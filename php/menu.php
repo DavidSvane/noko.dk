@@ -11,7 +11,7 @@
 
     if ($link == 'intranet') {
 
-      echo('<a href="/noko.dk/intranet/">' . ${$lang}[$link] . '</a>');
+      echo('<a href="/intranet/">' . ${$lang}[$link] . '</a>');
 
     } else if ($link == 'changelang') {
 

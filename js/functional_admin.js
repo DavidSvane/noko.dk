@@ -49,7 +49,7 @@ function updateFood() {
   }
   menu = encodeURIComponent(JSON.stringify(menu));
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: db_function, y: year, w: week, m: menu}, function (data) { alert("Madplan gemt"); });
+  $.post('http://davidsvane.com/noko/server/db.php', {page: db_function, y: year, w: week, m: menu, ver: 1}, function (data) { alert("Madplan gemt"); });
 
 }
 
@@ -206,7 +206,7 @@ function fetchAlumne() {
 
   var uid = $('#alumni_list').val();
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_fetch", u: uid, nr: localStorage.getItem("user")}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_fetch", u: uid, nr: localStorage.getItem("user"), ver: 1}, function (data) {
 
     var obj = JSON.parse(data);
 
@@ -243,39 +243,28 @@ function fetchAlumne() {
 function updateAlumne() {
 
   var uid = $('#ainfo').attr("user-id");
+  var p = uid == "new" ? 'a_alumner_insert' : 'a_alumner_update';
   var info = new Object();
+
+  if (uid == "new") {
+    var check = confirm("Du er ved at oprette en ny bruger!");
+    if (!check) { return; }
+  }
 
   $('#ainfo input').each(function () { info[$(this).parent().attr("class").substr(3)] = $(this).val(); });
   $('#ainfo select').each(function () { info[$(this).parent().attr("class").substr(3)] = $(this).val(); });
 
-  if (uid == "new") {
+  info = encodeURIComponent(JSON.stringify(info));
 
-    var check = confirm("Du er ved at oprette en ny bruger!")
-    if (!check) { return; }
+  $.post('http://davidsvane.com/noko/server/db.php', {page: p, u: uid, inf: info, nr: localStorage.getItem("user"), ver: 1}, function (data) {
 
-    $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_insert", inf: info, nr: localStorage.getItem("user")}, function (data) {
+    if (data == 'success') {
+      alert("Informationen blev gemt");
+    } else {
+      alert("Der skete en fejl på serveren");
+    }
 
-      if (data == 'success') {
-        alert("Informationerne blev gemt");
-      } else {
-        alert("Der skete en fejl på serveren");
-      }
-
-    });
-
-  } else {
-
-    $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_update", u: uid, inf: info, nr: localStorage.getItem("user")}, function (data) {
-
-      if (data == 'success') {
-        alert("Informationerne blev gemt");
-      } else {
-        alert("Der skete en fejl på serveren");
-      }
-
-    });
-
-  }
+  });
 
 }
 
@@ -319,7 +308,7 @@ function generateList() {
 
   params = JSON.stringify(params);
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "a_lists_fetch", p: params, nr: localStorage.getItem("user")}, function (data) {
+  $.post('http://davidsvane.com/noko/server/db.php', {page: "a_lists_fetch", p: params, nr: localStorage.getItem("user"), ver: 1}, function (data) {
 
     var obj = JSON.parse(data);
     obj = obj[0];

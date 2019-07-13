@@ -41,6 +41,7 @@ hr { box-sizing: border-box; border: none; border-top: 1px solid black; }
 /* HEADER */
 header { padding: 1em 1em 0; }
 .top_titles { font-family: darleston; font-size: 3em; }
+.top_titles a { font-family: darleston; text-decoration: none; color: black; }
 
 /* NAVIGATION (MENU) */
 nav a { box-sizing: border-box; color: black; text-decoration: none; padding: 0 1.5em; }
@@ -233,7 +234,7 @@ footer hr { padding: 0 0 0.25em; }
 .cnt_book .availables { width: 100%; height: 100%; background: var(--book-free); display: block; }
 /*.cnt_book .availables { font-size: 10px; text-decoration: none; background: var(--book-free); padding: 0 0.6em; cursor: pointer; border-radius: 100%; }*/
 .cnt_book .availables:hover { background: var(--book-free-hover); }
-#laundry > p, #bike > p, #rooms > p, #speaker > p { color: gray; font-style: italic; width: 100%; box-sizing: border-box; text-align: center; margin: 1em 0 2em; }
+#laundry > p, #bike > p, #rooms > p, #speaker > p, #gym > p { color: gray; font-style: italic; width: 100%; box-sizing: border-box; text-align: center; margin: 1em 0 2em; }
 
 #laundry div { white-space: nowrap; column-count: 3; padding-top: 1em; }
 #laundry div > p { box-sizing: border-box; margin: 0em 0em 0.5em 1em; padding-left: 2em; font-weight: bold; display: block; }

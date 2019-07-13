@@ -32,7 +32,7 @@
 <body id="i_">
 
 	<header class="centered blocky">
-    <h1 class="top_titles">Nordisk Kollegiums Intranet</h1>
+    <h1 class="top_titles"><a href="http://noko.dk">Nordisk Kollegiums Intranet</a></h1>
   </header>
 
   <nav class="centered blocky">
