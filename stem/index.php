@@ -24,17 +24,24 @@
   <link rel="stylesheet" type="text/css" href="voting.css?v=<?php echo time();?>"></link>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="voting.js?v=<?php echo time();?>"></script>
+	<script src="lib_md5.js"></script>
 
 </head>
 <body>
 
   <div id="login">
-
+    <div class="cnt">
+      <form action="javascript:userLogin()">
+        <input type="text" pattern="[0-9]{4}" placeholder="Løbenummer" maxlength="4" id="ul_user"/>
+        <input type="password" placeholder="Kode" id="ul_pass"/>
+        <input type="submit" value="Login" id="ul_sub"/>
+      </form>
+    </div>
   </div>
 
-  <header><h1><a href="javascript:showMenu()">NOKO AFSTEMNING</a></h1></header>
-  <nav></nav>
-  <main></main>
+  <header class="notverified"><h1><a href="javascript:showMenu()">NOKO AFSTEMNING</a></h1></header>
+  <nav class="notverified"></nav>
+  <main class="notverified"></main>
 
 </body>
 </html>

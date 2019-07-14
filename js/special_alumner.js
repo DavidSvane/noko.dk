@@ -3,7 +3,7 @@ function showAlumne(uid) {
   $('#alumne').remove();
   $('main').append('<div id="alumne" onclick="javascript:hideAlumne()"><div></div></div>');
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "alumne_fetch", u: uid, nr: localStorage.getItem("user"), ver: 1}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: "alumne_fetch", u: uid, nr: localStorage.getItem("user"), ver: 1}, function (data) {
 
     console.log(data);
     var mths = ['Januar','Februar','Marts','April','Maj','Juni','Juli','August','September','Oktober','November','December'];
@@ -56,7 +56,7 @@ function changeImage() {
     if ($('#p_img').val().length > 3) {
 
       $.ajax({
-        url: "http://noko.dk/ds/image_uploader.php?nr="+unr,
+        url: "http://noko.dk/server/image_uploader.php?nr="+unr,
         type: "POST",
         data: new FormData(document.getElementById("img_form")),
         contentType: false,

@@ -1,3 +1,26 @@
+function userLogin() {
+
+  var u = $('#ul_user').val();
+  var p = MD5($('#ul_pass').val());
+
+  $.post('http://noko.dk/server/verify.php', {usr: u, pas: p}, function (data) {
+
+    if (data.length > 42) {
+
+      var nr = JSON.parse(data)[0].uid;
+      localStorage.setItem("u_vote_nr", nr);
+      $('.notverified').removeClass("notverified");
+      $('#login').remove();
+      console.log(data);
+
+    } else {
+      alert("Forkert brugernavn eller kode")
+    }
+
+  });
+
+}
+
 function showMenu() {
 
   $('nav').show();
@@ -13,10 +36,9 @@ function showPoll(p) {
 }
 function generatePollsList() {
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: 'stem_all', nr: Math.floor((Math.random() * 9999) + 1) /*localStorage.getItem('user')*/, ver: 1}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: 'stem', nr: localStorage.getItem("u_vote_nr"), ver: 1}, function (data) {
 
     var obj = JSON.parse(data)[0];
-    console.log(obj);
 
     if (obj.length == 0) {
 
@@ -84,9 +106,8 @@ function generatePollsList() {
         vote.push(sels[i].dataset['val']);
       }
       vote = JSON.stringify(vote);
-      console.log(vote);
 
-      $.post('http://davidsvane.com/noko/server/db.php', {page: 'poll_vote', id: pid, nr: Math.floor((Math.random() * 9999) + 1), v: vote, ver: 1}, function (data) {
+      $.post('http://noko.dk/server/db.php', {page: 'poll_vote', id: pid, nr: localStorage.getItem("u_vote_nr"), v: vote, ver: 1}, function (data) {
         alert("Din stemme er modtaget.");
         showMenu();
       });

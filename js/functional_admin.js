@@ -4,7 +4,7 @@ function laundryAccounting() {
   var y = $('#vr_year').val();
   var w = $('#vr_week').val();
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "laundry_accounting", year: y, week: w, nr: localStorage.getItem("user")}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: "laundry_accounting", year: y, week: w, nr: localStorage.getItem("user")}, function (data) {
 
     var obj = JSON.parse(data);
     obj = obj[0];
@@ -49,7 +49,7 @@ function updateFood() {
   }
   menu = encodeURIComponent(JSON.stringify(menu));
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: db_function, y: year, w: week, m: menu, ver: 1}, function (data) { alert("Madplan gemt"); });
+  $.post('http://noko.dk/server/db.php', {page: db_function, y: year, w: week, m: menu, ver: 1}, function (data) { alert("Madplan gemt"); });
 
 }
 
@@ -82,7 +82,7 @@ function getShifts() {
   year = $('#vr_year').val();
   month = $('#vr_month').val();
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: 'a_vagtplan', ver: 1, y: year, m: month}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: 'a_vagtplan', ver: 1, y: year, m: month}, function (data) {
 
     var obj = JSON.parse(data);
     var obj = obj[0];
@@ -188,7 +188,7 @@ function saveShifts() {
 
   shifts = JSON.stringify(shifts);
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: 'plan_insert', ver: 1, y: year, m: month, plan: shifts}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: 'plan_insert', ver: 1, y: year, m: month, plan: shifts}, function (data) {
 
     if (data == 'success') {
       alert("Vagtplanen blev gemt");
@@ -206,7 +206,7 @@ function fetchAlumne() {
 
   var uid = $('#alumni_list').val();
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "a_alumner_fetch", u: uid, nr: localStorage.getItem("user"), ver: 1}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: "a_alumner_fetch", u: uid, nr: localStorage.getItem("user"), ver: 1}, function (data) {
 
     var obj = JSON.parse(data);
 
@@ -256,7 +256,7 @@ function updateAlumne() {
 
   info = encodeURIComponent(JSON.stringify(info));
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: p, u: uid, inf: info, nr: localStorage.getItem("user"), ver: 1}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: p, u: uid, inf: info, nr: localStorage.getItem("user"), ver: 1}, function (data) {
 
     if (data == 'success') {
       alert("Informationen blev gemt");
@@ -308,7 +308,7 @@ function generateList() {
 
   params = JSON.stringify(params);
 
-  $.post('http://davidsvane.com/noko/server/db.php', {page: "a_lists_fetch", p: params, nr: localStorage.getItem("user"), ver: 1}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: "a_lists_fetch", p: params, nr: localStorage.getItem("user"), ver: 1}, function (data) {
 
     var obj = JSON.parse(data);
     obj = obj[0];

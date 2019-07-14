@@ -6,7 +6,9 @@ function verifyUser() {
   var user = $('#name_field').val();
   var pass = MD5($('#pass_field').val());
 
-  $.post('http://davidsvane.com/noko/server/verify.php', {usr: user, pas: pass}, function (data) {
+  $.post('http://noko.dk/server/verify.php', {usr: user, pas: pass}, function (data) {
+
+    console.log(data);
 
     if (data.length < 200) {
       alert('Forkert brugernavn eller password.');
@@ -60,7 +62,7 @@ function load(p, reload = false) {
 
     if (localStorage.getItem('user') && localStorage.getItem('salt')) {
 
-      $.post('http://davidsvane.com/noko/server/verify.php', {usr: localStorage.getItem('user'), sal: localStorage.getItem('salt')}, function (data) {
+      $.post('http://noko.dk/server/verify.php', {usr: localStorage.getItem('user'), sal: localStorage.getItem('salt')}, function (data) {
 
         if (data.length < 42) {
           loginPage(p);
@@ -91,7 +93,7 @@ function load(p, reload = false) {
 
     if (localStorage.getItem('user') && localStorage.getItem('salt')) {
 
-      $.post('http://davidsvane.com/noko/server/verify.php', {usr: localStorage.getItem('user'), sal: localStorage.getItem('salt')}, function (data) {
+      $.post('http://noko.dk/server/verify.php', {usr: localStorage.getItem('user'), sal: localStorage.getItem('salt')}, function (data) {
 
         if (data.length < 42) {
 
@@ -102,7 +104,7 @@ function load(p, reload = false) {
           var upgraded = ['plan','laundry'];
           var version = upgraded.includes(p) ? 0 : 1;
 
-          $.post('http://davidsvane.com/noko/server/db.php', {page: p, nr: localStorage.getItem('user'), ver: version, re: reload}, function (data) {
+          $.post('http://noko.dk/server/db.php', {page: p, nr: localStorage.getItem('user'), ver: version, re: reload}, function (data) {
 
             try {
               var obj = JSON.parse(data);
@@ -160,7 +162,7 @@ function load(p, reload = false) {
                       var nid = $(e.target).closest('.news_block').attr("data-nid");
                       $(e.target).closest('.news_block').remove();
                       grid.refreshItems().layout(true);
-                      $.post('http://davidsvane.com/noko/server/db.php', {page: "news_remove", id: nid, ver: 1}, function (data) { return; });
+                      $.post('http://noko.dk/server/db.php', {page: "news_remove", id: nid, ver: 1}, function (data) { return; });
                     });
 
                     $('.news_block .edit').click(function (e) {
@@ -255,7 +257,7 @@ function load(p, reload = false) {
                       for (var i=1; i<8; i++) { $('#'+p+' table:last-of-type').append('<tr><td>'+dage[i-1]+'</td><td class="favorite"><div><i class="material-icons" onclick="javascript:toggleFoodFavorite(true,'+week_nr+','+i+')">favorite_border</i><i class="material-icons" onclick="javascript:toggleFoodFavorite(false,'+week_nr+','+i+')">favorite</i></div></td><td>'+e[i]+'</td></tr>'); }
                     });
 
-                    $.post('http://davidsvane.com/noko/server/db.php', {page: "food_favs", nr: localStorage.getItem('user'), ver: 1}, function (data) {
+                    $.post('http://noko.dk/server/db.php', {page: "food_favs", nr: localStorage.getItem('user'), ver: 1}, function (data) {
 
                       var u_favs = JSON.parse(data)[0];
 
@@ -271,7 +273,7 @@ function load(p, reload = false) {
                     +'<p>Køkkenet kan træffes på <a href="35274656">35 27 46 56</a></p><br /><br />'
                     +'<p>Styrelsen består i denne periode af:<br />Skipper: <a href="https://www.facebook.com/profile.php?id=100000334852905" target="_blank">Rasmus (LH5)</a><br />Styrmand: <a href="https://www.facebook.com/mohammed.elsheikh.75" target="_blank">Mohammed (112)</a><br />Telegrafist: <a href="https://www.facebook.com/sigrid.bryndorf" target="_blank">Sigrid (64)</a><br />Bådsmand: <a href="https://www.facebook.com/svendkm" target="_blank">Svend (5)</a><br />Kabysmester: <a href="https://www.facebook.com/mathilde.meile" target="_blank">Mathilde (47)</a><br />Ceremonimester: <a href="https://www.facebook.com/gustav.lindved" target="_blank">Gustav (105)</a><br />Svabergast: <a href="https://www.facebook.com/jens.kjaergaard" target="_blank">Jens (13)</a><br /><br />E-mail-adresse: <a href="mailto:styrelsen@noko.dk">styrelsen@noko.dk</a></p>'
                     +'<p>Ny bestyrelse:<br /><a href="https://www.facebook.com/patriciajnguetsop" target="_blank">Patricia (32)</a> og <a href="https://www.facebook.com/tobias.b.bergmann" target="_blank">Tobias(63)</a><br />E-mail-adresse: <a href="mailto:bestyrelsen@noko.dk">bestyrelsen@noko.dk</a></p><br />'
-                    +'<p>Netværksudvalget består af <a href="https://www.facebook.com/davidsvane" target="_blank">David (95)</a> og <a href="https://www.facebook.com/daniel.hjorth.lund" target="_blank">Daniel (98)</a><br />Kontakt dem hvis der er problemer med netværket.<br />Facebook: <a href="https://www.facebook.com/groups/226877854147487/">Netværksudvalgets Facebookgruppe</a></p><p><a href="http://noko.dk/ds/printer.pdf">Guide til printeren.</a></p>');
+                    +'<p>Netværksudvalget består af <a href="https://www.facebook.com/davidsvane" target="_blank">David (95)</a> og <a href="https://www.facebook.com/daniel.hjorth.lund" target="_blank">Daniel (98)</a><br />Kontakt dem hvis der er problemer med netværket.<br />Facebook: <a href="https://www.facebook.com/groups/226877854147487/">Netværksudvalgets Facebookgruppe</a></p><p><a href="http://noko.dk/files/Printer.pdf">Guide til printeren.</a></p>');
                     obj.forEach(function (e) {
                       $('#'+p).append('<p>'+e[1]+'</p><br />');
                     });
@@ -299,7 +301,7 @@ function load(p, reload = false) {
                     $('#me_info').append('<span><i>Telefon</i><input id="p_phone" type="text" value="'+obj[0].phone+'"/></span>');
                     $('#me_info').append('<span><i>Kode</i><input id="p_pass" type="text" value="'+obj[0].pass+'"/></span>');
                     $('#me_info').append('<br /><span class="p_explained">Foretag en ændring og tryk på "enter"<br />Din kode bliver automatisk enkrypteret</span>');
-                    $('#me_info').append('<form id="img_form" enctype="multipart/form-data" action="http://noko.dk/ds/image_uploader.php" method="post"><input id="p_img" name="new_image" type="file"/><input type="text" value="'+obj[0].nr+'" name="user-nr"/></form>');
+                    $('#me_info').append('<form id="img_form" enctype="multipart/form-data" action="http://noko.dk/server/image_uploader.php" method="post"><input id="p_img" name="new_image" type="file"/><input type="text" value="'+obj[0].nr+'" name="user-nr"/></form>');
 
                     $('#'+p+' input').keypress(function (e) {
                       if (e.which == 13) {
@@ -309,7 +311,7 @@ function load(p, reload = false) {
                         if (field == "pass") { data = MD5(data); }
                         var uid = $('#me h2').attr("user-id");
 
-                        $.post('http://davidsvane.com/noko/server/db.php', {page: "me_"+field, d: data, u: uid, nr: localStorage.getItem("user")}, function (data) {
+                        $.post('http://noko.dk/server/db.php', {page: "me_"+field, d: data, u: uid, nr: localStorage.getItem("user")}, function (data) {
                           if (data == "success") {
                             alert("Din info blev opdateret");
                           } else {
@@ -425,7 +427,7 @@ function load(p, reload = false) {
                     $('#v_cnt .v_'+curr).append('<h2>'+setup[curr]+'</h2><select><option value="null" selected>Vælg afstemning</option></select><div id="v_res"></div>');
                     $('#v_cnt .v_'+curr+' select').change(function () { pollResult( $(this).val() ); });
 
-                    $.post('http://davidsvane.com/noko/server/db.php', {page: 'stem_all', nr: localStorage.getItem('user'), ver: 1}, function (data) {
+                    $.post('http://noko.dk/server/db.php', {page: 'stem_all', nr: localStorage.getItem('user'), ver: 1}, function (data) {
                       var results = JSON.parse(data)[0];
                       results.forEach(function (e) {
                         $('#v_cnt .v_'+curr+' > select').append('<option value="'+e.id+'">'+e.id+': '+JSON.parse(e.question)[0]+'</option>');
@@ -860,7 +862,7 @@ function load(p, reload = false) {
                     });
 
                     // INFO: MARKING NOKO EVENTS
-                    $.post('http://davidsvane.com/noko/server/db.php', {page: 'rooms_taken'}, function (data) {
+                    $.post('http://noko.dk/server/db.php', {page: 'rooms_taken'}, function (data) {
                       var marks = JSON.parse(data);
                       marks = marks[0];
                       marks.forEach(function (e) { $('#'+p+' .d_'+(curr_y-parseInt(e['date'].substr(0,4)))+' .r_'+parseInt(e['date'].substr(5,2))+' .c_'+parseInt(e['date'].substr(8,2))).html("N"); });
