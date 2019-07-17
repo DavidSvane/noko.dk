@@ -3,7 +3,7 @@ function showAlumne(uid) {
   $('#alumne').remove();
   $('main').append('<div id="alumne" onclick="javascript:hideAlumne()"><div></div></div>');
 
-  $.post('http://noko.dk/server/db.php', {page: "alumne_fetch", u: uid, nr: localStorage.getItem("user"), ver: 1}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: "alumne_fetch", u: uid, nr: localStorage.getItem("user")}, function (data) {
 
     console.log(data);
     var mths = ['Januar','Februar','Marts','April','Maj','Juni','Juli','August','September','Oktober','November','December'];

@@ -5,6 +5,33 @@
   header('Access-Control-Allow-Origin: *');
   header('Content-Type: text/html; charset=utf-8');
 
+
+  // INFO: REUSABLE MODULES
+  function runQuery($page, $returning=true, $append=false) {
+
+    global $conn, $pages, $data;
+
+    if ($returning) {
+      $result = $conn->query($pages[$page]);
+
+      if (!$append) {
+
+        while($row = mysqli_fetch_array($result)){ $data[] = $row; }
+
+      } else {
+
+        $data[$append] = array();
+        while($row = mysqli_fetch_array($result)){ $data[$append][] = $row; }
+
+      }
+
+    } else {
+      $conn->query($pages[$page]);
+    }
+
+  }
+
+
   // INFO: VARIABLES
   $status = array(
     -2 => 'Slet seneste',
@@ -15,152 +42,134 @@
      3 => 'Omflyttet',
      4 => 'Fraflyttet',
      5 => 'Andet',
-     6 => 'Orlov retur*');
+     6 => 'Orlov retur*'
+   );
 
 
-   $week1 = new DateTime();
-   $week1->setISODate(date('Y', time()), date('W', time()), 1);
-   $week1 = $week1->format('Y-m-d');
-
-   $week2 = new DateTime();
-   $week2->setISODate(date('Y', time()), date('W', time())+1, 1);
-   $week2 = $week2->format('Y-m-d');
-
-   $d_f = new DateTime();
-   $d_f->setISODate(date('Y'),date('W')-1,4);
-   $d_f = date_format($d_f,'Y-m-d');
-
+   $date = new DateTime();
+   $week1 = $date->setISODate(date('Y', time()), date('W', time()), 1)->format('Y-m-d');;
+   $week2 = $date->setISODate(date('Y', time()), date('W', time())+1, 1)->format('Y-m-d');
+   $d_f = $date->setISODate(date('Y'),date('W')-1,4)->format('Y-m-d');
+   $d_l = $date->setISODate(date('Y'),date('W')-1,7)->format('Y-m-d 23:59:59');
    $d_p1 = date('Y').'-'.substr('00'.date('n'),-2);
    $d_p2 = date('Y').'-'.substr('00'.(date('n')+1),-2);
 
-   $d_l = new DateTime();
-   $d_l->setISODate(date('Y'),date('W')-1,7);
-   $d_l = date_format($d_l,'Y-m-d 23:59:59');
 
-
-  // INFO: SQL STATEMTNS FOR ALLE PAGES
+  // INFO: SQL STATEMTNS FOR ALLE PAGES (!! laundry | shifts)
   $pages = array(
 
+    // INFO: FRONT PAGE QUERIES
     'i_food' => "SELECT d" . date("N") . ", week
-        				FROM kitchen_plans
+        				FROM info_menu
         				WHERE week
-        				LIKE '" . date('Y-m-d', strtotime(date('Y') . 'W' . date('W'))) . "%'",
-
-    'i_shifts' => "SELECT day, pid
-          				FROM vagtplan_felter
-          				WHERE (d1=" . $_POST['rm'] . " OR d2=" . $_POST['rm'] . ")
-          				AND pid IN (
-          					SELECT id
-          					FROM vagtplan_sider
-          					WHERE month='" . date('Y-m-01 12:00:00', time()) . "'
-          				)",
-
+        				  LIKE '" . date('Y-m-d', strtotime(date('Y') . 'W' . date('W'))) . "%'",
+    'i_shifts' => "SELECT setting
+          				FROM info_shifts
+          				WHERE (
+                    year='".date('Y')."'
+                    AND month='".date('n')."'
+                  )",
     'i_laundry' => "SELECT SUBSTRING(week,1,10) AS week, nr, day, time
-            				FROM laundry
+            				FROM book_laundry
             				WHERE (
-            					room=" . $_POST['rm'] . "
+            					user=" . $_POST['rm'] . "
             					AND week>='" . $week1 . "'
-            					AND week<='" . $week2 . "'
+            					AND week<'" . $week2 . "'
             					)
             				ORDER BY SUBSTRING(week,1,10), nr, day, time ASC",
-
     'i_party' => "SELECT date, name
-            			FROM party
-            			WHERE date>='" . date("Y-m-d 00:00:00") . "'
+            			FROM info_cal
+            			WHERE (
+                    active=1
+                    AND date>='" . date("Y-m-d 00:00:00") . "'
+                  )
             			ORDER BY date
             			LIMIT 1",
-
-    'news' => 'SELECT i.id, i.time, i.title, i.description, i.place, i.img, i.priority, i.type, i.user, i.link
-              FROM info_news AS i
-              INNER JOIN info_news_types AS t
-              ON i.type=t.id
+    'news' => 'SELECT id, time, title, place, img, priority, link
+              FROM info_news
               WHERE (
-                i.active=1
-                AND i.time>"'.date("Y-m-d").'"
+                active=1
+                AND time>"'.date("Y-m-d").'"
               )
-              ORDER BY i.time ASC',
+              ORDER BY time ASC',
 
-    'food' => 'SELECT week, d1, d2, d3, d4, d5, d6, d7
-              FROM kitchen_plans
-              WHERE week>"'.$d_f.'"
-              ORDER BY week ASC',
 
-    'shifts' => 'SELECT pid, day, d1, d2, month, type
-                FROM vagtplan_felter
-                INNER JOIN vagtplan_sider
-                  ON vagtplan_felter.pid=vagtplan_sider.id
-                WHERE SUBSTRING(vagtplan_sider.month,1,7)="'.$d_p1.'"
-                  OR SUBSTRING(vagtplan_sider.month,1,7)="'.$d_p2.'"
-                ORDER BY month ASC, day ASC, type ASC',
-
-    'laundry' => 'SELECT week, day, nr, time, room, id
-                  FROM laundry
-                  WHERE week>"'.$d_l.'"',
-
-    'alumni' => 'SELECT u.uid, a.status, u.name, a.room, m.nr
-                FROM users AS u
-                INNER JOIN
-                (
-                	SELECT CONCAT(date,uid) AS md, uid, date, status, room
-                  FROM alumni_fields
-                ) AS a
-                ON a.uid=u.uid
-                INNER JOIN
-                (
-                	SELECT CONCAT(MAX(date),uid) AS md, nr
-                  FROM alumni_fields
-                  GROUP BY uid
-                ) AS m
-                ON a.md=m.md
-                WHERE (u.status=1
-                  AND a.status IN (0,2,3,6)
-                  AND a.room > 0)
-                ORDER BY a.room ASC',
-
+    // INFO: SUBPAGE QUERIES
+    'alumni' => 'SELECT uid, status, CONCAT(first," ",last) AS name, room, nr
+                FROM user
+                WHERE (
+                  active=1
+                  AND status IN (0,2,3,6)
+                  AND room > 0
+                )
+                ORDER BY room ASC',
     'calendar' => 'SELECT date, name, who
-                  FROM party
+                  FROM info_cal
                   WHERE SUBSTRING(date,1,4)="'.date('Y').'"
                   ORDER BY date ASC',
-
+    'food' => 'SELECT week, d1, d2, d3, d4, d5, d6, d7
+              FROM info_menu
+              WHERE week>"'.$d_f.'"
+              ORDER BY week ASC',
     'guides' => 'SELECT *
                 FROM guides
-                ORDER BY title ASC'
+                ORDER BY title ASC',
+    'laundry' => 'SELECT week, day, nr, time, user, id
+                  FROM book_laundry
+                  WHERE week>"'.$d_l.'"',
+    'shifts' => 'SELECT s.year, s.month, s.setting
+                FROM info_shifts AS s
+                INNER JOIN (
+                  SELECT MAX(id) AS id
+                  FROM info_shifts
+                  GROUP BY CONCAT(year,month)
+                ) AS m
+                ON s.id=m.id
+                WHERE (
+                  s.year="'.date('Y').'"
+                  AND s.month>="'.date('n').'"
+                )',
 
   );
 
 
   // INFO: SETTING SERVER VARIABLES AND CREATING CONNECTION
+  $data = array();
   $servername = "mysql5.gigahost.dk";
 	$username = "noko";
 	$password = "7@aahWhd3#^Wy8YF";
-	$dbname = (isset($_POST['ver']) && $_POST['ver'] > 0) ? "noko_intranet" : "noko_web";
+	$dbname = "noko_intranet";
 	$conn = new mysqli($servername, $username, $password, $dbname);
 	if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
   }
 
-  function normalQuery() {
 
-    global $conn, $pages, $status;
+  // INFO: QUERY LOGICS
+  if ($_POST['page'] == 'index') {
 
-    $specialklassen = [''];
-    if (in_array($_POST['page'], $specialklassen)) { $conn->set_charset("utf8"); }
+    runQuery('i_food', true, "food");
+    runQuery('i_shifts', true, "shifts");
+    runQuery('i_laundry', true, "laundry");
+    runQuery('i_party', true, "party");
+
+    // INFO: UTF8 ENCODE ARRAY
+    require 'utf8_encoder.php';
+    utf8_encode_deep($data);
+    echo(json_encode($data));
+
+  } else {
+
     $sql = $pages[$_POST['page']];
 
     // INFO: CHECK QUERY TYPE
     if (substr($sql,0,6) == 'SELECT') {
 
-      $result = $conn->query($sql);
-      $data = array();
-      while($row = mysqli_fetch_array($result)){ $data[] = $row; }
+      runQuery($_POST['page']);
 
-      $admins = ['admin'];
-      $package = [$data, in_array($_POST['nr'], $admins)];
-
-      // INFO: UTF8 ENCODE ARRAY
       require 'utf8_encoder.php';
-      utf8_encode_deep($package);
-      echo(json_encode($package));
+      utf8_encode_deep($data);
+      echo(json_encode($data));
 
     } else if (substr($sql,0,6) == 'UPDATE' || substr($sql,0,6) == 'DELETE' || substr($sql,0,6) == 'INSERT') {
 
@@ -170,36 +179,6 @@
     }
 
   }
-
-
-  if ($_POST['page'] == 'index') {
-
-    $sql = $pages['i_food'];
-    $result = $conn->query($sql);
-    $data['food'] = array();
-    if ($result->num_rows > 0) { while($row = mysqli_fetch_array($result)){ $data['food'][] = $row; } }
-
-    $sql = $pages['i_shifts'];
-    $result = $conn->query($sql);
-    $data['shifts'] = array();
-    if ($result->num_rows > 0) { while($row = mysqli_fetch_array($result)){ $data['shifts'][] = $row; } }
-
-    $sql = $pages['i_laundry'];
-    $result = $conn->query($sql);
-    $data['laundry'] = array();
-    if ($result->num_rows > 0) { while($row = mysqli_fetch_array($result)){ $data['laundry'][] = $row; } }
-
-    $sql = $pages['i_party'];
-    $result = $conn->query($sql);
-    $data['party'] = array();
-    if ($result->num_rows > 0) { while($row = mysqli_fetch_array($result)){ $data['party'][] = $row; } }
-
-    // INFO: UTF8 ENCODE ARRAY
-    require 'utf8_encoder.php';
-    utf8_encode_deep($data);
-    echo(json_encode($data));
-
-  } else { normalQuery(); }
 
 
   // INFO: CLOSING CONNECTION

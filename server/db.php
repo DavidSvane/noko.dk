@@ -6,29 +6,108 @@
   header('Content-Type: text/html; charset=utf-8');
 
 
-  // INFO: LIST OF UID WITH ADMIN ACCESS
-  $admins = ['admin',4202,'kontor','Køkkenet'];
+
+  // INFO: LISTS OF USER nr WITH SPECIAL ACCESS
+  $admins = [4202,'admin','kontor','Køkkenet'];
+  $ansvar = [4202,'admin',4249,2027,'kontor'];
+
+  $blocked = ['news_add'];
+  $a_pages = ['food_insert',
+    'food_update',
+    'a_madfavs',
+    'a_alumner',
+    'a_alumner_deactivate',
+    'a_alumner_fetch',
+    'a_alumner_insert',
+    'a_alumner_update',
+    'a_lists_fetch',
+    'a_madplan',
+    'a_pass',
+    'a_vagtplan',
+    'plan_insert',
+    'laundry_accounting',
+    'a_laundry',
+    'a_lists'];
+  $r_pages = ['r_apart',
+    'r_cal',
+    'r_groups',
+    'r_posts'];
+
+  if ( (in_array($_POST['page'], $a_pages) && !in_array($_POST['nr'], $admins))
+    || (in_array($_POST['page'], $r_pages) && !in_array($_POST['nr'], $ansvar))
+    || (in_array($_POST['page'], $blocked) && in_array($_POST['nr'], $blocked))
+  ) { die("User access denied"); }
+
+
+  // INFO: REUSABLE MODULES
+  function wrapData($output, $mb=false, $utf=true, $json=true) {
+
+    global $admins, $ansvar;
+    require 'utf8_encoder.php';
+
+    $output = [
+      $output,
+      in_array($_POST['nr'], $admins),
+      in_array($_POST['nr'], $ansvar)
+    ];
+
+    if ($mb) $output[0] = mb_convert_encoding($output[0], 'UTF-8', 'ISO-8859-1');
+    if ($utf) utf8_encode_deep($output);
+    if ($json) $output = json_encode($output);
+
+    return $output;
+
+  }
+  function runQuery($page, $returning=true, $append=false) {
+
+    global $conn, $pages, $data;
+
+    if ($returning) {
+      $result = $conn->query($pages[$page]);
+
+      if (!$append) {
+
+        while($row = mysqli_fetch_array($result)){ $data[] = $row; }
+
+      } else {
+
+        $data[$append] = array();
+        while($row = mysqli_fetch_array($result)){ $data[$append][] = $row; }
+
+      }
+
+    } else {
+      $conn->query($pages[$page]);
+    }
+
+  }
 
 
   // INFO: PAGES LOADING LIST OF FILES INSTEAD OF REGULAR DB CONTENT
-  if ($_POST['page'] == 'summaries') {
+  if ($_POST['page'] == 'summaries' || $_POST['page'] == 'files') {
 
-    $files = scandir('../plenum');
-    $package = [$files, in_array($_POST['nr'], $admins)];
-    echo(json_encode($package));
-    die();
-
-  } else if ($_POST['page'] == 'files') {
-
-    $files = scandir('../files');
-    $package = [$files, in_array($_POST['nr'], $admins)];
-    echo(json_encode($package));
+    $page = $_POST['page'] == 'summaries' ? 'plenum' : $_POST['page'];
+    $files = scandir('../'.$page);
+    echo(wrapData($files,true,false,true));
     die();
 
   }
 
 
-  // INFO: VARIABLES
+
+  // INFO: VARIABLES AND SERVER SETUP
+  $data = array();
+  $servername = "mysql5.gigahost.dk";
+  $username = "noko";
+  $password = "7@aahWhd3#^Wy8YF";
+  $dbname = "noko_intranet";
+
+  $conn = new mysqli($servername, $username, $password, $dbname);
+  if ($conn->connect_error) { die("Connection failed: " . $conn->connect_error); }
+
+  $specialklassen = ['food_insert','food_update','news_add','news_update','poll_open','a_alumner_insert','a_alumner_update','r_apart_update','r_cal_add','r_groups_add','r_posts_add'];
+  if (in_array($_POST['page'], $specialklassen)) { $conn->set_charset("utf8"); }
+
   $status = array(
     -2 => 'Slet seneste',
     -1 => 'Uændret',
@@ -40,36 +119,28 @@
      5 => 'Andet',
      6 => 'Orlov retur*');
 
-  // INFO: GETS THURSDAY OF LAST WEEK, FOOD TABLE IS ORDERED BY MONDAY OF EVERY WEEK
-  $d_f = new DateTime();
-  $d_f->setISODate(date('Y'),date('W')-2,4);
-  $d_f = date_format($d_f,'Y-m-d');
 
-  // INFO: GETS CURRENT AND NEXT MONTH, VAGTPLAN TABLES ARE ORDERED BY 1ST OF EVERY MONTH
-  $d_p1 = date('Y').'-'.substr('00'.date('n'),-2);
-  $d_p2 = date('Y').'-'.substr('00'.(date('n')+1),-2);
 
-  // INFO: GETS SUNDAY 1SEC TO MIDNIGHT OF LAST WEEK, LAUNDRY TABLE ORDERED BY DATES AND TIMESTAMP FROM BOOK TIME
-  $d_l = new DateTime();
-  $d_l->setISODate(date('Y'),date('W')-1,7);
-  $d_l = date_format($d_l,'Y-m-d 23:59:59');
-
-  // INFO: TIMESTAMPS OF WEEK FOR LAUNDRY ACCOUNTING
+  // INFO: SETTING DATE VARIABLES
+  $date = new DateTime();
+  $d_f = $date->setISODate(date('Y'),date('W')-2,4)->format('Y-m-d'); // FOOD (THURSDAY LAST WEEK)
+  $d_l = $date->setISODate(date('Y'),date('W')-1,7)->format('Y-m-d 23:59:59'); // LAUNDRY (1S TO MIDNIGHT LAST WEEK)
+  $d_p1 = date('Y').'-'.substr('00'.date('n'),-2); // PLAN (CURRENT MONTH)
+  $d_p2 = date('Y').'-'.substr('00'.(date('n')+1),-2); // PLAN (NEXT MONTH)
   if (isset($_POST['year']) && isset($_POST['week'])) {
-    $d_a1 = new DateTime();
-    $d_a1->setISODate($_POST['year'],$_POST['week']-1,7);
-    $d_a1 = date_format($d_a1,'Y-m-d 23:59:59');
-    $d_a2 = new DateTime();
-    $d_a2->setISODate($_POST['year'],$_POST['week'],7);
-    $d_a2 = date_format($d_a2,'Y-m-d 23:59:59');
+    $d_a1 = $date->setISODate($_POST['year'],$_POST['week']-1,7)->format('Y-m-d 23:59:59'); // LAUNDRY ACCOUNTING (START)
+    $d_a2 = $date->setISODate($_POST['year'],$_POST['week'],7)->format('Y-m-d 23:59:59'); // LAUNDRY ACCOUNTING (END)
   }
 
-  // INFO: VARIABLE SETUP FOR BOOKING QUERIES
+
+
+  // INFO:  PACE SPECIFIC VARIABLE SETUP
   if ($_POST['page'] == 'laundry_book') { $binfo = explode("_", $_POST['bid']); }
   if ($_POST['page'] == 'bike_book') { $binfo = explode("_", $_POST['bid']); }
   if ($_POST['page'] == 'rooms_book') { $binfo = explode("_", $_POST['bid']); }
   if ($_POST['page'] == 'gym_book') { $binfo = explode("_", $_POST['bid']); }
   if ($_POST['page'] == 'speaker_book') { $binfo = explode("_", $_POST['bid']); }
+
   if ($_POST['page'] == 'food_insert' || $_POST['page'] == 'food_update') {
     $menu = json_decode(urldecode($_POST['m']), true);
     $fweek = new DateTime();
@@ -77,13 +148,10 @@
     $fweek = date_format($fweek, 'Y-m-d 09:00:00');
   }
   if ($_POST['page'] == 'news_add' || $_POST['page'] == 'news_update') { $info = json_decode(urldecode($_POST['info']), true); }
-  $blocked_users = [];
-  if ($_POST['page'] == 'news_add' && in_array($_POST['nr'], $blocked_users)) { die("User access denied"); }
-
   if ($_POST['page'] == 'a_vagtplan' && !isset($_POST['y'])) {
     $vp_y = date('Y');
     $vp_m = date('n');
-  } else {
+  } else if ($_POST['page'] == 'a_vagtplan') {
     $vp_y = $_POST['y'];
     $vp_m = $_POST['m'];
   }
@@ -98,12 +166,18 @@
   }
   if ($_POST['page'] == 'a_alumner_insert' || $_POST['page'] == 'a_alumner_update') { $info = json_decode(urldecode($_POST['inf']), true); }
 
-  // INFO: SQL STATEMTNS FOR ALLE PAGES
+
+
+  // INFO: SQL STATEMTNS FOR PAGES (REMEMBER TO ADD admin AND ansvar PAGE TITLES TO RELEVANT ARRAYS IN THE TOP OF THE DOCUMENT)
   $pages = array(
-    // INFO: UNCATEGORIZED PAGE FUNCTIONS (!! vagtplan)
+
+    // INFO: UNCATEGORIZED PAGE FUNCTIONS (updated)
     'cal' => 'SELECT date, name, who
               FROM info_cal
-              WHERE SUBSTRING(date,1,4)="'.date('Y').'"
+              WHERE (
+                active=1
+                AND SUBSTRING(date,1,4)="'.date('Y').'"
+              )
               ORDER BY date ASC',
     'food' => 'SELECT week, d1, d2, d3, d4, d5, d6, d7
                 FROM info_menu
@@ -122,6 +196,10 @@
                             AND week="'.$_POST['w'].'"
                             AND day="'.$_POST['d'].'"
                           )',
+    'groups' => 'SELECT *
+                FROM plenum_groups
+                WHERE active=1
+                ORDER BY title ASC',
     'guides' => 'SELECT *
                 FROM guides
                 ORDER BY title ASC',
@@ -138,14 +216,18 @@
     'me_phone' => 'UPDATE user
                   SET phone="'.$_POST['d'].'"
                   WHERE uid="'.$_POST['u'].'"',
-    'plan' => 'SELECT pid, day, d1, d2, month, type
-                FROM vagtplan_felter
-                INNER JOIN vagtplan_sider
-                  ON vagtplan_felter.pid=vagtplan_sider.id
-                WHERE SUBSTRING(vagtplan_sider.month,1,7)="'.$d_p1.'"
-                  OR SUBSTRING(vagtplan_sider.month,1,7)="'.$d_p2.'"',
-    'plan_insert' => 'INSERT INTO info_shifts (year, month, setting)
-                      VALUES ("'.$_POST['y'].'", "'.$_POST['m'].'", \''.$_POST['plan'].'\')',
+    'plan' => 'SELECT year, month
+              FROM info_shifts
+              WHERE (
+                year>="'.date('Y').'"
+                AND month>="'.date('n').'"
+              )
+              GROUP BY CONCAT(year,month)
+              ORDER BY year ASC, month ASC',
+    'posts' => 'SELECT *
+                FROM plenum_posts
+                WHERE active=1
+                ORDER BY title ASC',
 
 
     // INFO: FUNCTIONS FOR THE FRONT PAGE EVENTS (update not needed)
@@ -243,10 +325,14 @@
                     FROM user
                     WHERE (active=1 AND status IN (0,2,3,6))
                     ORDER BY CHAR_LENGTH(room) ASC, room ASC',
-    'history' => 'SELECT date, first, last, room, status
-                  FROM user
-                  WHERE date>"2007"
-                  ORDER BY status ASC, first ASC',
+    'corridors_aparts' => 'SELECT *
+                          FROM user_aparts',
+    'history' => 'SELECT h.date, u.first, u.last, h.room, h.status
+                  FROM user AS u
+                  INNER JOIN user_history AS h
+                    ON u.uid=h.uid
+                  WHERE h.date>"2007"
+                  ORDER BY h.status ASC, u.first ASC',
     'photowall' => 'SELECT uid, first, last, room, nr
                   FROM user
                   WHERE (active=1 AND status IN (0,2,3,6))
@@ -257,7 +343,7 @@
                   ORDER BY first ASC',
 
 
-    // INFO: FUNCTIONS FOR THE BOOKING SYSTEMS (!! laundry)
+    // INFO: FUNCTIONS FOR THE BOOKING SYSTEMS (updated)
     'bike' => 'SELECT week, day, time, user, id
                 FROM book_bike
                 WHERE week>"'.$d_l.'"',
@@ -272,13 +358,13 @@
                   VALUES ("'.date('Y-m-d 00:00:00', strtotime("+".$binfo[0]." week")).'", '.$binfo[1].', '.$binfo[3].', '.$_POST['room'].')',
     'gym_remove' => 'DELETE FROM book_gym
                     WHERE id='.$_POST['bid'],
-    'laundry' => 'SELECT week, day, nr, time, room, id
-                  FROM laundry
+    'laundry' => 'SELECT week, day, nr, time, user, id
+                  FROM book_laundry
                   WHERE week>"'.$d_l.'"',
-    'laundry_book' => 'INSERT INTO laundry (week, day, nr, time, room)
+    'laundry_book' => 'INSERT INTO book_laundry (week, day, nr, time, user)
                       VALUES ("'.date('Y-m-d H:i:s', strtotime("+".$binfo[0]." week")).'", '.$binfo[1].', '.$binfo[2].', '.$binfo[3].', '.$_POST['room'].')',
     'laundry_check' => 'SELECT id
-                        FROM laundry
+                        FROM book_laundry
                         WHERE (
                           week>="'.date('Y-m-d 23:59:59', strtotime("+".$binfo[0]." week", strtotime("sunday last week"))).'"
                           AND week<"'.date('Y-m-d', strtotime("+".($binfo[0]+1)." week", strtotime("monday this week"))).'"
@@ -286,7 +372,7 @@
                           AND nr='.$binfo[2].'
                           AND time='.$binfo[3].'
                         )',
-    'laundry_remove' => 'DELETE FROM laundry
+    'laundry_remove' => 'DELETE FROM book_laundry
                         WHERE id='.$_POST['bid'],
     'rooms' => 'SELECT id, year, month, day, room, user
                 FROM book_rooms
@@ -311,7 +397,48 @@
                         WHERE id='.$_POST['bid'],
 
 
-    // INFO: FUNCTIONS FOR THE ADMIN PAGES (!! vagtplan | laundry)
+    // INFO: FUNCTIONS FOR THE ANSVAR PAGES (update not needed)
+    'r_apart' => 'SELECT *
+                  FROM user_aparts',
+    'r_apart_update' => 'UPDATE user_aparts
+                        SET who = CASE
+                          WHEN which="LSS" THEN "'.urldecode($_POST["lss"]).'"
+                          WHEN which="L2N" THEN "'.urldecode($_POST["l2n"]).'"
+                          WHEN which="L5N" THEN "'.urldecode($_POST["l5n"]).'"
+                          END, liable="'.$_POST['nr'].'"',
+    'r_cal' => 'SELECT *
+                FROM info_cal
+                WHERE (
+                  active=1
+                  AND date>"'.date('Y').'"
+                )
+                ORDER BY date ASC',
+    'r_cal_remove' => 'UPDATE info_cal
+                      SET active=0
+                      WHERE id="'.$_POST["e"].'"',
+    'r_cal_add' => 'INSERT INTO info_cal (name, date, who)
+                    VALUES ("'.$_POST['n'].'", "'.$_POST['d'].'", "'.$_POST['w'].'")',
+    'r_groups' => 'SELECT *
+                  FROM plenum_groups
+                  WHERE active=1
+                  ORDER BY title ASC',
+    'r_groups_remove' => 'UPDATE plenum_groups
+                          SET active=0
+                          WHERE id="'.$_POST["e"].'"',
+    'r_groups_add' => 'INSERT INTO plenum_groups (title, description, leader, liable)
+                      VALUES ("'.$_POST['t'].'", "'.$_POST['d'].'", "'.$_POST['le'].'", "'.$_POST['li'].'")',
+    'r_posts' => 'SELECT *
+                  FROM plenum_posts
+                  WHERE active=1
+                  ORDER BY title ASC',
+    'r_posts_remove' => 'UPDATE plenum_posts
+                          SET active=0
+                          WHERE id="'.$_POST["e"].'"',
+    'r_posts_add' => 'INSERT INTO plenum_posts (title, description, who, liable)
+                      VALUES ("'.$_POST['t'].'", "'.$_POST['d'].'", "'.$_POST['w'].'", "'.$_POST['l'].'")',
+
+
+    // INFO: FUNCTIONS FOR THE ADMIN PAGES (updated)
     'food_insert' => 'INSERT INTO info_menu (week, d1, d2, d3, d4, d5, d6, d7)
                       VALUES ("'.$fweek.'", "'.$menu[0].'", "'.$menu[1].'", "'.$menu[2].'", "'.$menu[3].'", "'.$menu[4].'", "'.$menu[5].'", "'.$menu[6].'")',
     'food_update' => 'UPDATE info_menu
@@ -321,8 +448,14 @@
                     FROM user_favorite_food',
     'a_alumner' => 'SELECT uid, first, last, room
                     FROM user
-                    WHERE status in (0,1,2,3,6)
+                    WHERE (
+                      active=1
+                      AND status in (0,1,2,3,6)
+                    )
                     ORDER BY first ASC',
+    'a_alumner_deactivate' => 'UPDATE user
+                              SET active=0
+                              WHERE uid="'.$_POST['u'].'"',
     'a_alumner_fetch' => 'SELECT *
                           FROM user
                           WHERE uid="'.$_POST['u'].'"',
@@ -337,8 +470,8 @@
                           '.$lists_data->options.'
                         FROM user
                         WHERE (
-                          f.date>"'.$lists_data->start.'"
-                          AND f.date<"'.$lists_data->end.'"
+                          date>"'.$lists_data->start.'"
+                          AND date<"'.$lists_data->end.'"
                           '.$lists_data->restrict.'
                         )
                         ORDER BY '.$lists_data->sort,
@@ -359,26 +492,14 @@
                       s.year="'.$vp_y.'"
                       AND s.month="'.$vp_m.'"
                     )',
-    'laundry_accounting' => 'SELECT l.room AS "Vaerelse", COUNT(l.room) AS "Antal"
-                            FROM laundry AS l
-                            INNER JOIN (
-                              SELECT a.room AS room, a.nr AS nr
-                              FROM alumni_fields AS a
-                              INNER JOIN (
-                                SELECT room, MAX(date) AS date
-                                FROM alumni_fields
-                                GROUP BY room
-                              ) AS g
-                              ON (
-                                a.room=g.room
-                                AND a.date=g.date
-                              )
-                              GROUP BY a.room
-                            ) AS n
-                            ON l.room=n.room
-                            WHERE week BETWEEN "'.$d_a1.'" AND "'.$d_a2.'"
-                            GROUP BY l.room
-                            ORDER BY l.room ASC',
+    'plan_insert' => 'INSERT INTO info_shifts (year, month, setting)
+                      VALUES ("'.$_POST['y'].'", "'.$_POST['m'].'", \''.$_POST['plan'].'\')',
+    'laundry_accounting' => 'SELECT user AS "Vaerelse", COUNT(user) AS "Antal"
+                            FROM book_laundry
+                            WHERE week
+                              BETWEEN "'.$d_a1.'" AND "'.$d_a2.'"
+                            GROUP BY user
+                            ORDER BY CHAR_LENGTH(Vaerelse) ASC, Vaerelse ASC',
 
 
     // INFO: BACKUP OF OLD DATABASE QUERIES (before update)
@@ -563,54 +684,36 @@
                   ON a.md=m.md
                   WHERE u.status=0
                   ORDER BY u.name ASC',
+    'BU_plan' => 'SELECT pid, day, d1, d2, month, type
+                FROM vagtplan_felter
+                INNER JOIN vagtplan_sider
+                  ON vagtplan_felter.pid=vagtplan_sider.id
+                WHERE SUBSTRING(vagtplan_sider.month,1,7)="'.$d_p1.'"
+                  OR SUBSTRING(vagtplan_sider.month,1,7)="'.$d_p2.'"',
     */
 
 
     'front' => '',
+    'a_laundry' => '',
     'a_lists' => '',
     'logud' => '',
     'login' => '',
   );
-
-  // INFO: SETTING SERVER VARIABLES AND CREATING CONNECTION
-  $servername = "mysql5.gigahost.dk";
-	$username = "noko";
-	$password = "7@aahWhd3#^Wy8YF";
-	$dbname = (isset($_POST['ver']) && $_POST['ver'] > 0) ? "noko_intranet" : "noko_web";
-	$conn = new mysqli($servername, $username, $password, $dbname);
-	if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-  }
-
-  $specialklassen = ['food_insert','food_update','news_add','news_update','poll_open','a_alumner_insert','a_alumner_update'];
-  if (in_array($_POST['page'], $specialklassen)) { $conn->set_charset("utf8"); }
   $sql = $pages[$_POST['page']];
 
-  // INFO: CHECK QUERY TYPE
+
+
+  // INFO: QUERY LOGIC AND SPECIAL CASES
   if ($sql == "") {
 
-    $package = ["", in_array($_POST['nr'], $admins)];
-    echo(json_encode($package));
+    echo(wrapData(""));
 
   } else if (substr($sql,0,6) == 'SELECT') {
 
-    $result = $conn->query($sql);
-    $data = array();
-    while($row = mysqli_fetch_array($result)){ $data[] = $row; }
+    runQuery($_POST['page']);
+    if ($_POST['page'] == 'news_edit') { runQuery('news_edit', true, "t"); }
 
-    if ($_POST['page'] == 'news_edit') {
-      $sql = $pages['news_types'];
-      $result = $conn->query($sql);
-      $data['t'] = array();
-      while($row = mysqli_fetch_array($result)){ $data['t'][] = $row; }
-    }
-
-    $package = [$data, in_array($_POST['nr'], $admins)];
-
-    // INFO: UTF8 ENCODE ARRAY
-    require 'utf8_encoder.php';
-    utf8_encode_deep($package);
-    echo(json_encode($package));
+    echo(wrapData($data));
 
   } else if (substr($sql,0,6) == 'UPDATE' || substr($sql,0,6) == 'DELETE' || substr($sql,0,6) == 'INSERT') {
 
@@ -620,40 +723,26 @@
 
     } else if ($_POST['page'] == 'poll_open') {
 
-      $conn->query($sql);
-      $sql = $pages['stem_pid'];
-      $result = $conn->query($sql);
-      $data = array();
-      while($row = mysqli_fetch_array($result)){ $data[] = $row; }
+      runQuery('poll_open', false);
+      runQuery('stem_pid');
       echo($data[0]["id"]);
 
     } else if ($_POST['page'] == 'laundry_book') {
 
-      $sql = $pages['laundry_check'];
-      $result = $conn->query($sql);
-      $data = array();
-      while($row = mysqli_fetch_array($result)){ $data[] = $row; }
-      if (sizeof($data) == 0) {
-        $sql = $pages['laundry_book'];
-        $conn->query($sql);
-      }
+      runQuery('laundry_check');
+      if (sizeof($data) == 0) { runQuery('laundry_book', false); }
 
     } else if ($_POST['page'] == 'poll_vote') {
 
-      $sql = $pages['poll_check'];
-      $result = $conn->query($sql);
-      $data = array();
-      while($row = mysqli_fetch_array($result)){ $data[] = $row; }
+      runQuery('poll_check');
       if (sizeof($data) == 0) {
-        $sql = $pages['poll_register'];
-        $conn->query($sql);
-        $sql = $pages['poll_vote'];
-        $conn->query($sql);
+        runQuery('poll_register', false);
+        runQuery('poll_vote', false);
       }
 
     } else {
 
-      $conn->query($sql);
+      runQuery($_POST['page'], false);
       echo('success');
 
     }

@@ -25,7 +25,7 @@ function addEvent() {
 
   einfo = encodeURIComponent(JSON.stringify(einfo));
 
-  $.post('http://noko.dk/server/db.php', {page: 'news_add', nr: localStorage.getItem('user'), info: einfo, ver: 1}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: 'news_add', nr: localStorage.getItem('user'), info: einfo}, function (data) {
 
     if (data == "success") {
       alert("Eventet blev tilføjet");
@@ -62,7 +62,7 @@ function updateEvent() {
 
   einfo = encodeURIComponent(JSON.stringify(einfo));
 
-  $.post('http://noko.dk/server/db.php', {page: 'news_update', nr: localStorage.getItem('user'), info: einfo, ver: 1}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: 'news_update', nr: localStorage.getItem('user'), info: einfo}, function (data) {
 
     if (data == "success") {
       alert("Eventet blev opdateret");

@@ -31,6 +31,7 @@ body { margin-top: 0px !important; padding-top: 0px !important; font-size: 12px;
 .blocky { box-sizing: border-box; width: var(--page-width); }
 .fixcenter { position: fixed; display: block; box-sizing: border-box; top: 50%; left: 50%; transform: translate(-50%,-50%); }
 .dotdotdot { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.not-shown { display: none !important; }
 
 
 /********** PAGE SPECIFIC **********/
@@ -85,6 +86,7 @@ footer hr { padding: 0 0 0.25em; }
 #i_ .sub_admin { margin-left: -70px; }
 #i_ .sub_information { margin-left: -56px; }
 #i_ .sub_plenum { margin-left: -75px; }
+#i_ .sub_ansvar { margin-left: -70px; }
 #i_ .sub a { display: block; padding: 0.3em 1.2em; }
 
 /* PAGE CONTENT */
@@ -168,6 +170,13 @@ footer hr { padding: 0 0 0.25em; }
 #plan td, #plan td * { text-align: center; color: black; } /* INFO: VAGTPLANER */
 #plan table { width: 100%; margin-top: 1em; border-collapse: collapse; }
 #plan table td { padding: 0.5em 0; border: 1px solid var(--book-border); }
+#plan_select { text-align: center; width: 100%; box-sizing: border-box; }
+#plan_select select { font-size: 1.5em; border: 1px solid gray; padding: 0.5em; display: inline-block; margin: 0.25em 1em 1em; }
+#plan_list tr:first-of-type td i { display: inline-block; font-weight: normal; padding: 0.5em 0 0; }
+#plan_list tr:not(:first-of-type) td:nth-child(2), #plan_list tr:first-of-type td:nth-child(2) i { color: rgb(42,120,180); }
+#plan_list tr:not(:first-of-type) td:nth-child(3), #plan_list tr:first-of-type td:nth-child(3) i { color: rgb(42,180,240); }
+#plan_list tr:not(:first-of-type) td:nth-child(4), #plan_list tr:first-of-type td:nth-child(4) i { color: rgb(180,42,42); }
+#plan_list tr:not(:first-of-type) td:nth-child(5), #plan_list tr:first-of-type td:nth-child(5) i { color: rgb(240,42,42); }
 #explanation { width: 100%; text-align: center; }
 #explanation span { padding: 0 2em; font-style: italic; }
 #explanation p { line-height: 2; text-align: center; color: gray; font-style: italic; }
@@ -195,6 +204,7 @@ footer hr { padding: 0 0 0.25em; }
 #changes > div { display: grid; grid-template-columns: repeat(3, 1fr); }
 #i_ #changes h2 { text-align: left; margin: 1em 0; }
 #changes h3 { font-weight: bold; margin-bottom: 0.5em;}
+#changes > div > div { padding-left: 32px; }
 #changes > div > div > div { padding: 1em 0;  }
 #changes ._0 { color: #292; }
 #changes ._4 { color: #922; }
@@ -272,13 +282,15 @@ footer hr { padding: 0 0 0.25em; }
 #guides li { padding: 0.5em 0.25em; line-height: 1.5em; }
 
 /* ADMIN MENU AND PAGES */
-#admin { display: none; }
+#admin, #ansvar { display: none; }
 #i_ .admin_page #selector { display: flex; justify-content: center; }
 #i_ .admin_page #selector input { width: 70px; text-align: center; font-size: 1.25em; border: 1px solid gray; margin: 0 1em; }
 #i_ .admin_page select { font-size: 1.5em; border: 1px solid gray; margin: 0 1em; }
 #i_ .admin_page a { text-decoration: none; display: inline-block; margin: 0 1em; padding: 0.5em; cursor: pointer; border: 1px solid var(--book-free); }
 #i_ .admin_page a:hover { background: var(--book-free-hover); color: white !important; }
 #i_ .admin_page #downloadFix { display: none; }
+#i_ .admin_page #a_deactivator { color: red; border-color: #fdd; }
+#i_ .admin_page #a_deactivator:hover { background: #f55; border-color: #f55; }
 
 #i_ .admin_page .fweek { display: none; margin-bottom: 2em; }
 #i_ .admin_page .fweek div { display: grid; grid-template-columns: 100px auto; grid-row-gap: 1.5em; justify-content: center; align-items: center; }
@@ -294,11 +306,11 @@ footer hr { padding: 0 0 0.25em; }
 #i_ .admin_page .vp_closed { background: var(--vp-closed); color: var(--vp-marked-c); border: var(--vp-marked-b); }
 #i_ .admin_page .vp_only { background: var(--vp-only); color: var(--vp-marked-c); border: var(--vp-marked-b); }
 #i_ .admin_page .plan, #i_ .admin_page .plan table { width: 100%; }
-#i_ .admin_page .plan td { width: 20%; padding: 0.5em; text-align: center; border: 1px solid rgba(0,0,0,0.1); }
+#i_ .admin_page .plan td, #plan_list td { width: 20%; padding: 0.5em; text-align: center; border: 1px solid rgba(0,0,0,0.1); }
 #i_ .admin_page .plan tr { border-bottom: 1px solid gray; }
-#i_ .admin_page .plan tr:first-child td { font-weight: bold; }
-#i_ .admin_page .plan tr:not(:first-child) td:first-child { font-style: italic; font-weight: bold; }
-#i_ .admin_page .plan tr:nth-child(odd) { background: rgba(0,0,0,0.1); }
+#i_ .admin_page .plan tr:first-child td, #plan_list tr:first-child td { font-weight: bold; }
+#i_ .admin_page .plan tr:not(:first-child) td:first-child, #plan_list tr:not(:first-child) td:first-child { font-style: italic; }
+#i_ .admin_page .plan tr:nth-child(even), #plan_list tr:nth-child(even) { background: var(--book-bg); }
 
 /*#i_ #a_alumner #selector select { width: 600px; }*/
 #i_ #ainfo { width: 100%; box-sizing: border-box; padding: 0 120px; display: grid; grid-template-columns: 50% 50%; grid-gap: 1em; margin: 0 0 1em; }
@@ -374,3 +386,35 @@ footer hr { padding: 0 0 0.25em; }
   #i_ #a_vagtplan.admin_page > .plan { display: block; }
   #i_ #a_vagtplan.admin_page > h2:last-of-type { display: block; margin: 1em 0 2em; }
 }
+
+
+
+/* ANSVAR PAGES CONTENT */
+#r_apart div { display: block; width: 75%; margin: auto; }
+#r_c_cals > div:nth-child(2) { display: none; }
+#r_c_cals table { width: 100%; border: 1px solid var(--book-border); }
+#r_c_cals table td { padding: 0.5em 0.8em; }
+#r_c_cals table tr:first-child td { padding: 1em 0.8em; font-weight: bold; }
+#r_c_cals table tr:nth-child(even) { background: var(--book-bg); }
+#r_c_cals table tr:not(:first-of-type) td:first-of-type { font-style: italic; }
+#r_c_cals table i.delete { color: red; }
+#r_c_cals table i.edit { color: #0d0; }
+#r_c_cals table i:hover { color: black; cursor: pointer; }
+
+#i_ .r_page h2 { margin-bottom: 2em; }
+#i_ .r_page h3 { display: inline-block; width: 15%; }
+#i_ .r_page input { width: 70%; padding: 0.5em; color: red; border: 1px solid var(--book-border); margin: 1em 0; }
+#i_ .r_page a, #i_ .r_page .btn { display: block; width: 200px; text-align: center; margin: 2em auto 0; padding: 0.5em; border: 1px solid #f55; cursor: pointer; color: white; background: #f55; }
+#i_ .r_page a:hover, #i_ .r_page .btn:hover { background: #f88; border-color: #f88; }
+#i_ .r_page #selector { display: flex; justify-content: center; margin-bottom: 2em; }
+#i_ .r_page #selector input { width: 70px; text-align: center; font-size: 1.25em; border: 1px solid gray; margin: 0 1em; }
+#i_ .r_page select { font-size: 1.5em; border: 1px solid gray; margin: 0 1em; }
+
+#i_ .r_page .rc_adder { width: 100%; text-align: center; }
+#i_ .r_page .rc_adder input { display: inline-block; margin: 0 1em 3em; }
+#i_ .r_page .rc_adder input:nth-child(1) { width: 150px; }
+#i_ .r_page .rc_adder input:nth-child(2) { width: 250px; }
+#i_ .r_page .rc_adder input:nth-child(3) { width: 150px; }
+#i_ .r_page .rc_adder input:nth-child(4) { width: 150px; }
+
+#groups #p_groups table td, #posts #p_posts table td { padding: 1em 0.8em; }

@@ -49,7 +49,7 @@ function updateFood() {
   }
   menu = encodeURIComponent(JSON.stringify(menu));
 
-  $.post('http://noko.dk/server/db.php', {page: db_function, y: year, w: week, m: menu, ver: 1}, function (data) { alert("Madplan gemt"); });
+  $.post('http://noko.dk/server/db.php', {page: db_function, y: year, w: week, m: menu, nr: localStorage.getItem("user")}, function (data) { alert("Madplan gemt"); });
 
 }
 
@@ -82,8 +82,9 @@ function getShifts() {
   year = $('#vr_year').val();
   month = $('#vr_month').val();
 
-  $.post('http://noko.dk/server/db.php', {page: 'a_vagtplan', ver: 1, y: year, m: month}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: 'a_vagtplan', y: year, m: month, nr: localStorage.getItem("user")}, function (data) {
 
+    console.log(data);
     var obj = JSON.parse(data);
     var obj = obj[0];
     console.log(obj.length);
@@ -119,7 +120,7 @@ function updateShifts() {
   var dage = ['Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag','Søndag'];
   var days = dinm[month-1];
   var a1 = parseInt($('#vp_saften').val());
-  var a2 = a1 + 2;
+  var a2 = incr(a1);
   var mc = parseInt($('#vp_smorgen').val());
 
   for (var i = 0; i < days; i++) { for (var j = 1; j < 5; j++) { $('#a_vagtplan .r_'+(i+1)+' .c_'+j).html(""); } }
@@ -161,7 +162,7 @@ function updateShifts() {
 
   $('#a_vagtplan .plan .tnt_row:not(:first-child) td:first-child').each(function (e) {
     var weekday = new Date(months[month-1]+" "+parseInt($(this).parent().attr("tnt_row"))+", "+year+" 12:00:00");
-    $(this).html( dage[((weekday.getDay() + 6) % 7)] + '&nbsp;&nbsp;&nbsp;&nbsp;' + $(this).parent().attr("tnt_row") + '.' )
+    $(this).html( dage[((weekday.getDay() + 6) % 7)] + '&nbsp;&nbsp;&nbsp;&nbsp;' + $(this).parent().attr("tnt_row") + '.' );
   });
   $('#a_vagtplan .plan tr').show();
   $('#a_vagtplan .plan tr').slice(days+1).hide();
@@ -188,7 +189,7 @@ function saveShifts() {
 
   shifts = JSON.stringify(shifts);
 
-  $.post('http://noko.dk/server/db.php', {page: 'plan_insert', ver: 1, y: year, m: month, plan: shifts}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: 'plan_insert', y: year, m: month, plan: shifts, nr: localStorage.getItem("user")}, function (data) {
 
     if (data == 'success') {
       alert("Vagtplanen blev gemt");
@@ -206,7 +207,7 @@ function fetchAlumne() {
 
   var uid = $('#alumni_list').val();
 
-  $.post('http://noko.dk/server/db.php', {page: "a_alumner_fetch", u: uid, nr: localStorage.getItem("user"), ver: 1}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: "a_alumner_fetch", u: uid, nr: localStorage.getItem("user")}, function (data) {
 
     var obj = JSON.parse(data);
 
@@ -218,6 +219,7 @@ function fetchAlumne() {
       $('#ainfo input').val("");
       $('#ainfo .ai_status select').val(0);
       $('#ainfo .ai_sex select').val(0);
+      $('#a_deactivator').addClass('not-shown');
 
     } else {
 
@@ -234,6 +236,8 @@ function fetchAlumne() {
       // INFO: SELECT RELEVANT DROPDOWN OPTIONS
       $('#ainfo .ai_status select').val(obj.status);
       $('#ainfo .ai_sex select').val(obj.sex);
+
+      $('#a_deactivator').removeClass('not-shown');
 
     }
 
@@ -256,10 +260,30 @@ function updateAlumne() {
 
   info = encodeURIComponent(JSON.stringify(info));
 
-  $.post('http://noko.dk/server/db.php', {page: p, u: uid, inf: info, nr: localStorage.getItem("user"), ver: 1}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: p, u: uid, inf: info, nr: localStorage.getItem("user")}, function (data) {
 
     if (data == 'success') {
       alert("Informationen blev gemt");
+    } else {
+      alert("Der skete en fejl på serveren");
+    }
+
+  });
+
+}
+function deactivateAlumne() {
+
+  var uid = $('#ainfo').attr("user-id");
+  var check = confirm("Du er ved at DEAKTIVERE en ny bruger!\nDenne handling kan kun omgøres af en webansvarlig!");
+  if (!check) { return; }
+
+  $.post('http://noko.dk/server/db.php', {page: 'a_alumner_deactivate', u: uid, nr: localStorage.getItem("user")}, function (data) {
+
+    if (data == 'success') {
+      alert("Alumnen er deaktiveret");
+      $('#alumni_list').val('new');
+      $('#alumni_list').change();
+      $('#alumni_list option[value="'+uid+'"]').remove();
     } else {
       alert("Der skete en fejl på serveren");
     }
@@ -308,7 +332,7 @@ function generateList() {
 
   params = JSON.stringify(params);
 
-  $.post('http://noko.dk/server/db.php', {page: "a_lists_fetch", p: params, nr: localStorage.getItem("user"), ver: 1}, function (data) {
+  $.post('http://noko.dk/server/db.php', {page: "a_lists_fetch", p: params, nr: localStorage.getItem("user")}, function (data) {
 
     var obj = JSON.parse(data);
     obj = obj[0];

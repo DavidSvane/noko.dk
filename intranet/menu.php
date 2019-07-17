@@ -27,19 +27,25 @@
       'me' => 'Min Profil',
     )),
     'plenum' => array('Plenum',array(
-      'summaries' => 'Referater',
-      /*'groups' => 'Udvalg',
-      'posts' => 'Tillidshverv',*/
       'stem' => 'Afstemning',
+      'summaries' => 'Referater',
+      'posts' => 'Tillidshverv',
+      'groups' => 'Udvalg',
+    )),
+    'ansvar' => array('Ansvar',array(
+      'r_cal' => 'Festkalender',
+      'r_apart' => 'Lejlighedsbeboere',
+      'r_posts' => 'Tillidshverv',
+      'r_groups' => 'Udvalg',
     )),
     'admin' => array('Admin',array(
       'a_alumner' => 'Alumner',
+      'a_lists' => 'Datalister',
+      'a_madfavs' => 'Madhjerter *',
       'a_madplan' => 'Madplan',
-      'a_madfavs' => 'Favoritretter',
+      'a_pass' => 'Passwords',
       'a_vagtplan' => 'Vagtplan',
       'a_laundry' => 'Vaskeregnskab',
-      'a_lists' => 'Lister',
-      'a_pass' => 'Passwords',
     )),
     'logud' => 'Log ud',
   );

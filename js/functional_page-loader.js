@@ -33,6 +33,7 @@ function verifyUser() {
     }
 
     if (obj['admin']) { $('#admin').show(); }
+    if (obj['ansvar']) { $('#ansvar').show(); }
 
   });
 
@@ -87,6 +88,7 @@ function load(p, reload = false) {
     deleteCookie('salt');
     deleteCookie('room');
     $('#admin').hide();
+    $('#ansvar').hide();
     load('login');
 
   } else {
@@ -96,19 +98,20 @@ function load(p, reload = false) {
       $.post('http://noko.dk/server/verify.php', {usr: localStorage.getItem('user'), sal: localStorage.getItem('salt')}, function (data) {
 
         if (data.length < 42) {
-
           loginPage(p);
-
         } else {
 
-          var upgraded = ['plan','laundry'];
-          var version = upgraded.includes(p) ? 0 : 1;
+          $.post('http://noko.dk/server/db.php', {page: p, nr: localStorage.getItem('user'), re: reload}, function (data) {
 
-          $.post('http://noko.dk/server/db.php', {page: p, nr: localStorage.getItem('user'), ver: version, re: reload}, function (data) {
+            if (data == "User access denied") {
+              alert("Nice try, adgang nægtet!");
+              return;
+            }
 
             try {
               var obj = JSON.parse(data);
               var adm = obj[1];
+              var ans = obj[2];
               var obj = obj[0];
               var keys = Object.keys(obj[0]).length/2;
             } catch (err) {}
@@ -124,6 +127,7 @@ function load(p, reload = false) {
                 var user_room = localStorage.getItem('room');
 
                 if (adm) { $('#admin').show(); }
+                if (ans) { $('#ansvar').show(); }
                 $('main').html('<div id="'+p+'"></div>');
 
                 // INFO: ALPHABETIC LIST OF THE LOGICS GENERATING EACH PAGE
@@ -162,7 +166,7 @@ function load(p, reload = false) {
                       var nid = $(e.target).closest('.news_block').attr("data-nid");
                       $(e.target).closest('.news_block').remove();
                       grid.refreshItems().layout(true);
-                      $.post('http://noko.dk/server/db.php', {page: "news_remove", id: nid, ver: 1}, function (data) { return; });
+                      $.post('http://noko.dk/server/db.php', {page: "news_remove", id: nid}, function (data) { return; });
                     });
 
                     $('.news_block .edit').click(function (e) {
@@ -245,7 +249,7 @@ function load(p, reload = false) {
                     var l = obj.length;
 
                     for (var i = 0; i < l-2; i++) {
-                      $('#'+p+' .files').append('<a href="http://davidsvane.com/noko/files/'+obj[i+2]+'" target="_blank">'+obj[i+2].split(".")[0]+'</a>');
+                      $('#'+p+' .files').append('<a href="http://noko.dk/files/'+obj[i+2]+'" target="_blank">'+obj[i+2].split(".")[0]+'</a>');
                     }
                   break;
                   case 'food': // INFO: DENNE OG KOMMEN UGES MADPLAN
@@ -257,7 +261,7 @@ function load(p, reload = false) {
                       for (var i=1; i<8; i++) { $('#'+p+' table:last-of-type').append('<tr><td>'+dage[i-1]+'</td><td class="favorite"><div><i class="material-icons" onclick="javascript:toggleFoodFavorite(true,'+week_nr+','+i+')">favorite_border</i><i class="material-icons" onclick="javascript:toggleFoodFavorite(false,'+week_nr+','+i+')">favorite</i></div></td><td>'+e[i]+'</td></tr>'); }
                     });
 
-                    $.post('http://noko.dk/server/db.php', {page: "food_favs", nr: localStorage.getItem('user'), ver: 1}, function (data) {
+                    $.post('http://noko.dk/server/db.php', {page: "food_favs", nr: localStorage.getItem('user')}, function (data) {
 
                       var u_favs = JSON.parse(data)[0];
 
@@ -274,14 +278,15 @@ function load(p, reload = false) {
                     +'<p>Styrelsen består i denne periode af:<br />Skipper: <a href="https://www.facebook.com/profile.php?id=100000334852905" target="_blank">Rasmus (LH5)</a><br />Styrmand: <a href="https://www.facebook.com/mohammed.elsheikh.75" target="_blank">Mohammed (112)</a><br />Telegrafist: <a href="https://www.facebook.com/sigrid.bryndorf" target="_blank">Sigrid (64)</a><br />Bådsmand: <a href="https://www.facebook.com/svendkm" target="_blank">Svend (5)</a><br />Kabysmester: <a href="https://www.facebook.com/mathilde.meile" target="_blank">Mathilde (47)</a><br />Ceremonimester: <a href="https://www.facebook.com/gustav.lindved" target="_blank">Gustav (105)</a><br />Svabergast: <a href="https://www.facebook.com/jens.kjaergaard" target="_blank">Jens (13)</a><br /><br />E-mail-adresse: <a href="mailto:styrelsen@noko.dk">styrelsen@noko.dk</a></p>'
                     +'<p>Ny bestyrelse:<br /><a href="https://www.facebook.com/patriciajnguetsop" target="_blank">Patricia (32)</a> og <a href="https://www.facebook.com/tobias.b.bergmann" target="_blank">Tobias(63)</a><br />E-mail-adresse: <a href="mailto:bestyrelsen@noko.dk">bestyrelsen@noko.dk</a></p><br />'
                     +'<p>Netværksudvalget består af <a href="https://www.facebook.com/davidsvane" target="_blank">David (95)</a> og <a href="https://www.facebook.com/daniel.hjorth.lund" target="_blank">Daniel (98)</a><br />Kontakt dem hvis der er problemer med netværket.<br />Facebook: <a href="https://www.facebook.com/groups/226877854147487/">Netværksudvalgets Facebookgruppe</a></p><p><a href="http://noko.dk/files/Printer.pdf">Guide til printeren.</a></p>');
-                    obj.forEach(function (e) {
-                      $('#'+p).append('<p>'+e[1]+'</p><br />');
-                    });
-                    $('#'+p).after('<br /><img src="../res/img10.jpg"/>');
                   break;
                   case 'groups': // INFO: LISTE OVER UDVALG STIFTET VED PLENUM SAMT FORMAND
-                    $('#'+p).append('<h1>UDVALG</h1><div class="groups"></div>');
+                    $('#'+p).addClass('r_page');
+                    $('#'+p).append('<h2>Udvalg</h2>');
+                    $('#'+p).append('<div id="r_c_cals"><div id="p_groups"><table><tr><td>Udvalg</td><td>Formand</td><td>Beskrivelse</td></tr></table></div></div>');
 
+                    obj.forEach(function (e) {
+                      $('#p_groups table').append('<tr data-id="'+e.id+'"><td>'+e.title+'</td><td>'+e.leader+'</td><td>'+e.description+'</td></tr>');
+                    });
                   break;
                   case 'guides': // INFO: VEJLEDNINGER TIL OFTE STILLEDE SPØRGSMÅL
                     $('#'+p).append('<i>Klik på en guide herunder for at se indholdet</i>');
@@ -322,69 +327,29 @@ function load(p, reload = false) {
                     });
                   break;
                   case 'plan': // INFO: OVERSIGT OVER ALUMNERNES KØKKENVAGTER
-                    $('#'+p).addClass("cnt_book");
-                    var curr_year = '1994';
-                    var curr_mth = '01';
-                    var curr_week = 0;
-                    var curr_day = 0;
-                    var first_week = 0;
-                    var last_week = 0;
-                    var counter = 32;
-                    var num_weeks = 0;
-                    var shift_cols = {
-                      d1_1: 'rgb(42,120,180)',
-                      d2_1: 'rgb(42,180,240)',
-                      d1_2: 'rgb(180,42,42)',
-                      d2_2: 'rgb(240,42,42)'
-                    };
-                    var shift_names = {
-                      d1_1: 'Opvask',
-                      d2_1: 'Servering',
-                      d1_2: 'Tidlig',
-                      d2_2: 'Sen'
-                    };
-
-                    $('#'+p).append('<br /><br /><div id="explanation"><b><span style="color:'+shift_cols['d1_1']+'">'+shift_names['d1_1']+'evagt (17-20)</span><span style="color:'+shift_cols['d2_1']+'">'+shift_names['d2_1']+'evagt (17-20)</span><span style="color:'+shift_cols['d1_2']+'">'+shift_names['d1_2']+' weekendvagt (8:15-11:30)</span><span style="color:'+shift_cols['d2_2']+'">'+shift_names['d2_2']+' weekendvagt (10-13)</span>');
-                    /*<br /><br /><br /><br /><br /><p>Der er to funktioner der skal udfyldes; servering/anretning og afrydning.<br />Det er muligt at bytte vagter; BYTTEDE VAGTER SKAL NOTERES PÅ SEDLEN I SPISESALEN VED DISKEN.<br />Har du valgt selv at passe din vagt, men er blevet forsinket på din vej hjem til kollegiet/køkkenet, da ring til køkkenet på tlf. nr. 35 27 46 56<br />Er du forsinket kan køkkenet tilkalde en afløser. Tilkaldes en afløser bliver det betragtet som en udeblivelse.<br />UDEBLIVELSE MEDFØRER EN BØDESTRAF PÅ KR 500,00</p></b></div>');*/
+                    $('#'+p).append('<div id="plan_select"><select id="ps_year"></select><select id="ps_month"></select></div><div id="plan_list"></div>');
 
                     obj.forEach(function (e) {
-                      if (curr_year != e.month.substr(0,4) || curr_mth != e.month.substr(5,2)) {
-                        curr_year = e.month.substr(0,4);
-                        curr_mth = e.month.substr(5,2);
-
-                        first_week = weekFromISO(curr_year+'/'+curr_mth+'/01 00:00:00');
-                        counter = dinm[parseInt(curr_mth)-1];
-                        do {
-                          last_week = weekFromISO(curr_year+'/'+curr_mth+'/'+counter+' 00:00:00');
-                          counter--;
-                        } while (date.getTime(curr_year+'/'+curr_mth+'/'+counter+' 00:00:00') == 'NaN');
-                        num_weeks = ((last_week - first_week) % 52) + 1;
-
-                        $('#'+p).append('<b>'+mths[parseInt(curr_mth)-1]+' '+curr_year+'</b><br />');
-                        $('#'+p).append('<table id="t_'+curr_year+'_'+curr_mth+'"></table>');
-                        $('#t_'+curr_year+'_'+curr_mth).append('<tr><td></td><td>Mandag</td><td>Tirsdag</td><td>Onsdag</td><td>Torsdag</td><td>Fredag</td><td>Lørdag</td><td>Søndag</td></tr>');
-                        for (var i = num_weeks; i > 0; i--) {
-                          curr_week = last_week - (i - 1);
-                          $('#t_'+curr_year+'_'+curr_mth).append('<tr class="r_'+curr_week+'"></tr>');
-                          $('#t_'+curr_year+'_'+curr_mth+' .r_'+curr_week).append('<td>Uge '+curr_week+'</td>');
-                          for (var j = 1; j < 8; j++) {
-                            $('#t_'+curr_year+'_'+curr_mth+' .r_'+curr_week).append('<td class="c_'+j+'"></td>');
-                          }
-                        }
+                      if ($('#ps_year option[value="'+e.year+'"]').length == 0) {
+                        $('#ps_year').append('<option value="'+e.year+'">'+e.year+'</option>')
                       }
-
-                      curr_day = ('00'+e.day).substr(-2);
-                      curr_week = weekFromISO(curr_year+'/'+curr_mth+'/'+curr_day+' 00:00:00');
-                      curr_day = new Date(curr_year+'/'+curr_mth+'/'+curr_day+' 00:00:00');
-                      curr_day = curr_day.getDay();
-                      if (curr_day == 0) { curr_day += 7; }
-
-                      $('#t_'+curr_year+'_'+curr_mth+' .r_'+curr_week+' .c_'+curr_day).append('<p style="color:'+shift_cols['d1_'+e.type]+'" title="'+shift_names['d1_'+e.type]+'">'+e.d1+'</p><p style="color:'+shift_cols['d2_'+e.type]+'" title="'+shift_names['d2_'+e.type]+'">'+e.d2+'</p>');
+                      if ($('#ps_month option[value="'+e.month+'"]').length == 0) {
+                        $('#ps_month').append('<option value="'+e.month+'">'+mths[parseInt(e.month)-1]+'</option>')
+                      }
                     });
+
+                    $('#ps_year').change(function (e) { loadDuty(); });
+                    $('#ps_month').change(function (e) { loadDuty(); });
+                    loadDuty();
                   break;
                   case 'posts': // INFO: LISTE OVER TILLIDSHVERV
-                    $('#'+p).append('<h1>TILLIDSHVERV</h1><div class="posts"></div>');
+                    $('#'+p).addClass('r_page');
+                    $('#'+p).append('<h2>Tillidshverv</h2>');
+                    $('#'+p).append('<div id="r_c_cals"><div id="p_posts"><table><tr><td>Hverv</td><td>Besidder</td><td>Beskrivelse</td></tr></table></div></div>');
 
+                    obj.forEach(function (e) {
+                      $('#p_posts table').append('<tr data-id="'+e.id+'"><td>'+e.title+'</td><td>'+e.who+'</td><td>'+e.description+'</td></tr>');
+                    });
                   break;
                   case 'stem': // INFO: AFSTEMNINGSSYSTEM TIL PLENUM
                     var setup = ['For/Imod','En af Flere','Flere af Flere','Resultat'];
@@ -427,7 +392,7 @@ function load(p, reload = false) {
                     $('#v_cnt .v_'+curr).append('<h2>'+setup[curr]+'</h2><select><option value="null" selected>Vælg afstemning</option></select><div id="v_res"></div>');
                     $('#v_cnt .v_'+curr+' select').change(function () { pollResult( $(this).val() ); });
 
-                    $.post('http://noko.dk/server/db.php', {page: 'stem_all', nr: localStorage.getItem('user'), ver: 1}, function (data) {
+                    $.post('http://noko.dk/server/db.php', {page: 'stem_all', nr: localStorage.getItem('user')}, function (data) {
                       var results = JSON.parse(data)[0];
                       results.forEach(function (e) {
                         $('#v_cnt .v_'+curr+' > select').append('<option value="'+e.id+'">'+e.id+': '+JSON.parse(e.question)[0]+'</option>');
@@ -441,7 +406,7 @@ function load(p, reload = false) {
                     var variant = ["", "Forår", "Efterår"];
 
                     for (var i = 1; i < l-1; i++) {
-                      $('#'+p+' .summaries').append('<a href="http://davidsvane.com/noko/plenum/'+obj[l-i]+'" target="_blank">Referat<br />'+obj[l-i].substr(7,4)+' '+variant[parseInt(obj[l-i].substr(12,1))]+'</a>');
+                      $('#'+p+' .summaries').append('<a href="http://noko.dk/plenum/'+obj[l-i]+'" target="_blank">Referat<br />'+obj[l-i].substr(7,4)+' '+variant[parseInt(obj[l-i].substr(12,1))]+'</a>');
                     }
                   break;
 
@@ -469,12 +434,19 @@ function load(p, reload = false) {
                     $('#'+p).append('<b>Nuværende beboere</b>');
 
                     var gangs = ["Stuen Nord", "1. Nord", "2. Nord", "3. Nord", "4. Nord", "5. Nord", "Stuen Syd", "1. Syd", "2. Syd", "3. Syd", "4. Syd", "5. Syd"];
-                    var gang = {1:0, 3:0, 5:0, 7:0, 9:0, 11:0, 13:0, 15:0, 17:0, 19:0, 21:0, 23:0, 25:1, 27:1, 29:1, 31:1, 33:1, 35:1, 37:1, 39:1, 41:1, 43:2, 45:2, 47:2, 49:2, 51:2, 53:2, 55:2, 57:2, 59:2, 61:2, 63:2, 65:2, 67:3, 69:3, 71:3, 73:3, 75:3, 77:3, 79:3, 81:3, 83:3, 85:3, 87:3, 89:3, 91:3, 93:3, 95:3, 97:4, 99:4, 101:4, 103:4, 105:4, 107:4, 109:4, 111:4, 113:4, 115:4, 117:4, 119:4, 121:4, 123:4, 125:4, 127:5, 129:5, 131:5, 133:5, 135:5, 137:5, 139:5, 2:6, 4:6, 6:6, 8:6, 10:6, 12:6, 14:6, 16:6, 20:7, 22:7, 24:7, 26:7, 28:7, 30:7, 32:7, 34:7, 36:7, 38:7, 40:7, 42:7, 44:8, 46:8, 48:8, 50:8, 52:8, 54:8, 56:8, 58:8, 60:8, 62:8, 64:8, 66:8, 68:9, 70:9, 72:9, 74:9, 76:9, 78:9, 80:9, 82:9, 84:9, 86:9, 88:9, 90:9, 92:10, 94:10, 96:10, 98:10, 100:10, 102:10, 104:10, 106:10, 108:10, 110:10, 112:10, 114:10, 116:11, 118:11, 120:11, 122:11};
+                    var gang = {1:0, 3:0, 5:0, 7:0, 9:0, 11:0, 13:0, 15:0, 17:0, 19:0, 21:0, 23:0, 25:1, 27:1, 29:1, 31:1, 33:1, 35:1, 37:1, 39:1, 41:1, 43:2, 45:2, 47:2, 49:2, 51:2, 53:2, 55:2, 57:2, 59:2, 61:2, 63:2, 65:2, 67:3, 69:3, 71:3, 73:3, 75:3, 77:3, 79:3, 81:3, 83:3, 85:3, 87:3, 89:3, 91:3, 93:3, 95:3, 97:4, 99:4, 101:4, 103:4, 105:4, 107:4, 109:4, 111:4, 113:4, 115:4, 117:4, 119:4, 121:4, 123:4, 125:4, 127:5, 129:5, 131:5, 133:5, 135:5, 137:5, 139:5, 2:6, 4:6, 6:6, 8:6, 10:6, 12:6, 14:6, 16:6, 20:7, 22:7, 24:7, 26:7, 28:7, 30:7, 32:7, 34:7, 36:7, 38:7, 40:7, 42:7, 44:8, 46:8, 48:8, 50:8, 52:8, 54:8, 56:8, 58:8, 60:8, 62:8, 64:8, 66:8, 68:9, 70:9, 72:9, 74:9, 76:9, 78:9, 80:9, 82:9, 84:9, 86:9, 88:9, 90:9, 92:10, 94:10, 96:10, 98:10, 100:10, 102:10, 104:10, 106:10, 108:10, 110:10, 112:10, 114:10, 116:11, 118:11, 120:11, 122:11, LSS:6, L2N:2, L5N:5};
 
                     gangs.forEach(function (g, i) { $('#'+p).append('<div class="_'+i+'"><b>'+g+'</b></div>') });
 
                     obj.forEach(function (e) {
                       $('#'+p+' ._'+gang[ e.room ]).append('<p onclick="showAlumne('+e.uid+')">'+e['room']+': '+e['first']+' '+e['last']+'</p>');
+                    });
+
+                    $.post('http://noko.dk/server/db.php', {page: 'corridors_aparts', nr: localStorage.getItem('user')}, function (data) {
+                      var aps = JSON.parse(data)[0];
+                      aps.forEach(function (e) {
+                        $('#'+p+' ._'+gang[ e.which ]).append('<p>'+e['which']+': '+e['who']+'</p>');
+                      });
                     });
                   break
                   case 'current': // INFO: ALFABETISK LISTE OVER NUVÆRENDE ALUMNER
@@ -502,7 +474,6 @@ function load(p, reload = false) {
                     });
                   break;
                   case 'history': // INFO: ALUMNEÆNDRINGER PÅ ÅRSBASIS
-                  console.log(data);
                     var c_y = "";
                     var c_s = "";
 
@@ -782,10 +753,10 @@ function load(p, reload = false) {
                     // INFO: ADDING ROOM NUMBERS TO RESERVED TIMES
                     obj.forEach(function (e) {
                       week_id = weekFromISO(e['week'].replace(/-/g,'/')) - curr_week;
-                      if (adm || e['room'] == user_room) {
-                        $('#'+p+' .d_'+week_id+' .t_'+(parseInt(e['nr'])-1)+' .r_'+(parseInt(e['time'])+1)+' .c_'+e['day']).html('<a id="b_'+e['id']+'" class="owner" onclick="javascript:removeLaundry('+e['id']+')">'+e['room']+'</a>');
+                      if (adm || e['user'] == user_room) {
+                        $('#'+p+' .d_'+week_id+' .t_'+(parseInt(e['nr'])-1)+' .r_'+(parseInt(e['time'])+1)+' .c_'+e['day']).html('<a id="b_'+e['id']+'" class="owner" onclick="javascript:removeLaundry('+e['id']+')">'+e['user']+'</a>');
                       } else {
-                        $('#'+p+' .d_'+week_id+' .t_'+(parseInt(e['nr'])-1)+' .r_'+(parseInt(e['time'])+1)+' .c_'+e['day']).text(e['room']);
+                        $('#'+p+' .d_'+week_id+' .t_'+(parseInt(e['nr'])-1)+' .r_'+(parseInt(e['time'])+1)+' .c_'+e['day']).text(e['user']);
                       }
                     });
 
@@ -969,8 +940,96 @@ function load(p, reload = false) {
                   break;
 
 
+                  // INFO: SIDER FOR ANSVARSHAVENDE
+                  case 'r_apart': // INFO: OPDATERING AF LEJLIGHEDSBEBOERE
+                    var aparts = {lss: "Stuen Syd", l2n: "2. Nord", l5n: "5. Nord"};
+
+                    $('#'+p).addClass("r_page");
+                    $('#'+p).append('<h2>Lejlighedsbeboere</h2>');
+
+                    obj.forEach(function (e) {
+                      $('#'+p).append('<div><h3>'+aparts[e.which.toLowerCase()]+'</h3><input data-l="'+e.which+'" type="text" value="'+e.who+'"/></div>');
+                    });
+
+                    $('#'+p).append('<a onclick="javascript:updateAparts()">Gem informationer</a>');
+                  break;
+                  case 'r_cal': // INFO: OPDATERING AF FESTKALENDER
+                    var year = date.getFullYear();
+
+                    $('#'+p).addClass("r_page");
+                    $('#'+p).append('<h2>Festkalender</h2>');
+
+                    $('#'+p).append('<div id="selector"><select id="r_c_year"></select></div><div class="rc_adder"><form action="javascript:addCal()"><input id="r_c_date" placeholder="Tidspunkt (yyyy-mm-dd)" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" maxlength="10"/><input id="r_c_name" placeholder="Titel på event"/><input id="r_c_who" placeholder="Arrangører"/><input class="btn" type="submit" value="Tilføj event"/></form></div><div id="r_c_cals"></div>');
+                    $('#selector select').change(function (e) {
+                      $('#r_c_cals > div').hide();
+                      $('#cal_'+$(this).val()).show();
+                    });
+
+                    $('#r_c_year').append('<option value="'+year+'">'+year+'</option><option value="'+(year+1)+'">'+(year+1)+'</option>');
+                    $('#r_c_cals').append('<div id="cal_'+year+'"><table><tr><td>Dato</td><td>Hvad</td><td>Hvem</td><td></td></tr></table></div><div id="cal_'+(year+1)+'"><table><tr><td>Dato</td><td>Hvad</td><td>Hvem</td><td></td></tr></table></div>');
+
+                    obj.forEach(function (e) {
+                      $('#cal_'+String(e.date).substring(0,4)+' table').append('<tr data-id="'+e.id+'"><td>'+e.date.substring(0,10)+'</td><td>'+e.name+'</td><td>'+e.who+'</td><td><i class="material-icons edit">edit</i><i class="material-icons delete">delete</i></td></tr>');
+                    });
+
+                    $('#r_c_cals .edit').click(function (e) {
+                      editCal(
+                        $(this).closest("tr").attr("data-id"),
+                        $(this).closest("tr").find("td:nth-child(1)").text(),
+                        $(this).closest("tr").find("td:nth-child(2)").text(),
+                        $(this).closest("tr").find("td:nth-child(3)").text()
+                      );
+                    });
+                    $('#r_c_cals .delete').click(function (e) { removeCal($(this).closest("tr").attr("data-id")); });
+                  break;
+                  case 'r_groups': // INFO: OPDATERING AF UDVALG
+                    $('#'+p).addClass("r_page");
+                    $('#'+p).append('<h2>Udvalg</h2>');
+
+                    $('#'+p).append('<div class="rc_adder"><form action="javascript:addGroup()"><input id="r_c_name" placeholder="Titel på udvalg"/><input id="r_c_who" placeholder="Formand"/><input id="r_c_desc" placeholder="Beskrivelse"/><input class="btn" type="submit" value="Tilføj udvalg"/></form></div><div id="r_c_cals"></div>');
+
+                    $('#r_c_cals').append('<div id="groups"><table><tr><td>Udvalg</td><td>Formand</td><td>Beskrivelse</td><td></td></tr></table></div>');
+
+                    obj.forEach(function (e) {
+                      $('#groups table').append('<tr data-id="'+e.id+'"><td>'+e.title+'</td><td>'+e.leader+'</td><td>'+e.description+'</td><td><i class="material-icons edit">edit</i><i class="material-icons delete">delete</i></td></tr>');
+                    });
+
+                    $('#r_c_cals .edit').click(function (e) {
+                      editGroup(
+                        $(this).closest("tr").attr("data-id"),
+                        $(this).closest("tr").find("td:nth-child(1)").text(),
+                        $(this).closest("tr").find("td:nth-child(2)").text(),
+                        $(this).closest("tr").find("td:nth-child(3)").text()
+                      );
+                    });
+                    $('#r_c_cals .delete').click(function (e) { removeGroup($(this).closest("tr").attr("data-id")); });
+                  break;
+                  case 'r_posts': // INFO: OPDATERING AF TILLIDSHVERV
+                    $('#'+p).addClass("r_page");
+                    $('#'+p).append('<h2>Tillidshverv</h2>');
+
+                    $('#'+p).append('<div class="rc_adder"><form action="javascript:addPost()"><input id="r_c_name" placeholder="Titel på hverv"/><input id="r_c_who" placeholder="Besidder"/><input id="r_c_desc" placeholder="Beskrivelse"/><input class="btn" type="submit" value="Tilføj hverv"/></form></div><div id="r_c_cals"></div>');
+
+                    $('#r_c_cals').append('<div id="posts"><table><tr><td>Hverv</td><td>Besidder</td><td>Beskrivelse</td><td></td></tr></table></div>');
+
+                    obj.forEach(function (e) {
+                      $('#posts table').append('<tr data-id="'+e.id+'"><td>'+e.title+'</td><td>'+e.who+'</td><td>'+e.description+'</td><td><i class="material-icons edit">edit</i><i class="material-icons delete">delete</i></td></tr>');
+                    });
+
+                    $('#r_c_cals .edit').click(function (e) {
+                      editGroup(
+                        $(this).closest("tr").attr("data-id"),
+                        $(this).closest("tr").find("td:nth-child(1)").text(),
+                        $(this).closest("tr").find("td:nth-child(2)").text(),
+                        $(this).closest("tr").find("td:nth-child(3)").text()
+                      );
+                    });
+                    $('#r_c_cals .delete').click(function (e) { removeGroup($(this).closest("tr").attr("data-id")); });
+                  break;
+
+
                   // INFO: ADMINISTRATORSIDER
-                  case 'a_alumner':
+                  case 'a_alumner': // INFO: CREATING USERS AND EDITING USER DATA
                     var sexi = ["Mand","Kvinde"];
                     $('#'+p).addClass("admin_page");
 
@@ -981,6 +1040,7 @@ function load(p, reload = false) {
                     $('#alumni_list').change(function (e) { fetchAlumne(); });
                     obj.forEach(function (e) { $('#selector select').append('<option value="'+e.uid+'">'+e.first+' '+e.last+' ('+e.room+')</option>'); });
                     $('#selector').append('<a onclick="javascript:updateAlumne()">Gem informationer</a>');
+                    $('#selector').append('<a id="a_deactivator" class="not-shown" onclick="javascript:deactivateAlumne()">Deaktiver alumne</a>');
 
                     // INFO: ADD USER INFO REGION WITH THE 10 NEEDED FIELDS INCLUDING FILLING OPTIONS IN
                     $('#'+p).append('<div id="ainfo"></div>');
@@ -1003,7 +1063,7 @@ function load(p, reload = false) {
                     // INFO: AUTOMATIC MD5 ENCRYPTION ON PASSWORD FIELD
                     $('.ai_pass input').change(function (e) { $(this).val() == "" ? $(this).val("") : $(this).val(MD5( $(this).val() )); });
                   break;
-                  case 'a_laundry':
+                  case 'a_laundry': // INFO: PULLING LAUNDRY ACCOUNTING LISTS FROM THE DB
                     var years = date.getFullYear() - 2018; // INFO: THE NEW INTRANET WAS DEPLOYED IN 2019 AND COUNTING THEREFORE STARTS HERE
                     var last_week = weekFromISO(date.toISOString()) - 2;
                     $('#'+p).addClass("admin_page");
@@ -1026,7 +1086,7 @@ function load(p, reload = false) {
 
                     $('#'+p).append('<br /><br /><div id="a_cnt"></div>');
                   break;
-                  case 'a_lists':
+                  case 'a_lists': // INFO: PULLING USER DATA INTO CSV FILES
                     $('#'+p).append('<h1>EXPORTER ALUMNELISTE</h1><a href="javascript:listsAllNone()" id="l_allnone">Alle / ingen</a><form id="l_form" action="javascript:generateList()"></form>')
 
                     var options = ['first','last','room','nr','status','study','mail','phone','sex','pass'];
@@ -1072,7 +1132,7 @@ function load(p, reload = false) {
 
                     $('#'+p).append('<a id="downloadFix" download="" href=""></a>');
                   break;
-                  case 'a_madplan':
+                  case 'a_madplan': // INFO: CREATING AND EDITING FOOD MENUS
                     var weeks_to_show = 5;
                     var this_week = weekFromISO(date.toISOString().substr(0,19).replace("T",' ').replace(/-/g,'/'));
                     var weeks = obj.length;
@@ -1107,18 +1167,18 @@ function load(p, reload = false) {
                       $('#fw_'+$('#vr_week').val()).show();
                     });
                   break;
-                  case 'a_madfavs':
+                  case 'a_madfavs': // INFO: PULLING USER RATINGS OF FOOD
                     console.log(obj);
                     $('#'+p).text(data);
                   break;
-                  case 'a_pass':
+                  case 'a_pass': // INFO: LIST OF SYSTEM PASSWORDS
                     $('#'+p).append('<h1>PASSWORDS</h1><h3>Aktive</h3><table class="a_1"><thead><tr><td>Anvendelse</td><td>Brugernavn</td><td>Password</td></tr></thead><tbody></tbody></table><h3>Inaktive</h3><table class="a_0"><thead><tr><td>Anvendelse</td><td>Brugernavn</td><td>Password</td></tr></thead><tbody></tbody></table>');
 
                     obj.forEach(function (e) {
                       $('#'+p+' .a_'+e.active+' tbody').append('<tr><td>'+e.name+'</td><td>'+e.username+'</td><td>'+e.password+'</td></tr>');
                     });
                   break;
-                  case 'a_vagtplan':
+                  case 'a_vagtplan': // INFO: CREATING AND EDITING KITCHEN DUTY LISTS
                     var year = date.getFullYear();
                     var month = date.getMonth();
                     $('#'+p).addClass("admin_page");

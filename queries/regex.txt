@@ -1,0 +1,6 @@
+// MARKERING AF LINJER MED FORMANDSBENÆVNELSER
+(.*?).–.form[a|æ]nd:\s+(.+?)\r\n
+
+
+// FJERN IKKE-MARKEREDE LINJER
+^[^$].*\r\n
